@@ -497,6 +497,15 @@ const Coach = {
     document.getElementById("coachStepName").textContent = "تمّت الصلاة — تقبّل الله منك 🤲";
     document.getElementById("coachHands").textContent = "";
     if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+
+    // إن كنا داخل تطبيق أندرويد، نبلّغه ليفكّ قفل هذه الصلاة.
+    // هذا الإثبات الوحيد الذي لا يُتحايل عليه: أن تصلّي فعلاً.
+    try {
+      if (window.NoorApp && typeof NoorApp.prayerCompleted === "function") {
+        NoorApp.prayerCompleted();
+        document.getElementById("coachHands").textContent = "🔓 فُتح قفل الصلاة";
+      }
+    } catch (e) { /* خارج التطبيق — لا شيء نفعله */ }
   },
 
   renderStep() {
