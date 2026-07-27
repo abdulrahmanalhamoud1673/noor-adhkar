@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#06231c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>نور — أذكاري وصلاتي</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=12">
+</head>
+<body>
+
+<!-- ══════════ شاشة قفل الصلاة ══════════ -->
+<div id="prayerLock" class="lock-screen hidden">
+  <div class="lock-glow"></div>
+  <div class="lock-content">
+    <div class="lock-icon">🕌</div>
+    <div class="lock-label">حان الآن وقت صلاة</div>
+    <h1 id="lockPrayerName">الظهر</h1>
+    <p class="lock-verse">﴿ إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوْقُوتًا ﴾</p>
+
+    <div class="lock-timer">
+      <div id="lockCountdown">15:00</div>
+      <span>الوقت المتبقي للقفل</span>
+    </div>
+
+    <div class="lock-blocked">
+      <div class="lock-blocked-title">🚫 تطبيقات محظورة الآن</div>
+      <div id="lockBlockedList" class="lock-blocked-list"></div>
+    </div>
+
+    <button id="lockDoneBtn" class="btn btn-gold btn-lg">صلّيت — افتح التطبيق ✓</button>
+    <button id="lockEmergency" class="btn-ghost">استمر بالضغط 5 ثوانٍ للخروج الاضطراري</button>
+  </div>
+</div>
+
+<!-- ══════════ الشريط العلوي ══════════ -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <span class="brand-mark">☾</span>
+      <div>
+        <div class="brand-name">نــور</div>
+        <div class="brand-sub" id="hijriDate">—</div>
+      </div>
+    </div>
+    <button id="settingsBtn" class="icon-btn" aria-label="الإعدادات">⚙️</button>
+  </div>
+</header>
+
+<main id="app">
+
+<!-- ══════════ صفحة: الرئيسية ══════════ -->
+<section class="page active" id="page-home">
+  <div class="hero card-glass">
+    <div class="hero-label">الصلاة القادمة</div>
+    <h2 id="nextPrayerName">—</h2>
+    <div class="hero-time" id="nextPrayerTime">--:--</div>
+    <div class="countdown-ring">
+      <div class="countdown" id="countdown">--:--:--</div>
+      <div class="countdown-sub">حتى الأذان</div>
+    </div>
+    <div class="hero-loc" id="locationLabel">📍 عمّان، الأردن</div>
+  </div>
+
+  <div class="times-grid" id="timesGrid"></div>
+
+  <div class="quick-row">
+    <button class="quick-card" data-adhkar="sabah">
+      <span class="quick-icon">🌅</span>
+      <span class="quick-title">أذكار الصباح</span>
+      <span class="quick-prog" id="progSabah">0%</span>
+    </button>
+    <button class="quick-card" data-adhkar="masaa">
+      <span class="quick-icon">🌙</span>
+      <span class="quick-title">أذكار المساء</span>
+      <span class="quick-prog" id="progMasaa">0%</span>
+    </button>
+  </div>
+
+  <button class="last-read hidden" id="lastReadCard">
+    <span class="last-read-icon">🔖</span>
+    <div>
+      <div class="last-read-label">أكمل ما قرأت</div>
+      <div class="last-read-name" id="lastReadName">—</div>
+      <div class="last-read-ayah" id="lastReadAyah">—</div>
+    </div>
+    <span class="quran-cta-arrow">‹</span>
+  </button>
+
+  <button class="quran-cta" data-goto="page-quran">
+    <span class="quran-cta-icon">📖</span>
+    <div>
+      <div class="quran-cta-title">القرآن الكريم</div>
+      <div class="quran-cta-sub">استمع بصوت خمسة من أجمل القرّاء</div>
+    </div>
+    <span class="quran-cta-arrow">‹</span>
+  </button>
+
+  <div class="card-glass streak-card">
+    <div class="streak-head">
+      <span>🔥 سلسلة الأيام</span>
+      <strong id="streakDays">0 يوم</strong>
+    </div>
+    <div class="streak-bar"><div id="streakFill"></div></div>
+    <p class="streak-note" id="streakNote">أكمل أذكار الصباح والمساء اليوم لتبدأ سلسلتك.</p>
+  </div>
+
+  <button id="testLockBtn" class="btn btn-outline full">تجربة قفل الصلاة الآن</button>
+</section>
+
+<!-- ══════════ صفحة: الأذكار (صباح + مساء) ══════════ -->
+<section class="page" id="page-adhkar">
+  <div class="page-head">
+    <h2 id="adhkarTitle">🌅 أذكار الصباح</h2>
+    <p id="adhkarWhen">وقتها: من بعد الفجر إلى شروق الشمس (ويمتد إلى الظهر)</p>
+  </div>
+
+  <div class="segmented" id="adhkarSwitch">
+    <button class="seg active" data-type="sabah"><span>🌅</span> الصباح</button>
+    <button class="seg" data-type="masaa"><span>🌙</span> المساء</button>
+    <div class="seg-pill" id="segPill"></div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar"><div id="barAdhkar"></div></div>
+    <span id="cntAdhkar">0 / 0</span>
+  </div>
+
+  <div class="dhikr-list" id="listAdhkar"></div>
+  <button class="btn btn-outline full reset-btn" id="resetAdhkar">إعادة تصفير العدّادات</button>
+</section>
+
+<!-- ══════════ صفحة: القرآن الكريم ══════════ -->
+<section class="page" id="page-quran">
+  <div class="page-head">
+    <h2>📖 القرآن الكريم</h2>
+    <p>اختر القارئ ثم السورة — استمع أو اقرأ</p>
+  </div>
+
+  <div class="reciters-wrap">
+    <button class="rec-arrow rec-right" id="recRight" aria-label="السابق">›</button>
+    <div class="reciters" id="recitersRow"></div>
+    <button class="rec-arrow rec-left" id="recLeft" aria-label="التالي">‹</button>
+  </div>
+
+  <div class="quran-search">
+    <input type="search" id="surahSearch" placeholder="ابحث عن سورة…" autocomplete="off">
+  </div>
+
+  <div class="surah-list" id="surahList"></div>
+</section>
+
+<!-- ══════════ مشغّل التلاوة ══════════ -->
+<div id="player" class="player hidden">
+  <div class="player-grip"></div>
+  <div class="player-head">
+    <div class="player-art" id="playerArt">📖</div>
+    <div class="player-meta">
+      <div class="player-surah" id="playerSurah">—</div>
+      <div class="player-reciter" id="playerReciter">—</div>
+    </div>
+    <button class="icon-btn" id="playerClose" aria-label="إغلاق">✕</button>
+  </div>
+
+  <div class="player-seek">
+    <span id="playerCur">0:00</span>
+    <input type="range" id="playerBar" min="0" max="1000" value="0">
+    <span id="playerDur">0:00</span>
+  </div>
+
+  <div class="player-controls">
+    <button id="playerPrev" aria-label="السورة السابقة">⏮</button>
+    <button id="playerBack" aria-label="رجوع ١٠ ثوانٍ">↺</button>
+    <button id="playerPlay" class="play-main" aria-label="تشغيل">▶</button>
+    <button id="playerFwd" aria-label="تقدّم ١٠ ثوانٍ">↻</button>
+    <button id="playerNext" aria-label="السورة التالية">⏭</button>
+  </div>
+
+  <button class="btn btn-outline full" id="readSurah">📖 اقرأ نص السورة</button>
+  <div class="surah-text hidden" id="surahText"></div>
+</div>
+<div id="playerBackdrop" class="player-backdrop hidden"></div>
+
+<!-- ══════════ وضع المصحف: قراءة مع تلوين الآية ══════════ -->
+<div id="mushaf" class="mushaf hidden">
+  <div class="mushaf-top">
+    <button class="icon-btn" id="mushafClose" aria-label="إغلاق">✕</button>
+    <div class="mushaf-title">
+      <div id="mushafSurah">—</div>
+      <div id="mushafReciter">—</div>
+    </div>
+    <button class="icon-btn" id="mushafMenu" aria-label="خيارات">⚙</button>
+  </div>
+
+  <div class="mushaf-panel hidden" id="mushafPanel">
+    <div class="mp-row">
+      <span>حجم الخط</span>
+      <div class="mp-stepper">
+        <button id="fontMinus">−</button>
+        <b id="fontVal">23</b>
+        <button id="fontPlus">+</button>
+      </div>
+    </div>
+    <div class="mp-row">
+      <span>الانتقال للسورة التالية تلقائياً</span>
+      <label class="switch"><input type="checkbox" id="mAutoNext" checked><span class="slider"></span></label>
+    </div>
+    <div class="mp-row mp-nav">
+      <button id="mSurahPrev" class="btn btn-outline">السورة السابقة</button>
+      <button id="mSurahNext" class="btn btn-outline">السورة التالية</button>
+    </div>
+    <p class="mp-hint">اضغط على أي آية لتبدأ التلاوة منها</p>
+  </div>
+
+  <div class="mushaf-page" id="mushafBody"></div>
+
+  <div class="mushaf-bar">
+    <div class="mushaf-ayah-label" id="mAyahLabel">—</div>
+    <div class="mushaf-buttons">
+      <button id="mSpeed" class="mb-small">1×</button>
+      <button id="mPrev" aria-label="الآية السابقة">⏮</button>
+      <button id="mPlay" class="play-main" aria-label="تشغيل">▶</button>
+      <button id="mNext" aria-label="الآية التالية">⏭</button>
+      <button id="mRepeat" class="mb-small" aria-label="تكرار">🔁</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ صفحة: تعلّم الصلاة ══════════ -->
+<section class="page" id="page-learn">
+  <div class="page-head">
+    <h2>🕌 طريقة الصلاة</h2>
+    <p>خطوة بخطوة — اضغط على أي خطوة لتفتحها</p>
+  </div>
+
+  <div class="rakaat-info card-glass">
+    <div class="rakaat-title">عدد ركعات كل صلاة</div>
+    <div class="rakaat-grid">
+      <div><span>الفجر</span><strong>2</strong></div>
+      <div><span>الظهر</span><strong>4</strong></div>
+      <div><span>العصر</span><strong>4</strong></div>
+      <div><span>المغرب</span><strong>3</strong></div>
+      <div><span>العشاء</span><strong>4</strong></div>
+    </div>
+  </div>
+
+  <div class="steps-list" id="stepsList"></div>
+
+  <button class="btn btn-gold full" data-goto="page-coach">🕋 صلِّ الآن مع الشيخ بالكاميرا</button>
+</section>
+
+<!-- ══════════ صفحة: صلِّ مع الشيخ ══════════ -->
+<section class="page" id="page-coach">
+  <div class="page-head">
+    <h2>🕋 صلِّ مع الشيخ</h2>
+    <p>الكاميرا تتابع وضعية جسمك ويديك، والشيخ يتلو معك خطوة بخطوة</p>
+  </div>
+
+  <div class="coach-intro card-glass" id="coachIntro">
+    <label class="pick-label">أي صلاة تريد أن تصلّي الآن؟</label>
+    <div class="prayer-pick" id="prayerPick">
+      <button data-rakaat="2" data-name="الفجر">الفجر<span>٢ ركعات</span></button>
+      <button data-rakaat="4" data-name="الظهر">الظهر<span>٤ ركعات</span></button>
+      <button data-rakaat="4" data-name="العصر">العصر<span>٤ ركعات</span></button>
+      <button data-rakaat="3" data-name="المغرب">المغرب<span>٣ ركعات</span></button>
+      <button data-rakaat="4" data-name="العشاء">العشاء<span>٤ ركعات</span></button>
+    </div>
+
+    <div class="coach-steps">
+      <div><b>1</b> ضع الهاتف على الأرض أو كرسي <b>من جانبك</b> — لا أمامك.</div>
+      <div><b>2</b> ابتعد مترين تقريباً حتى يظهر جسمك من الرأس إلى القدم.</div>
+      <div><b>3</b> إضاءة جيدة وخلفية غير مزدحمة.</div>
+      <div><b>4</b> كبّر — والتطبيق يتابعك حتى التسليم.</div>
+    </div>
+
+    <p class="privacy-note">🔒 كل التحليل داخل جهازك. لا تُرسل صورة ولا فيديو إلى أي مكان.</p>
+    <button id="startCoach" class="btn btn-gold btn-lg full">ابدأ الصلاة</button>
+  </div>
+
+  <div class="coach-stage hidden" id="coachStage">
+    <div class="video-wrap">
+      <video id="camVideo" playsinline autoplay muted></video>
+      <canvas id="camCanvas"></canvas>
+      <div class="pose-badge" id="poseBadge">جارٍ التحضير…</div>
+      <div class="conf-bar"><div id="confFill"></div></div>
+    </div>
+
+    <div class="coach-row">
+      <div class="sheikh-box card-glass">
+        <div class="sheikh-label">الشيخ</div>
+        <div class="sheikh-stage" id="sheikhStage"></div>
+        <div class="sheikh-pose" id="sheikhPoseName">قيام</div>
+      </div>
+
+      <div class="coach-panel card-glass">
+        <div class="coach-rakah" id="coachRakah">—</div>
+        <h3 id="coachStepName">—</h3>
+        <p class="coach-hands" id="coachHands">—</p>
+        <div class="coach-reps" id="coachReps"></div>
+      </div>
+    </div>
+
+    <div class="coach-say" id="coachSay">—</div>
+
+    <div class="coach-controls">
+      <button id="prevStep" class="btn btn-outline">◀ السابق</button>
+      <button id="stopCoach" class="btn btn-danger">إيقاف</button>
+      <button id="nextStep" class="btn btn-outline">التالي ▶</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ صفحة: الإعدادات ══════════ -->
+<section class="page" id="page-settings">
+  <div class="page-head"><h2>⚙️ الإعدادات</h2></div>
+
+  <div class="card-glass setting-group">
+    <h3>📍 موقعك</h3>
+    <select id="citySelect"></select>
+    <button id="useGPS" class="btn btn-outline full">📡 استخدم موقعي الحالي (أدق)</button>
+  </div>
+
+  <div class="card-glass setting-group">
+    <h3>🔒 قفل الصلاة</h3>
+    <div class="toggle-row">
+      <span>اقفل الشاشة عند الأذان</span>
+      <label class="switch"><input type="checkbox" id="lockEnabled" checked><span class="slider"></span></label>
+    </div>
+    <label>مدة القفل</label>
+    <input type="range" id="lockDuration" min="5" max="30" step="5" value="15">
+    <div class="range-val"><span id="lockDurationVal">15</span> دقيقة</div>
+
+    <label>التطبيقات التي أريد حظرها</label>
+    <div class="apps-grid" id="appsGrid"></div>
+
+    <div class="info-box warn">
+      <b>⚠️ اقرأ هذا — القفل هنا داخل التطبيق فقط</b>
+      <p>هذه الشاشة تقفل <b>تطبيق نور نفسه</b> عند الأذان. لكنها <b>لا تستطيع</b> منعك من فتح إنستغرام أو تيك توك، لأن المتصفح ممنوع أمنياً من التحكم بتطبيقات أخرى — وهذا قيد في أندرويد نفسه وليس نقصاً في البرمجة.</p>
+    </div>
+
+    <div class="info-box good">
+      <b>✅ الحظر الحقيقي — جاهز وينتظرك</b>
+      <p>بنيتُ لك تطبيق أندرويد اسمه <b>نور — قفل الصلاة</b> يفعل تماماً ما تريد: تفتح إنستغرام وقت الصلاة فيرجّعك فوراً ولا يفتح حتى تضغط «صلّيت».</p>
+      <p>مكانه: مجلد <b>noor-blocker</b> بجانب مجلد التطبيق. افتح ملف <b>README.md</b> بداخله وفيه الخطوات بالعربي.</p>
+      <p>لم تُثبّته بعد — قل لي وأساعدك خطوة بخطوة.</p>
+    </div>
+  </div>
+
+  <div class="card-glass setting-group">
+    <h3>🔊 الصوت</h3>
+    <div class="toggle-row">
+      <span>نطق الأذكار والأدعية</span>
+      <label class="switch"><input type="checkbox" id="voiceEnabled" checked><span class="slider"></span></label>
+    </div>
+  </div>
+
+  <details class="card-glass setting-group adv">
+    <summary>إعدادات متقدمة</summary>
+
+    <label>طريقة حساب أوقات الصلاة</label>
+    <select id="methodSelect"></select>
+
+    <label>مذهب العصر</label>
+    <select id="asrSelect">
+      <option value="standard">الجمهور (الشافعي/المالكي/الحنبلي)</option>
+      <option value="hanafi">الحنفي</option>
+    </select>
+
+    <label>سرعة الصوت</label>
+    <input type="range" id="voiceRate" min="0.5" max="1.2" step="0.1" value="0.8">
+
+    <label>صوت القارئ الآلي</label>
+    <select id="voiceSelect"></select>
+    <button id="testVoice" class="btn btn-outline full">🔊 اختبر الصوت</button>
+
+    <label>تنبيه الأذان</label>
+    <button id="enableNotif" class="btn btn-outline full">تفعيل تنبيه الأذان</button>
+    <p class="hint">يجب إبقاء التطبيق مفتوحاً في الخلفية ليعمل التنبيه.</p>
+  </details>
+
+  <details class="card-glass setting-group adv">
+    <summary>مصادر صور القرّاء</summary>
+    <p class="hint">جميع الصور من ويكيميديا كومنز برخص حرة تسمح باستخدامها. ذكر المصدر واجب.</p>
+    <div id="creditsList" class="credits"></div>
+  </details>
+
+  <p class="version">نور — الإصدار 1.0 · صُنع بحب في الأردن 🇯🇴</p>
+</section>
+
+</main>
+
+<!-- ══════════ شريط التنقّل السفلي ══════════ -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-goto="page-home"><span>🏠</span>الرئيسية</button>
+  <button class="nav-btn" data-goto="page-adhkar"><span>📿</span>الأذكار</button>
+  <button class="nav-btn" data-goto="page-quran"><span>📖</span>القرآن</button>
+  <button class="nav-btn" data-goto="page-learn"><span>🕌</span>الصلاة</button>
+  <button class="nav-btn" data-goto="page-coach"><span>🕋</span>صلِّ معي</button>
+</nav>
+
+<div id="toast" class="toast"></div>
+
+<script src="js/data.js?v=12"></script>
+<script src="js/prayertimes.js?v=12"></script>
+<script src="js/app.js?v=12"></script>
+<script src="js/mushaf.js?v=12"></script>
+</body>
+</html>

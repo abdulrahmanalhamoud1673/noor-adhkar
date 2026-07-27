@@ -1,0 +1,8 @@
+# ملفات ويندوز
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# مخرجات مؤقتة
+_raw/
+*.tmp

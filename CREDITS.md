@@ -1,0 +1,44 @@
+# المصادر والحقوق
+
+## صور القرّاء — `reciters/`
+
+جميع الصور مأخوذة من **ويكيميديا كومنز** برخص حرة، وقد قُصّت وصُغّرت للاستخدام كصور مصغّرة داخل التطبيق. الصور المعدّلة تبقى تحت رخصة أصلها.
+
+| الملف | القارئ | المصوّر / الجهة | الرخصة |
+|---|---|---|---|
+| `afs.jpg` | مشاري راشد العفاسي | quranic.ru | Copyrighted free use |
+| `basit.jpg` | عبد الباسط عبد الصمد | Prasar Bharati — وزارة الإعلام الهندية | GODL-India |
+| `sds.jpg` | عبد الرحمن السديس | Prime Minister Office (India) | GODL-India |
+| `maher.jpg` | ماهر المعيقلي | Real avdulmouhd | **CC BY-SA 4.0** |
+| `yasser.jpg` | ياسر الدوسري | MAL MALDIVE | **CC BY-SA 4.0** |
+
+صفحات المصادر:
+
+- <https://commons.wikimedia.org/wiki/File:%D0%9C%D0%B8%D1%88%D0%B0%D1%80%D0%B8_%D0%A0%D0%B0%D1%88%D0%B8%D0%B4.jpg>
+- <https://commons.wikimedia.org/wiki/File:Abdul_Basit_Abdul_Samad_at_Centenary_Celebration_Of_Darul_Uloom_Deoband_1980.jpg>
+- <https://commons.wikimedia.org/wiki/File:Abdul-Rahman_Al-Sudais_(Cropped,_2011).jpg>
+- <https://commons.wikimedia.org/wiki/File:Professor_Maher_Al-Mu%27aiqly.jpg>
+- <https://commons.wikimedia.org/wiki/File:Yasser_Al-Dosari.jpg>
+
+الصورتان المرخّصتان بـ **CC BY-SA 4.0** (`maher.jpg` و `yasser.jpg`) والنسخ المعدّلة منهما تُنشر تحت **نفس الرخصة**:
+<https://creativecommons.org/licenses/by-sa/4.0/>
+
+## التلاوات الصوتية
+
+تُبثّ مباشرة من خوادمها ولا تُخزَّن في هذا المستودع:
+
+- تلاوة السور كاملة — [mp3quran.net](https://mp3quran.net)
+- تلاوة آية بآية — [everyayah.com](https://everyayah.com)
+
+## نصوص القرآن
+
+تُجلب عند الطلب من [alquran.cloud](https://alquran.cloud) بمصحف رواية حفص (quran-uthmani).
+
+## المكتبات
+
+- [MediaPipe Tasks Vision](https://github.com/google-ai-edge/mediapipe) — Apache License 2.0 — لتتبّع وضعية الجسم في مدرّب الصلاة.
+- خطوط [Amiri](https://fonts.google.com/specimen/Amiri) و [Tajawal](https://fonts.google.com/specimen/Tajawal) — SIL Open Font License.
+
+## نصوص الأذكار
+
+من *حصن المسلم*، وخطوات الصلاة على المشهور من صفة صلاة النبي ﷺ.
