@@ -814,6 +814,74 @@ $("prevStep").addEventListener("click", () => window.Coach && window.Coach.go(-1
 $("nextStep").addEventListener("click", () => window.Coach && window.Coach.go(1));
 
 /* ══════════════════════════════════════
+   تحدّي الاستغفار
+   ══════════════════════════════════════ */
+let chPhrase = Store.get("chPhrase", "أَسْتَغْفِرُ اللهَ");
+let chReps = Store.get("chReps", 10);
+
+function initChallengePickers() {
+  const mark = (sel, isOn) =>
+    document.querySelectorAll(sel).forEach(b => b.classList.toggle("on", isOn(b)));
+
+  mark("#dhikrPick button", b => b.dataset.phrase === chPhrase);
+  mark("#repsPick button", b => +b.dataset.reps === chReps);
+
+  document.querySelectorAll("#dhikrPick button").forEach(b => {
+    b.addEventListener("click", () => {
+      chPhrase = b.dataset.phrase;
+      Store.set("chPhrase", chPhrase);
+      mark("#dhikrPick button", x => x.dataset.phrase === chPhrase);
+      vibrate(15);
+    });
+  });
+
+  document.querySelectorAll("#repsPick button").forEach(b => {
+    b.addEventListener("click", () => {
+      chReps = +b.dataset.reps;
+      Store.set("chReps", chReps);
+      mark("#repsPick button", x => +x.dataset.reps === chReps);
+      vibrate(15);
+    });
+  });
+}
+
+$("startChallenge").addEventListener("click", async () => {
+  const btn = $("startChallenge");
+  btn.disabled = true;
+  btn.textContent = "جارٍ تجهيز الكاميرا…";
+  try {
+    if (!window.Challenge) await import("./pushup-challenge.js");
+    await window.Challenge.start(chReps, chPhrase);
+    $("chIntro").classList.add("hidden");
+    $("chStage").classList.remove("hidden");
+  } catch (err) {
+    console.error(err);
+    alert("تعذّر تشغيل الكاميرا أو الميكروفون.\n\n" + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "ابدأ التحدّي";
+  }
+});
+
+$("stopChallenge").addEventListener("click", () => {
+  if (window.Challenge) window.Challenge.stop();
+  $("chStage").classList.add("hidden");
+  $("chIntro").classList.remove("hidden");
+});
+
+/** يفتحه تطبيق أندرويد عبر #challenge=العدد */
+function applyChallengeRequest() {
+  const m = /challenge=(\d+)/.exec(location.hash);
+  if (!m) return;
+  chReps = +m[1];
+  const p = /phrase=([^&]+)/.exec(location.hash);
+  if (p) chPhrase = decodeURIComponent(p[1]);
+  initChallengePickers();
+  goto("page-challenge");
+  $("startChallenge").textContent = "ابدأ لفكّ الحظر";
+}
+
+/* ══════════════════════════════════════
    الإقلاع
    ══════════════════════════════════════ */
 /**
@@ -850,8 +918,10 @@ function boot() {
   });
 
   // تنظيف عامل الخدمة القديم الذي كان يخزّن نسخاً قديمة من الملفات
+  step("تحدّي الاستغفار", initChallengePickers);
   step("تنظيف الذاكرة المخزّنة", cleanupOldCaches);
   step("طلب فكّ القفل", applyLockRequest);
+  step("طلب التحدّي", applyChallengeRequest);
 }
 
 /**

@@ -706,6 +706,51 @@ body.no-scroll { overflow: hidden; }
 }
 .coach-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 9px; }
 
+/* ────────── تحدّي الاستغفار ────────── */
+.dhikr-pick, .reps-pick { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.dhikr-pick button, .reps-pick button {
+  background: rgba(0,0,0,.28); border: 1px solid var(--line); border-radius: 12px;
+  padding: 11px 14px; color: var(--text); font-family: inherit; font-size: 14px;
+  font-weight: 700; cursor: pointer; transition: .2s;
+}
+.reps-pick button { flex: 1; text-align: center; font-size: 16px; }
+.dhikr-pick button:active, .reps-pick button:active { transform: scale(.94); }
+.dhikr-pick button.on, .reps-pick button.on {
+  border-color: var(--gold); background: rgba(212,175,55,.18);
+  color: var(--gold-soft); box-shadow: 0 0 16px -4px var(--gold);
+}
+
+.ch-counter {
+  position: absolute; top: 12px; right: 12px; z-index: 3;
+  background: rgba(0,0,0,.72); backdrop-filter: blur(10px);
+  border: 1px solid var(--gold); border-radius: 14px;
+  padding: 10px 18px; font-size: 22px; font-weight: 800;
+  color: var(--gold-soft); direction: ltr;
+}
+
+.ch-phrase-box { text-align: center; padding: 18px; }
+.ch-label { font-size: 12px; color: var(--gold); margin-bottom: 8px; }
+.ch-phrase {
+  font-family: 'Amiri', serif; font-size: 30px; line-height: 1.7;
+  color: var(--text); margin-bottom: 14px;
+}
+.ch-dots {
+  display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; margin-bottom: 14px;
+}
+.ch-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: rgba(255,255,255,.12); border: 1px solid var(--line); transition: .3s;
+}
+.ch-dot.on { background: var(--emerald); box-shadow: 0 0 12px var(--emerald); }
+.ch-progress { height: 8px; }
+
+.ch-hint {
+  text-align: center; font-size: 15px; color: var(--gold-soft);
+  background: rgba(212,175,55,.08); border: 1px solid var(--line);
+  border-radius: 14px; padding: 14px; margin-bottom: 12px; min-height: 50px;
+  display: flex; align-items: center; justify-content: center;
+}
+
 /* شريط وضع فكّ القفل */
 .verify-banner {
   background: linear-gradient(120deg, rgba(212,175,55,.20), rgba(239,68,68,.10));
