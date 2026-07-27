@@ -40,9 +40,6 @@ const S = {
   method: Store.get("method", "jordan"),
   asr: Store.get("asr", "standard"),
   coords: Store.get("coords", null),
-  lockEnabled: Store.get("lockEnabled", true),
-  lockDuration: Store.get("lockDuration", 15),
-  blockedApps: Store.get("blockedApps", ["instagram", "tiktok", "youtube"]),
   voiceEnabled: Store.get("voiceEnabled", true),
   voiceRate: Store.get("voiceRate", 0.8),
   voiceName: Store.get("voiceName", "")
@@ -170,16 +167,6 @@ function tickCountdown() {
   $("countdown").textContent =
     `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 
-  // إطلاق القفل عند دخول الوقت
-  if (S.lockEnabled && diff < 1.2 && !Lock.active) {
-    const lastFired = Store.get("lastLock", "");
-    const stamp = todayKey() + "_" + next.key;
-    if (lastFired !== stamp) {
-      Store.set("lastLock", stamp);
-      Lock.open(next.key);
-      notify(PRAYER_NAMES[next.key]);
-    }
-  }
 }
 
 /* التاريخ الهجري */
@@ -787,108 +774,6 @@ const Voice = {
 };
 
 /* ══════════════════════════════════════
-   قفل الصلاة
-   ══════════════════════════════════════ */
-const Lock = {
-  active: false,
-  endsAt: 0,
-  wakeLock: null,
-
-  async open(prayerKey) {
-    this.active = true;
-    this.endsAt = Date.now() + S.lockDuration * 60000;
-
-    $("lockPrayerName").textContent = PRAYER_NAMES[prayerKey] || "الصلاة";
-    const blocked = DISTRACTING_APPS.filter(a => S.blockedApps.includes(a.id));
-    $("lockBlockedList").innerHTML = blocked.length
-      ? blocked.map(a => `<span>${a.icon} ${a.name}</span>`).join("")
-      : "<span>لم تختر أي تطبيقات بعد</span>";
-
-    $("prayerLock").classList.remove("hidden");
-    vibrate([200, 100, 200, 100, 400]);
-
-    // منع الشاشة من الإطفاء
-    try {
-      if ("wakeLock" in navigator) this.wakeLock = await navigator.wakeLock.request("screen");
-    } catch {}
-
-    // ملء الشاشة
-    try { await document.documentElement.requestFullscreen(); } catch {}
-
-    this._timer = setInterval(() => this.tick(), 250);
-    this.tick();
-  },
-
-  tick() {
-    const left = Math.max(0, this.endsAt - Date.now());
-    const m = Math.floor(left / 60000);
-    const s = Math.floor((left % 60000) / 1000);
-    $("lockCountdown").textContent = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-    if (left <= 0) this.close();
-  },
-
-  async close() {
-    this.active = false;
-    clearInterval(this._timer);
-    $("prayerLock").classList.add("hidden");
-    if (this.wakeLock) { try { await this.wakeLock.release(); } catch {} this.wakeLock = null; }
-    if (document.fullscreenElement) { try { await document.exitFullscreen(); } catch {} }
-  }
-};
-
-$("lockDoneBtn").addEventListener("click", () => {
-  Lock.close();
-  toast("تقبّل الله منك 🤲");
-});
-
-// الخروج الاضطراري: ضغط مستمر 5 ثوانٍ
-(() => {
-  const btn = $("lockEmergency");
-  let t = null, start = 0;
-  const begin = () => {
-    start = Date.now();
-    t = setInterval(() => {
-      const held = (Date.now() - start) / 1000;
-      btn.textContent = held >= 5
-        ? "أفلت للخروج"
-        : `استمر بالضغط… ${(5 - held).toFixed(1)} ث`;
-      if (held >= 5) { clearInterval(t); t = null; }
-    }, 100);
-  };
-  const end = () => {
-    const held = (Date.now() - start) / 1000;
-    if (t) { clearInterval(t); t = null; }
-    btn.textContent = "استمر بالضغط 5 ثوانٍ للخروج الاضطراري";
-    if (held >= 5) Lock.close();
-  };
-  ["mousedown", "touchstart"].forEach(ev => btn.addEventListener(ev, begin));
-  ["mouseup", "mouseleave", "touchend", "touchcancel"].forEach(ev => btn.addEventListener(ev, end));
-})();
-
-$("testLockBtn").addEventListener("click", () => {
-  const { current } = prayerState();
-  Lock.open(current);
-});
-
-/* ---------- التنبيهات ---------- */
-function notify(prayerName) {
-  if (Notification.permission !== "granted") return;
-  try {
-    new Notification("حان وقت صلاة " + prayerName, {
-      body: "توقّف الآن وأقم الصلاة 🕌",
-      icon: "icon-192.png",
-      vibrate: [300, 150, 300]
-    });
-  } catch {}
-}
-
-$("enableNotif").addEventListener("click", async () => {
-  if (!("Notification" in window)) return toast("جهازك لا يدعم التنبيهات");
-  const p = await Notification.requestPermission();
-  toast(p === "granted" ? "✅ تم تفعيل التنبيهات" : "لم يتم السماح بالتنبيهات");
-});
-
-/* ══════════════════════════════════════
    الإعدادات
    ══════════════════════════════════════ */
 function initSettings() {
@@ -937,36 +822,6 @@ function initSettings() {
       () => toast("تعذّر تحديد الموقع — تأكد من السماح للتطبيق")
     );
   });
-
-  // القفل
-  $("lockEnabled").checked = S.lockEnabled;
-  $("lockEnabled").addEventListener("change", e => saveS("lockEnabled", e.target.checked));
-
-  const ld = $("lockDuration");
-  ld.value = S.lockDuration;
-  $("lockDurationVal").textContent = S.lockDuration;
-  ld.addEventListener("input", e => {
-    $("lockDurationVal").textContent = e.target.value;
-    saveS("lockDuration", +e.target.value);
-  });
-
-  // التطبيقات المحظورة
-  const ag = $("appsGrid");
-  DISTRACTING_APPS.forEach(app => {
-    const chip = document.createElement("div");
-    chip.className = "app-chip" + (S.blockedApps.includes(app.id) ? " on" : "");
-    chip.innerHTML = `<span>${app.icon}</span>${app.name}`;
-    chip.addEventListener("click", () => {
-      const list = [...S.blockedApps];
-      const i = list.indexOf(app.id);
-      if (i >= 0) list.splice(i, 1); else list.push(app.id);
-      saveS("blockedApps", list);
-      chip.classList.toggle("on");
-      vibrate(15);
-    });
-    ag.appendChild(chip);
-  });
-
   // الصوت
   $("voiceEnabled").checked = S.voiceEnabled;
   $("voiceEnabled").addEventListener("change", e => saveS("voiceEnabled", e.target.checked));

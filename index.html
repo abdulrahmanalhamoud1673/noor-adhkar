@@ -11,33 +11,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=12">
+<link rel="stylesheet" href="css/style.css?v=13">
 </head>
 <body>
-
-<!-- ══════════ شاشة قفل الصلاة ══════════ -->
-<div id="prayerLock" class="lock-screen hidden">
-  <div class="lock-glow"></div>
-  <div class="lock-content">
-    <div class="lock-icon">🕌</div>
-    <div class="lock-label">حان الآن وقت صلاة</div>
-    <h1 id="lockPrayerName">الظهر</h1>
-    <p class="lock-verse">﴿ إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوْقُوتًا ﴾</p>
-
-    <div class="lock-timer">
-      <div id="lockCountdown">15:00</div>
-      <span>الوقت المتبقي للقفل</span>
-    </div>
-
-    <div class="lock-blocked">
-      <div class="lock-blocked-title">🚫 تطبيقات محظورة الآن</div>
-      <div id="lockBlockedList" class="lock-blocked-list"></div>
-    </div>
-
-    <button id="lockDoneBtn" class="btn btn-gold btn-lg">صلّيت — افتح التطبيق ✓</button>
-    <button id="lockEmergency" class="btn-ghost">استمر بالضغط 5 ثوانٍ للخروج الاضطراري</button>
-  </div>
-</div>
 
 <!-- ══════════ الشريط العلوي ══════════ -->
 <header class="topbar">
@@ -110,8 +86,6 @@
     <div class="streak-bar"><div id="streakFill"></div></div>
     <p class="streak-note" id="streakNote">أكمل أذكار الصباح والمساء اليوم لتبدأ سلسلتك.</p>
   </div>
-
-  <button id="testLockBtn" class="btn btn-outline full">تجربة قفل الصلاة الآن</button>
 </section>
 
 <!-- ══════════ صفحة: الأذكار (صباح + مساء) ══════════ -->
@@ -327,32 +301,6 @@
   </div>
 
   <div class="card-glass setting-group">
-    <h3>🔒 قفل الصلاة</h3>
-    <div class="toggle-row">
-      <span>اقفل الشاشة عند الأذان</span>
-      <label class="switch"><input type="checkbox" id="lockEnabled" checked><span class="slider"></span></label>
-    </div>
-    <label>مدة القفل</label>
-    <input type="range" id="lockDuration" min="5" max="30" step="5" value="15">
-    <div class="range-val"><span id="lockDurationVal">15</span> دقيقة</div>
-
-    <label>التطبيقات التي أريد حظرها</label>
-    <div class="apps-grid" id="appsGrid"></div>
-
-    <div class="info-box warn">
-      <b>⚠️ اقرأ هذا — القفل هنا داخل التطبيق فقط</b>
-      <p>هذه الشاشة تقفل <b>تطبيق نور نفسه</b> عند الأذان. لكنها <b>لا تستطيع</b> منعك من فتح إنستغرام أو تيك توك، لأن المتصفح ممنوع أمنياً من التحكم بتطبيقات أخرى — وهذا قيد في أندرويد نفسه وليس نقصاً في البرمجة.</p>
-    </div>
-
-    <div class="info-box good">
-      <b>✅ الحظر الحقيقي — جاهز وينتظرك</b>
-      <p>بنيتُ لك تطبيق أندرويد اسمه <b>نور — قفل الصلاة</b> يفعل تماماً ما تريد: تفتح إنستغرام وقت الصلاة فيرجّعك فوراً ولا يفتح حتى تضغط «صلّيت».</p>
-      <p>مكانه: مجلد <b>noor-blocker</b> بجانب مجلد التطبيق. افتح ملف <b>README.md</b> بداخله وفيه الخطوات بالعربي.</p>
-      <p>لم تُثبّته بعد — قل لي وأساعدك خطوة بخطوة.</p>
-    </div>
-  </div>
-
-  <div class="card-glass setting-group">
     <h3>🔊 الصوت</h3>
     <div class="toggle-row">
       <span>نطق الأذكار والأدعية</span>
@@ -406,9 +354,9 @@
 
 <div id="toast" class="toast"></div>
 
-<script src="js/data.js?v=12"></script>
-<script src="js/prayertimes.js?v=12"></script>
-<script src="js/app.js?v=12"></script>
-<script src="js/mushaf.js?v=12"></script>
+<script src="js/data.js?v=13"></script>
+<script src="js/prayertimes.js?v=13"></script>
+<script src="js/app.js?v=13"></script>
+<script src="js/mushaf.js?v=13"></script>
 </body>
 </html>
