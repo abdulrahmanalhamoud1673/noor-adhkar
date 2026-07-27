@@ -706,6 +706,15 @@ body.no-scroll { overflow: hidden; }
 }
 .coach-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 9px; }
 
+/* شريط وضع فكّ القفل */
+.verify-banner {
+  background: linear-gradient(120deg, rgba(212,175,55,.20), rgba(239,68,68,.10));
+  border: 1px solid var(--gold); border-radius: 15px;
+  padding: 14px 16px; margin-bottom: 14px;
+  font-size: 13.5px; line-height: 1.9; color: var(--text);
+}
+.verify-banner b { color: var(--gold); }
+
 /* ────────── الأزرار ────────── */
 .btn {
   padding: 14px 20px; border-radius: 15px; border: 1px solid var(--line);

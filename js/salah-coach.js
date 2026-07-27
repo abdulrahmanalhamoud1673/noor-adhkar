@@ -322,14 +322,40 @@ const Coach = {
   sheikh: null,
   _audio: null,
 
-  async start(rakaat) {
+  /* ─── وضع التحقق (يُستدعى من قفل الصلاة) ─── */
+  verify: false,
+  requiredRakaat: 0,
+  startedAt: 0,
+  offMs: 0,        // كم مضى وأنت خارج الوضعية أثناء الذكر
+  lastCheck: 0,
+
+  /** أقل زمن معقول لأداء الصلاة — ٤٥ ثانية للركعة */
+  get minTotalMs() { return this.requiredRakaat * 45000; },
+
+  /**
+   * @param rakaat عدد الركعات
+   * @param verify وضع التحقق: يُستدعى من شاشة القفل، ولا يُفتح القفل
+   *               إلا بأداء الصلاة كاملة فعلاً — بلا تخطٍّ ولا اختصار
+   */
+  async start(rakaat, verify = false) {
     if (this.running) return;
 
+    this.verify = verify;
     this.flow = buildFlow(rakaat);
     this.step = 0;
     this.repDone = 0;
     this.history = [];
     this.busy = false;
+    this.startedAt = Date.now();
+    this.offMs = 0;
+    this.lastCheck = 0;
+    this.requiredRakaat = rakaat;
+
+    // في وضع التحقق نُخفي أزرار التنقّل اليدوي — وإلا لأمكن تخطّي الصلاة بضغطات
+    const manual = document.getElementById("coachManual");
+    if (manual) manual.style.display = verify ? "none" : "";
+    const vb = document.getElementById("verifyBanner");
+    if (vb) vb.classList.toggle("hidden", !verify);
 
     this.stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: "user", width: { ideal: 720 }, height: { ideal: 960 } },
@@ -389,14 +415,17 @@ const Coach = {
         if (m.visibility < 0.5) {
           this.badge("none", 0);
           this.history = [];
+          this.watchHold(null);
         } else {
           const { pose, score } = classify(m);
           this.badge(pose, score);
           this.track(pose, score);
+          this.watchHold(score >= 0.4 ? pose : null);
         }
       } else {
         this.badge("none", 0);
         this.history = [];
+        this.watchHold(null);
       }
     }
     requestAnimationFrame(() => this.loop());
@@ -445,6 +474,37 @@ const Coach = {
     document.getElementById("confFill").style.width = Math.round(score * 100) + "%";
   },
 
+  /**
+   * في وضع التحقق: يجب أن تبقى في الوضعية طوال الذكر.
+   * لو خرجت منها أكثر من ثانية ونصف، تُلغى الخطوة وتُعاد —
+   * فلا يكفي أن تمرّ بالحركة مروراً سريعاً.
+   */
+  watchHold(pose) {
+    if (!this.verify || !this.busy) { this.offMs = 0; this.lastCheck = 0; return; }
+
+    const now = performance.now();
+    const dt = this.lastCheck ? now - this.lastCheck : 0;
+    this.lastCheck = now;
+
+    const expected = fam(this.flow[this.step]?.pose);
+    const ok = pose && fam(pose) === expected;
+
+    this.offMs = ok ? 0 : this.offMs + dt;
+    if (this.offMs > 1500) this.abortStep();
+  },
+
+  /** يُلغي الخطوة الجارية ويعيدها من أولها */
+  abortStep() {
+    this.offMs = 0;
+    hush();
+    this.busy = false;
+    this.repDone = 0;
+    this.history = [];
+    const el = document.getElementById("coachHands");
+    if (el) el.textContent = "⚠️ خرجت من الوضعية — أعِد هذه الخطوة";
+    if (navigator.vibrate) navigator.vibrate([80, 60, 80]);
+  },
+
   track(pose, score) {
     const need = 8, threshold = 0.5;
     this.history.push(score >= threshold ? pose : "none");
@@ -458,9 +518,10 @@ const Coach = {
   async onPose(pose) {
     if (this.busy) return;
 
-    // نسمح بالتقدّم حتى خطوتين للأمام إذا سبقتَ الصوت
+    // في وضع التحقق لا تخطّي إطلاقاً: يجب مطابقة الخطوة الحالية بالضبط.
+    // خارجه نسمح بخطوتين للأمام تسهيلاً إن سبقتَ الصوت.
     let target = -1;
-    const ahead = Math.min(this.step + 2, this.flow.length - 1);
+    const ahead = this.verify ? this.step : Math.min(this.step + 2, this.flow.length - 1);
     for (let j = this.step; j <= ahead; j++) {
       if (fam(this.flow[j].pose) === fam(pose)) { target = j; break; }
     }
@@ -498,12 +559,25 @@ const Coach = {
     document.getElementById("coachHands").textContent = "";
     if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 
-    // إن كنا داخل تطبيق أندرويد، نبلّغه ليفكّ قفل هذه الصلاة.
-    // هذا الإثبات الوحيد الذي لا يُتحايل عليه: أن تصلّي فعلاً.
+    if (!this.verify) return;
+
+    // شرط أخير: زمن معقول. الصلاة الرباعية لا تُؤدّى في دقيقة.
+    const spent = Date.now() - this.startedAt;
+    if (spent < this.minTotalMs) {
+      const need = Math.ceil((this.minTotalMs - spent) / 1000);
+      document.getElementById("coachHands").textContent =
+        `⚠️ أُدّيت الحركات بسرعة غير معقولة — أعِد الصلاة متأنّياً (${need} ثانية ناقصة)`;
+      this.step = 0;
+      this.startedAt = Date.now();
+      this.renderStep();
+      return;
+    }
+
+    // أدّى الصلاة كاملة بترتيبها وبعدد ركعاتها وبزمن معقول — يُفتح القفل
     try {
       if (window.NoorApp && typeof NoorApp.prayerCompleted === "function") {
         NoorApp.prayerCompleted();
-        document.getElementById("coachHands").textContent = "🔓 فُتح قفل الصلاة";
+        document.getElementById("coachHands").textContent = "🔓 فُتح قفل الصلاة — تقبّل الله";
       }
     } catch (e) { /* خارج التطبيق — لا شيء نفعله */ }
   },

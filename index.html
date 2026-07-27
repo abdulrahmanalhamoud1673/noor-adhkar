@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=16">
+<link rel="stylesheet" href="css/style.css?v=17">
 </head>
 <body>
 
@@ -261,6 +261,10 @@
     <button id="startCoach" class="btn btn-gold btn-lg full">ابدأ الصلاة</button>
   </div>
 
+  <div class="verify-banner hidden" id="verifyBanner">
+    🔒 <b>وضع فكّ القفل</b> — أدِّ الصلاة كاملة أمام الكاميرا. لا تخطّي ولا اختصار، وعند التسليم يُفتح القفل.
+  </div>
+
   <div class="coach-stage hidden" id="coachStage">
     <div class="video-wrap">
       <video id="camVideo" playsinline autoplay muted></video>
@@ -286,7 +290,7 @@
 
     <div class="coach-say" id="coachSay">—</div>
 
-    <div class="coach-controls">
+    <div class="coach-controls" id="coachManual">
       <button id="prevStep" class="btn btn-outline">◀ السابق</button>
       <button id="stopCoach" class="btn btn-danger">إيقاف</button>
       <button id="nextStep" class="btn btn-outline">التالي ▶</button>
@@ -307,9 +311,9 @@
 
 <div id="toast" class="toast"></div>
 
-<script src="js/data.js?v=16"></script>
-<script src="js/prayertimes.js?v=16"></script>
-<script src="js/app.js?v=16"></script>
-<script src="js/mushaf.js?v=16"></script>
+<script src="js/data.js?v=17"></script>
+<script src="js/prayertimes.js?v=17"></script>
+<script src="js/app.js?v=17"></script>
+<script src="js/mushaf.js?v=17"></script>
 </body>
 </html>

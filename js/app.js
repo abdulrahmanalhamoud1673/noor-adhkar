@@ -760,13 +760,35 @@ document.querySelectorAll("#prayerPick button").forEach(btn => {
   });
 });
 
+/** وضع فكّ القفل: يأتي من شاشة القفل بعدد ركعات مفروض لا يمكن تغييره */
+let coachVerify = false;
+
+function applyLockRequest() {
+  const m = /pray=(\d)/.exec(location.hash);
+  if (!m) return;
+
+  coachRakaat = +m[1];
+  coachVerify = true;
+
+  // نثبّت الصلاة المطلوبة ونمنع اختيار صلاة أقصر للتحايل
+  document.querySelectorAll("#prayerPick button").forEach(b => {
+    const same = +b.dataset.rakaat === coachRakaat;
+    b.classList.toggle("on", same);
+    b.disabled = !same;
+    b.style.opacity = same ? "1" : ".3";
+  });
+
+  goto("page-coach");
+  $("startCoach").textContent = "ابدأ الصلاة لفكّ القفل";
+}
+
 $("startCoach").addEventListener("click", async () => {
   const btn = $("startCoach");
   btn.disabled = true;
   btn.textContent = "جارٍ تجهيز الكاميرا…";
   try {
     if (!window.Coach) await import("./salah-coach.js");
-    await window.Coach.start(coachRakaat);
+    await window.Coach.start(coachRakaat, coachVerify);
     $("coachIntro").classList.add("hidden");
     $("coachStage").classList.remove("hidden");
   } catch (err) {
@@ -829,6 +851,7 @@ function boot() {
 
   // تنظيف عامل الخدمة القديم الذي كان يخزّن نسخاً قديمة من الملفات
   step("تنظيف الذاكرة المخزّنة", cleanupOldCaches);
+  step("طلب فكّ القفل", applyLockRequest);
 }
 
 /**
