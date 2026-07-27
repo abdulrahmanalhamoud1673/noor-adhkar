@@ -919,10 +919,21 @@ function boot() {
 
   // تنظيف عامل الخدمة القديم الذي كان يخزّن نسخاً قديمة من الملفات
   step("تحدّي الاستغفار", initChallengePickers);
+  step("فضفض", () => Chat.init());
   step("تنظيف الذاكرة المخزّنة", cleanupOldCaches);
   step("طلب فكّ القفل", applyLockRequest);
   step("طلب التحدّي", applyChallengeRequest);
 }
+
+/**
+ * تطبيق أندرويد يفتح الصفحة نفسها مع #pray=…‏ أو #challenge=…‏ .
+ * حين تكون الصفحة محمّلة أصلاً لا يُعيد المتصفّح تحميلها، فلا تعمل boot()
+ * ولا تُقرأ العلامة. لذلك نُنصت لتغيّر العلامة ونعيد قراءتها.
+ */
+window.addEventListener("hashchange", () => {
+  step("طلب فكّ القفل", applyLockRequest);
+  step("طلب التحدّي", applyChallengeRequest);
+});
 
 /**
  * التخزين المؤقت كان يخلط ملفات قديمة بجديدة فيتعطّل التطبيق.

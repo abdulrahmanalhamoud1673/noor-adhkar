@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=19">
+<link rel="stylesheet" href="css/style.css?v=20">
 </head>
 <body>
 
@@ -73,6 +73,15 @@
     <div>
       <div class="quran-cta-title">القرآن الكريم</div>
       <div class="quran-cta-sub">استمع بصوت خمسة من أجمل القرّاء</div>
+    </div>
+    <span class="quran-cta-arrow">‹</span>
+  </button>
+
+  <button class="quran-cta chat-cta" data-goto="page-chat">
+    <span class="quran-cta-icon">💬</span>
+    <div>
+      <div class="quran-cta-title">فضفض</div>
+      <div class="quran-cta-sub">احكِ همّك… ويذكّرك بآية وحديث يعينانك</div>
     </div>
     <span class="quran-cta-arrow">‹</span>
   </button>
@@ -266,6 +275,55 @@
   </div>
 </div>
 
+<!-- ══════════ صفحة: فضفض (محادثة) ══════════ -->
+<section class="page" id="page-chat">
+  <div class="page-head">
+    <h2>💬 فضفض</h2>
+    <p>احكِ ما في قلبك — الآيات والأحاديث تُعرض بنصّها الصحيح لا من كلام الذكاء الاصطناعي</p>
+  </div>
+
+  <!-- إعداد أول مرة -->
+  <div class="card-glass chat-setup" id="chatSetup">
+    <div class="chat-setup-icon">🔑</div>
+    <h3>تفعيل المحادثة — مرّة واحدة</h3>
+    <p class="chat-setup-lead">
+      هذه الميزة تتكلّم مع نموذج ذكاء اصطناعي، وتحتاج مفتاحاً خاصاً بك.
+      المفتاح يُحفظ على جهازك فقط، ولا يذهب لأي مكان غير خوادم Anthropic.
+    </p>
+    <ol class="chat-steps">
+      <li>افتح <span dir="ltr">console.anthropic.com</span> من المتصفّح وسجّل دخولك.</li>
+      <li>ادخل على <strong>API Keys</strong> ثم <strong>Create Key</strong>.</li>
+      <li>انسخ المفتاح (يبدأ بـ <span dir="ltr">sk-ant-</span>) والصقه هنا.</li>
+      <li>ضع رصيداً بسيطاً في <strong>Billing</strong> — الاستعمال يُحاسَب بالاستخدام.</li>
+    </ol>
+    <input id="chatKey" type="password" dir="ltr" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
+    <button class="btn btn-gold full" id="saveChatKey">حفظ وابدأ</button>
+    <p class="chat-privacy">🔒 كلامك ومحادثتك تُخزَّن على هاتفك وحده. لا يوجد خادم لنا يقرأها.</p>
+  </div>
+
+  <!-- المحادثة -->
+  <div class="chat-wrap hidden" id="chatWrap">
+    <div class="chat-log" id="chatLog"></div>
+
+    <div class="chat-suggest" id="chatSuggest">
+      <button>يومي كان ثقيل وتعبت</button>
+      <button>قلبي قاسي وما عم أخشع بالصلاة</button>
+      <button>عصّبت اليوم وندمت</button>
+      <button>خايف من المستقبل</button>
+    </div>
+
+    <div class="chat-input-row">
+      <textarea id="chatInput" rows="1" placeholder="اكتب ما تشعر به…"></textarea>
+      <button id="chatSend" class="chat-send" aria-label="إرسال">➤</button>
+    </div>
+
+    <div class="chat-tools">
+      <button class="chat-tool" id="chatClear">🗑️ محادثة جديدة</button>
+      <button class="chat-tool" id="chatKeyEdit">🔑 تغيير المفتاح</button>
+    </div>
+  </div>
+</section>
+
 <!-- ══════════ صفحة: تعلّم الصلاة ══════════ -->
 <section class="page" id="page-learn">
   <div class="page-head">
@@ -361,15 +419,17 @@
   <button class="nav-btn active" data-goto="page-home"><span>🏠</span>الرئيسية</button>
   <button class="nav-btn" data-goto="page-adhkar"><span>📿</span>الأذكار</button>
   <button class="nav-btn" data-goto="page-quran"><span>📖</span>القرآن</button>
+  <button class="nav-btn" data-goto="page-chat"><span>💬</span>فضفض</button>
   <button class="nav-btn" data-goto="page-learn"><span>🕌</span>الصلاة</button>
   <button class="nav-btn" data-goto="page-coach"><span>🕋</span>صلِّ معي</button>
 </nav>
 
 <div id="toast" class="toast"></div>
 
-<script src="js/data.js?v=19"></script>
-<script src="js/prayertimes.js?v=19"></script>
-<script src="js/app.js?v=19"></script>
-<script src="js/mushaf.js?v=19"></script>
+<script src="js/data.js?v=20"></script>
+<script src="js/prayertimes.js?v=20"></script>
+<script src="js/app.js?v=20"></script>
+<script src="js/mushaf.js?v=20"></script>
+<script src="js/chat.js?v=20"></script>
 </body>
 </html>
