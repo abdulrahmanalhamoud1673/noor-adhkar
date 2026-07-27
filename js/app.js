@@ -88,7 +88,6 @@ document.addEventListener("click", e => {
   const btn = e.target.closest("[data-goto]");
   if (btn) goto(btn.dataset.goto);
 });
-$("settingsBtn").addEventListener("click", () => goto("page-settings"));
 
 /* ══════════════════════════════════════
    أوقات الصلاة
@@ -505,9 +504,9 @@ const Quran = {
         <div class="surah-num">${num}</div>
         <div class="surah-info">
           <div class="surah-name">سورة ${name}</div>
-          <div class="surah-sub">${ayahs} آية · ${place}</div>
+          <div class="surah-sub">${ayahs} آية · ${place} · اضغط للقراءة 📖</div>
         </div>
-        <button class="surah-listen" data-listen="${num}">${this.surah === num && !this.audio.paused ? "❚❚" : "▶"}</button>`;
+        <button class="surah-listen" data-listen="${num}">${this.surah === num && !this.audio.paused ? "❚❚ إيقاف" : "استماع"}</button>`;
 
       // الضغط على السورة يفتح المصحف مع تلوين الآيات
       el.addEventListener("click", () => Mushaf.openSurah(num));
@@ -675,37 +674,11 @@ const Voice = {
   init() {
     const load = () => {
       this.voices = speechSynthesis.getVoices().filter(v => v.lang.startsWith("ar"));
-      const sel = $("voiceSelect");
-      sel.innerHTML = "";
-
-      // تنبيه إذا لم يجد صوتاً عربياً على الجهاز
-      let warn = $("voiceWarn");
-      if (!warn) {
-        warn = document.createElement("div");
-        warn.id = "voiceWarn";
-        warn.className = "info-box";
-        sel.parentNode.insertBefore(warn, sel.nextSibling);
-      }
-      warn.style.display = this.voices.length ? "none" : "block";
-      warn.innerHTML =
-        "<b>⚠️ لا يوجد صوت عربي على هذا الجهاز</b>" +
-        "<p>لتشغيل الصوت: إعدادات الهاتف ← إمكانية الوصول ← تحويل النص إلى كلام ← نزّل اللغة العربية.</p>" +
-        "<p>أو ضع تسجيلات شيخ حقيقية بصيغة mp3 داخل مجلد <b>audio</b> بأسماء: takbir, ruku, sujud, itidal, julus, fatiha, ikhlas, istiftah, tashahhud, ibrahimiyya, salam — وسيستخدمها التطبيق تلقائياً بدل الصوت الآلي.</p>";
-
-      if (!this.voices.length) {
-        sel.innerHTML = '<option>لا توجد أصوات عربية على جهازك</option>';
-        return;
-      }
-      this.voices.forEach(v => {
-        const o = document.createElement("option");
-        o.value = v.name;
-        o.textContent = v.name;
-        if (v.name === S.voiceName) o.selected = true;
-        sel.appendChild(o);
-      });
     };
     load();
-    speechSynthesis.addEventListener("voiceschanged", load);
+    if ("speechSynthesis" in window) {
+      speechSynthesis.addEventListener("voiceschanged", load);
+    }
   },
 
   /** هل يوجد صوت عربي على الجهاز؟ */
@@ -774,79 +747,6 @@ const Voice = {
 };
 
 /* ══════════════════════════════════════
-   الإعدادات
-   ══════════════════════════════════════ */
-function initSettings() {
-  // المدن
-  const cs = $("citySelect");
-  for (const [id, c] of Object.entries(CITIES)) {
-    const o = document.createElement("option");
-    o.value = id; o.textContent = c.name;
-    if (id === S.city && !S.coords) o.selected = true;
-    cs.appendChild(o);
-  }
-  cs.addEventListener("change", () => {
-    saveS("city", cs.value);
-    saveS("coords", null);
-    renderTimes();
-    toast("تم تحديث الموقع: " + CITIES[cs.value].name);
-  });
-
-  // طرق الحساب
-  const ms = $("methodSelect");
-  for (const [id, m] of Object.entries(PT.METHODS)) {
-    const o = document.createElement("option");
-    o.value = id; o.textContent = m.name;
-    if (id === S.method) o.selected = true;
-    ms.appendChild(o);
-  }
-  ms.addEventListener("change", () => { saveS("method", ms.value); renderTimes(); toast("تم تحديث طريقة الحساب"); });
-
-  $("asrSelect").value = S.asr;
-  $("asrSelect").addEventListener("change", e => { saveS("asr", e.target.value); renderTimes(); });
-
-  // GPS
-  $("useGPS").addEventListener("click", () => {
-    if (!navigator.geolocation) return toast("جهازك لا يدعم تحديد الموقع");
-    toast("جارٍ تحديد موقعك…");
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        saveS("coords", {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-          name: "موقعي الحالي"
-        });
-        renderTimes();
-        toast("✅ تم ضبط موقعك بدقة");
-      },
-      () => toast("تعذّر تحديد الموقع — تأكد من السماح للتطبيق")
-    );
-  });
-  // الصوت
-  $("voiceEnabled").checked = S.voiceEnabled;
-  $("voiceEnabled").addEventListener("change", e => saveS("voiceEnabled", e.target.checked));
-  $("voiceRate").value = S.voiceRate;
-  $("voiceRate").addEventListener("input", e => saveS("voiceRate", +e.target.value));
-  $("voiceSelect").addEventListener("change", e => saveS("voiceName", e.target.value));
-  $("testVoice").addEventListener("click", () => Voice.speak("اللَّهُ أَكْبَرُ", "takbir"));
-
-  // نسب حقوق صور القرّاء
-  const credits = $("creditsList");
-  if (credits) {
-    credits.innerHTML = PHOTO_CREDITS.map(c => `
-      <div class="credit">
-        <img src="reciters/${c.id}.jpg" alt="" onerror="this.style.display='none'">
-        <div>
-          <b>${c.name}</b>
-          <span>تصوير: ${c.author}</span>
-          <span>الرخصة: ${c.license}</span>
-          <a href="${c.url}" target="_blank" rel="noopener">صفحة المصدر ↗</a>
-        </div>
-      </div>`).join("");
-  }
-}
-
-/* ══════════════════════════════════════
    مدرّب الصلاة بالكاميرا (يُحمَّل عند الحاجة فقط)
    ══════════════════════════════════════ */
 let coachRakaat = 2;
@@ -898,7 +798,6 @@ function boot() {
   renderHijri();
   renderTimes();
   renderSteps();
-  initSettings();
   Voice.init();
   Quran.init();
   Mushaf.init();

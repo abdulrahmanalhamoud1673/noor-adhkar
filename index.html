@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=13">
+<link rel="stylesheet" href="css/style.css?v=14">
 </head>
 <body>
 
@@ -25,7 +25,6 @@
         <div class="brand-sub" id="hijriDate">—</div>
       </div>
     </div>
-    <button id="settingsBtn" class="icon-btn" aria-label="الإعدادات">⚙️</button>
   </div>
 </header>
 
@@ -114,7 +113,7 @@
 <section class="page" id="page-quran">
   <div class="page-head">
     <h2>📖 القرآن الكريم</h2>
-    <p>اختر القارئ ثم السورة — استمع أو اقرأ</p>
+    <p>اضغط <b>اسم السورة</b> لتفتح المصحف وتقرأ مع الشيخ</p>
   </div>
 
   <div class="reciters-wrap">
@@ -128,6 +127,11 @@
   </div>
 
   <div class="surah-list" id="surahList"></div>
+
+  <p class="credit-line">
+    صور القرّاء من ويكيميديا كومنز برخص حرة —
+    <a href="https://github.com/abdulrahmanalhamoud1673/noor-adhkar/blob/main/CREDITS.md" target="_blank" rel="noopener">المصادر والرخص</a>
+  </p>
 </section>
 
 <!-- ══════════ مشغّل التلاوة ══════════ -->
@@ -290,57 +294,6 @@
   </div>
 </section>
 
-<!-- ══════════ صفحة: الإعدادات ══════════ -->
-<section class="page" id="page-settings">
-  <div class="page-head"><h2>⚙️ الإعدادات</h2></div>
-
-  <div class="card-glass setting-group">
-    <h3>📍 موقعك</h3>
-    <select id="citySelect"></select>
-    <button id="useGPS" class="btn btn-outline full">📡 استخدم موقعي الحالي (أدق)</button>
-  </div>
-
-  <div class="card-glass setting-group">
-    <h3>🔊 الصوت</h3>
-    <div class="toggle-row">
-      <span>نطق الأذكار والأدعية</span>
-      <label class="switch"><input type="checkbox" id="voiceEnabled" checked><span class="slider"></span></label>
-    </div>
-  </div>
-
-  <details class="card-glass setting-group adv">
-    <summary>إعدادات متقدمة</summary>
-
-    <label>طريقة حساب أوقات الصلاة</label>
-    <select id="methodSelect"></select>
-
-    <label>مذهب العصر</label>
-    <select id="asrSelect">
-      <option value="standard">الجمهور (الشافعي/المالكي/الحنبلي)</option>
-      <option value="hanafi">الحنفي</option>
-    </select>
-
-    <label>سرعة الصوت</label>
-    <input type="range" id="voiceRate" min="0.5" max="1.2" step="0.1" value="0.8">
-
-    <label>صوت القارئ الآلي</label>
-    <select id="voiceSelect"></select>
-    <button id="testVoice" class="btn btn-outline full">🔊 اختبر الصوت</button>
-
-    <label>تنبيه الأذان</label>
-    <button id="enableNotif" class="btn btn-outline full">تفعيل تنبيه الأذان</button>
-    <p class="hint">يجب إبقاء التطبيق مفتوحاً في الخلفية ليعمل التنبيه.</p>
-  </details>
-
-  <details class="card-glass setting-group adv">
-    <summary>مصادر صور القرّاء</summary>
-    <p class="hint">جميع الصور من ويكيميديا كومنز برخص حرة تسمح باستخدامها. ذكر المصدر واجب.</p>
-    <div id="creditsList" class="credits"></div>
-  </details>
-
-  <p class="version">نور — الإصدار 1.0 · صُنع بحب في الأردن 🇯🇴</p>
-</section>
-
 </main>
 
 <!-- ══════════ شريط التنقّل السفلي ══════════ -->
@@ -354,9 +307,9 @@
 
 <div id="toast" class="toast"></div>
 
-<script src="js/data.js?v=13"></script>
-<script src="js/prayertimes.js?v=13"></script>
-<script src="js/app.js?v=13"></script>
-<script src="js/mushaf.js?v=13"></script>
+<script src="js/data.js?v=14"></script>
+<script src="js/prayertimes.js?v=14"></script>
+<script src="js/app.js?v=14"></script>
+<script src="js/mushaf.js?v=14"></script>
 </body>
 </html>
