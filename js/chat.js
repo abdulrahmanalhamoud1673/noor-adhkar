@@ -87,10 +87,10 @@ ${Object.entries(HADITH).map(([k, h]) => `${k} — ${h.tag}`).join("\n")}
 
 /* ────────── حالة ────────── */
 const KEY_ID = "aiKey";
+const MODEL_ID = "aiModel";
 const HIST_ID = "chatHistory";
-const MODEL = "claude-opus-5";
+const API = "https://generativelanguage.googleapis.com/v1beta";
 
-let client = null;
 let sending = false;
 let history = Store.get(HIST_ID, []);           // [{role, text}]
 const ayahCache = Store.get("ayahCache", {});   // "2:286" → {text, surah, num}
@@ -140,11 +140,20 @@ function esc(s) {
 }
 
 /**
+ * حارس أخير: النموذج ممنوع من كتابة نصّ آية بنفسه، لكنه قد يعصي.
+ * أي شيء يكتبه بين ﴿ ﴾ نحذفه — النصّ الموثوق لا يظهر إلا داخل بطاقة
+ * ذهبية نجلب نصّها نحن من المصحف، فلا يختلط الموثوق بغيره.
+ */
+function dropFakeQuran(t) {
+  return t.replace(/﴿[^﴾]*﴾?/g, " ");
+}
+
+/**
  * يحوّل نصّ النموذج إلى HTML. العلامات تصير بطاقات، والنصّ العادي فقرات.
  * live = أثناء البثّ: نضع مكان الآية بطاقة انتظار ولا نُطلق أي طلب شبكة.
  */
 function renderReply(box, raw, live) {
-  const text = live ? trimOpenMarker(raw) : raw;
+  const text = dropFakeQuran(live ? trimOpenMarker(raw) : raw);
   box.innerHTML = "";
   let cursor = 0;
   const pending = [];
@@ -229,14 +238,103 @@ function drawHistory() {
   scrollDown();
 }
 
-/* ────────── الإرسال ────────── */
-async function ensureClient() {
-  if (client) return client;
-  const key = Store.get(KEY_ID, "");
-  if (!key) throw new Error("NO_KEY");
-  const { default: Anthropic } = await import("https://esm.sh/@anthropic-ai/sdk");
-  client = new Anthropic({ apiKey: key, dangerouslyAllowBrowser: true });
-  return client;
+/* ══════════ الاتصال بـ Gemini (الطبقة المجانية) ══════════ */
+
+function apiError(status, body) {
+  const e = new Error(body || "http " + status);
+  e.status = status;
+  return e;
+}
+
+/**
+ * أسماء نماذج جوجل تتغيّر مع الوقت، فلا نثبّت اسماً في الكود.
+ * نسأل الخادم عن النماذج المتاحة لهذا المفتاح ونختار أفضل نموذج
+ * سريع مجاني، ثم نحفظ الاسم حتى لا نسأل كل مرة.
+ */
+function scoreModel(n) {
+  if (/embedding|imagen|veo|aqa|tts|audio|image|vision/.test(n)) return -1;
+  let s = 0;
+  if (n.includes("flash")) s += 10;      // النماذج السريعة هي المتاحة مجاناً
+  if (n.includes("lite")) s -= 4;        // أضعف مما نريد
+  if (/preview|exp|thinking/.test(n)) s -= 3;
+  if (n === "gemini-flash-latest") s += 6;
+  const v = /gemini-(\d+)\.(\d+)/.exec(n);
+  if (v) s += (+v[1]) * 2 + (+v[2]) * 0.2;
+  return s;
+}
+
+async function pickModel(key) {
+  const cached = Store.get(MODEL_ID, "");
+  if (cached) return cached;
+
+  const r = await fetch(`${API}/models?key=${encodeURIComponent(key)}`);
+  if (!r.ok) throw apiError(r.status, await r.text());
+  const j = await r.json();
+
+  const names = (j.models || [])
+    .filter(m => (m.supportedGenerationMethods || []).includes("generateContent"))
+    .map(m => m.name.replace(/^models\//, ""));
+
+  let best = "", bestScore = -1;
+  names.forEach(n => { const s = scoreModel(n); if (s > bestScore) { bestScore = s; best = n; } });
+  if (!best) throw apiError(404, "no model");
+
+  Store.set(MODEL_ID, best);
+  return best;
+}
+
+const SAFETY = [
+  "HARM_CATEGORY_HARASSMENT",
+  "HARM_CATEGORY_HATE_SPEECH",
+  "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+  "HARM_CATEGORY_DANGEROUS_CONTENT",
+].map(category => ({ category, threshold: "BLOCK_ONLY_HIGH" }));
+
+function buildBody(convo, noThinking) {
+  const cfg = { temperature: 0.85, topP: 0.95, maxOutputTokens: 4096 };
+  // نماذج 2.5 فما فوق «تفكّر» قبل الردّ، والتفكير يأكل من حدّ الإخراج
+  // فيخرج ردّ فارغ. نطفئه لأن هذه محادثة قصيرة لا تحتاجه.
+  if (noThinking) cfg.thinkingConfig = { thinkingBudget: 0 };
+  return JSON.stringify({
+    systemInstruction: { parts: [{ text: SYSTEM }] },
+    contents: convo.map(m => ({
+      role: m.role === "user" ? "user" : "model",
+      parts: [{ text: m.text }],
+    })),
+    generationConfig: cfg,
+    safetySettings: SAFETY,
+  });
+}
+
+/** يفتح البثّ ويعيد الاستجابة. يعيد المحاولة بلا thinkingConfig إن رفضه النموذج. */
+async function openStream(model, key, convo) {
+  const url = `${API}/models/${model}:streamGenerateContent?alt=sse&key=${encodeURIComponent(key)}`;
+  const post = body => fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body });
+
+  let r = await post(buildBody(convo, true));
+  if (r.status === 400) r = await post(buildBody(convo, false));
+  if (!r.ok) throw apiError(r.status, await r.text());
+  return r;
+}
+
+/** يقرأ سطور SSE سطراً سطراً ويسلّمها للمعالج */
+async function readSSE(res, onLine) {
+  if (!res.body || !res.body.getReader) {          // متصفّح قديم: نقرأ الكل دفعة
+    (await res.text()).split("\n").forEach(onLine);
+    return;
+  }
+  const reader = res.body.getReader();
+  const dec = new TextDecoder();
+  let buf = "";
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    const lines = buf.split("\n");
+    buf = lines.pop();
+    lines.forEach(onLine);
+  }
+  if (buf) onLine(buf);
 }
 
 async function send(text) {
@@ -256,30 +354,44 @@ async function send(text) {
 
   let full = "";
   try {
-    const c = await ensureClient();
-    // نرسل آخر ٢٠ رسالة فقط حتى لا تكبر التكلفة بلا داعٍ
-    const convo = history.slice(-20).map(m => ({ role: m.role, content: m.text }));
+    const key = Store.get(KEY_ID, "");
+    if (!key) throw new Error("NO_KEY");
 
-    const stream = c.messages.stream({
-      model: MODEL,
-      max_tokens: 4096,
-      system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }],
-      output_config: { effort: "medium" },
-      messages: convo,
-    });
+    const model = await pickModel(key);
+    const convo = history.slice(-20);          // آخر ٢٠ رسالة تكفي للسياق
+    const res = await openStream(model, key, convo);
 
-    stream.on("text", delta => {
-      full += delta;
+    let blocked = "";
+    await readSSE(res, line => {
+      if (!line.startsWith("data:")) return;
+      const payload = line.slice(5).trim();
+      if (!payload || payload === "[DONE]") return;
+
+      let j;
+      try { j = JSON.parse(payload); } catch { return; }
+
+      if (j.promptFeedback && j.promptFeedback.blockReason) blocked = j.promptFeedback.blockReason;
+
+      const cand = j.candidates && j.candidates[0];
+      if (!cand) return;
+      if (cand.finishReason === "SAFETY" || cand.finishReason === "PROHIBITED_CONTENT") blocked = "SAFETY";
+
+      const parts = (cand.content && cand.content.parts) || [];
+      const chunk = parts.map(p => p.text || "").join("");
+      if (!chunk) return;
+      full += chunk;
       renderReply(box, full, true);
       scrollDown();
     });
 
-    const final = await stream.finalMessage();
-
-    if (final.stop_reason === "refusal") {
+    if (!full.trim()) {
       box.innerHTML = "";
-      box.textContent = "اعتذر، ما قدرت أردّ على هذا. جرّب تصيغه بطريقة ثانية.";
+      box.classList.add("err");
+      box.textContent = blocked
+        ? "ما قدر يردّ على هذا الكلام. جرّب تصيغه بطريقة ثانية."
+        : "رجع ردّ فارغ. أعد المحاولة.";
       history.pop();
+      Store.set(HIST_ID, history);
     } else {
       renderReply(box, full, false);
       history.push({ role: "assistant", text: full });
@@ -301,10 +413,14 @@ async function send(text) {
 
 function errorText(err) {
   if (err.message === "NO_KEY") return "ما في مفتاح محفوظ. اضغط «🔑 تغيير المفتاح» وضعه.";
-  if (err.status === 401) return "المفتاح غير صحيح أو ملغى. اضغط «🔑 تغيير المفتاح» وضع مفتاحاً جديداً.";
-  if (err.status === 400) return "الطلب مرفوض من الخادم. غالباً المفتاح لا يملك رصيداً بعد.";
-  if (err.status === 429) return "أكثرت من الطلبات بسرعة. انتظر دقيقة وأعد المحاولة.";
-  if (err.status >= 500) return "الخادم مشغول الآن. أعد المحاولة بعد قليل.";
+  if (err.status === 400 || err.status === 401) {
+    Store.set(MODEL_ID, "");
+    return "المفتاح غير صحيح. انسخه من جديد من Google AI Studio واضغط «🔑 تغيير المفتاح».";
+  }
+  if (err.status === 403) return "المفتاح مرفوض. تأكّد أنك أخذته من Google AI Studio وأنه غير مقيَّد.";
+  if (err.status === 429) return "وصلت حدّ الاستخدام المجاني لهذه الدقيقة. انتظر دقيقة وأعد المحاولة.";
+  if (err.status === 404) { Store.set(MODEL_ID, ""); return "النموذج غير متاح. أعد المحاولة."; }
+  if (err.status >= 500) return "خوادم جوجل مشغولة الآن. أعد المحاولة بعد قليل.";
   return "تعذّر الاتصال. تحقّق من الإنترنت ثم أعد المحاولة.";
 }
 
@@ -320,9 +436,9 @@ function initChat() {
 
   $("saveChatKey").addEventListener("click", () => {
     const v = $("chatKey").value.trim();
-    if (!v.startsWith("sk-ant-")) { toast("المفتاح يبدأ بـ sk-ant-"); return; }
+    if (!v.startsWith("AIza")) { toast("مفتاح جوجل يبدأ بـ AIza"); return; }
     Store.set(KEY_ID, v);
-    client = null;
+    Store.set(MODEL_ID, "");           // نعيد اختيار النموذج لهذا المفتاح
     $("chatKey").value = "";
     showSetup(false);
     toast("تم الحفظ ✓");
@@ -330,7 +446,7 @@ function initChat() {
 
   $("chatKeyEdit").addEventListener("click", () => {
     Store.set(KEY_ID, "");
-    client = null;
+    Store.set(MODEL_ID, "");
     showSetup(true);
   });
 
