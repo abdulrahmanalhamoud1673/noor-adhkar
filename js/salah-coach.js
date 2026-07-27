@@ -8,6 +8,7 @@
 import { PoseLandmarker, FilesetResolver }
   from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
 import { createSheikh, POSE_AR } from "./sheikh-figure.js";
+import { fitFrame } from "./pushup-challenge.js";
 
 const MODEL_URL =
   "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";
@@ -357,13 +358,17 @@ const Coach = {
     const vb = document.getElementById("verifyBanner");
     if (vb) vb.classList.toggle("hidden", !verify);
 
+    // مجال رؤية واسع كي يظهر جسمك من الرأس إلى القدم
     this.stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "user", width: { ideal: 720 }, height: { ideal: 960 } },
+      video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
       audio: false
     });
     const video = document.getElementById("camVideo");
     video.srcObject = this.stream;
     await video.play();
+
+    // إطار بنفس نسبة الكاميرا — بلا قصّ ولا زوم
+    fitFrame(video, video.closest(".video-wrap"));
 
     if (!this.landmarker) {
       const vision = await FilesetResolver.forVisionTasks(WASM_URL);

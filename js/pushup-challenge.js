@@ -25,6 +25,22 @@ const BONES = [
 
 const mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
 
+/**
+ * يضبط إطار العرض على نسبة أبعاد الكاميرا الحقيقية.
+ * بدون هذا يقصّ المتصفح الصورة لتملأ الإطار فتبدو مُكبّرة،
+ * وتنزاح نقاط الهيكل عن الجسم.
+ */
+export function fitFrame(video, wrap) {
+  if (!wrap) return;
+  const apply = () => {
+    if (!video.videoWidth || !video.videoHeight) return;
+    wrap.style.aspectRatio = `${video.videoWidth} / ${video.videoHeight}`;
+  };
+  apply();
+  video.addEventListener("loadedmetadata", apply, { once: true });
+  video.addEventListener("resize", apply);
+}
+
 /** زاوية عند النقطة b بين a و c بالدرجات */
 function angleAt(a, b, c) {
   const v1 = { x: a.x - b.x, y: a.y - b.y };
@@ -88,13 +104,17 @@ const Challenge = {
     this.goodFrames = 0;
     this.awaitingDhikr = false;
 
+    // مجال رؤية واسع: الهاتف على الأرض ويجب أن يرى جسمك كاملاً
     this.stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "user", width: { ideal: 720 }, height: { ideal: 960 } },
+      video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
       audio: false
     });
     const video = document.getElementById("chVideo");
     video.srcObject = this.stream;
     await video.play();
+
+    // نجعل الإطار بنفس نسبة الكاميرا، فتظهر الصورة كاملة بلا زوم
+    fitFrame(video, video.closest(".video-wrap"));
 
     if (!this.landmarker) {
       const vision = await FilesetResolver.forVisionTasks(WASM_URL);
