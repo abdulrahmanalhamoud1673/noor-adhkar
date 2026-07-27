@@ -794,28 +794,60 @@ $("nextStep").addEventListener("click", () => window.Coach && window.Coach.go(1)
 /* ══════════════════════════════════════
    الإقلاع
    ══════════════════════════════════════ */
+/**
+ * كل خطوة إقلاع داخل حمايتها الخاصة.
+ * سابقاً كان فشل خطوة واحدة يوقف كل ما بعدها، فيظهر التطبيق
+ * فارغاً: لا عدّاد ولا أذكار ولا سور. الآن يسقط الجزء المعطوب وحده.
+ */
+function step(name, fn) {
+  try { fn(); }
+  catch (e) { console.error("تعذّرت خطوة الإقلاع:", name, e); }
+}
+
 function boot() {
-  renderHijri();
-  renderTimes();
-  renderSteps();
-  Voice.init();
-  Quran.init();
-  Mushaf.init();
-  renderLastRead();
+  step("التاريخ الهجري", renderHijri);
+  step("أوقات الصلاة", renderTimes);
+  step("خطوات الصلاة", renderSteps);
+  step("الصوت", () => Voice.init());
+  step("القرآن", () => Quran.init());
+  step("المصحف", () => Mushaf.init());
+  step("آخر ما قرأت", renderLastRead);
 
-  // يفتح الأذكار المناسبة للوقت الحالي
   const hour = new Date().getHours();
-  showAdhkar(hour >= 12 ? "masaa" : "sabah");
+  step("الأذكار", () => showAdhkar(hour >= 12 ? "masaa" : "sabah"));
 
-  setInterval(tickCountdown, 500);
-  setInterval(renderTimes, 60000);
-  tickCountdown();
+  step("العدّاد التنازلي", () => {
+    setInterval(tickCountdown, 500);
+    setInterval(renderTimes, 60000);
+    tickCountdown();
+  });
 
-  if (hour >= 4 && hour < 11) toast("🌅 وقت أذكار الصباح");
-  else if (hour >= 15 && hour < 20) toast("🌙 وقت أذكار المساء");
+  step("تنبيه الوقت", () => {
+    if (hour >= 4 && hour < 11) toast("🌅 وقت أذكار الصباح");
+    else if (hour >= 15 && hour < 20) toast("🌙 وقت أذكار المساء");
+  });
 
-  if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
-    navigator.serviceWorker.register("sw.js").catch(() => {});
+  // تنظيف عامل الخدمة القديم الذي كان يخزّن نسخاً قديمة من الملفات
+  step("تنظيف الذاكرة المخزّنة", cleanupOldCaches);
+}
+
+/**
+ * التخزين المؤقت كان يخلط ملفات قديمة بجديدة فيتعطّل التطبيق.
+ * نلغي أي عامل خدمة مسجَّل ونمسح كل ما خزّنه، مرة واحدة وللأبد.
+ */
+function cleanupOldCaches() {
+  if (!location.protocol.startsWith("http")) return;
+
+  if (window.caches && caches.keys) {
+    caches.keys()
+      .then(keys => Promise.all(keys.map(k => caches.delete(k))))
+      .catch(() => {});
+  }
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.getRegistrations()
+      .then(regs => Promise.all(regs.map(r => r.unregister())))
+      .catch(() => {});
   }
 }
 
