@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#06231c">
+<title>تحميل تطبيق نور</title>
+<link rel="icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-0:#04150f; --bg-1:#06231c; --emerald:#10b981; --gold:#d4af37;
+  --gold-soft:#f0d98a; --text:#eaf5f0; --text-dim:#9dbdb0;
+  --line:rgba(212,175,55,.18); --glass:rgba(255,255,255,.045);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Tajawal',-apple-system,'Segoe UI',sans-serif;
+  background:
+    radial-gradient(1200px 600px at 80% -10%,rgba(16,185,129,.16),transparent 60%),
+    radial-gradient(900px 500px at 10% 5%,rgba(212,175,55,.10),transparent 55%),
+    linear-gradient(180deg,var(--bg-1) 0%,var(--bg-0) 100%);
+  background-attachment:fixed;
+  color:var(--text);min-height:100vh;
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:28px 18px 46px;
+}
+.wrap{width:100%;max-width:440px}
+
+.hero{text-align:center;margin-bottom:26px}
+.app-icon{
+  width:104px;height:104px;margin:0 auto 16px;border-radius:26px;
+  display:grid;place-items:center;font-size:52px;
+  background:linear-gradient(150deg,rgba(212,175,55,.28),rgba(16,185,129,.14));
+  border:1px solid var(--line);
+  box-shadow:0 12px 40px -8px rgba(212,175,55,.35);
+}
+h1{font-size:31px;font-weight:800;letter-spacing:1px}
+.ver{font-size:13px;color:var(--gold);margin-top:4px}
+.tag{font-size:14.5px;color:var(--text-dim);margin-top:10px;line-height:1.8}
+
+.btn-dl{
+  display:flex;align-items:center;justify-content:center;gap:11px;
+  width:100%;padding:20px;border-radius:19px;margin:24px 0 10px;
+  background:linear-gradient(140deg,var(--gold),#b8941f);
+  color:#16130a;font-family:inherit;font-size:19px;font-weight:800;
+  text-decoration:none;border:none;cursor:pointer;
+  box-shadow:0 10px 30px -6px rgba(212,175,55,.45);
+  transition:.18s;
+}
+.btn-dl:active{transform:scale(.97)}
+.btn-dl span{font-size:23px}
+.size{text-align:center;font-size:12.5px;color:var(--text-dim);margin-bottom:26px}
+
+.card{
+  background:var(--glass);border:1px solid var(--line);
+  border-radius:19px;padding:19px;margin-bottom:14px;
+}
+.card h2{font-size:16.5px;color:var(--gold);margin-bottom:13px}
+ol{margin:0;padding-right:19px}
+ol li{font-size:14.5px;line-height:2.05;color:var(--text-dim);margin-bottom:5px}
+ol li b{color:var(--text)}
+
+.feat{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid rgba(212,175,55,.09)}
+.feat:last-child{border-bottom:none}
+.feat-ico{font-size:22px;flex-shrink:0;width:30px;text-align:center}
+.feat-txt b{display:block;font-size:15px;margin-bottom:2px}
+.feat-txt span{font-size:12.5px;color:var(--text-dim);line-height:1.65}
+
+.note{
+  background:rgba(16,185,129,.09);border:1px solid rgba(16,185,129,.26);
+  border-radius:15px;padding:15px;font-size:13px;line-height:1.9;color:var(--text-dim);
+}
+.note b{color:var(--emerald)}
+
+.ios{
+  display:none;background:rgba(239,68,68,.09);border:1px solid rgba(239,68,68,.28);
+  border-radius:15px;padding:15px;font-size:13.5px;line-height:1.9;color:var(--text-dim);
+  margin-bottom:16px;
+}
+.ios b{color:#fca5a5;display:block;margin-bottom:5px}
+.ios a{color:var(--gold)}
+
+.web-link{
+  display:block;text-align:center;margin-top:20px;
+  font-size:13.5px;color:var(--gold);text-decoration:none;
+  padding:14px;border:1px solid var(--line);border-radius:15px;
+  background:rgba(255,255,255,.03);
+}
+.foot{text-align:center;font-size:11.5px;color:#6e8f82;margin-top:24px;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="app-icon">☾</div>
+    <h1>نــور</h1>
+    <div class="ver">الإصدار 2.0 · أندرويد</div>
+    <p class="tag">أذكارك وقرآنك وصلاتك في تطبيق واحد<br>يُنبّهك للأذان ويمنعك عن التشتت</p>
+  </div>
+
+  <div class="ios" id="iosNote">
+    <b>يبدو أنك تستخدم آيفون</b>
+    ملف APK يعمل على أندرويد فقط. على الآيفون استخدم النسخة الويب من الزر بالأسفل، وأضفها إلى الشاشة الرئيسية من زر المشاركة.
+  </div>
+
+  <a class="btn-dl" id="dlBtn"
+     href="https://github.com/abdulrahmanalhamoud1673/noor-blocker/releases/download/v2.0/noor-v2.0.apk">
+    <span>⬇</span> تحميل التطبيق
+  </a>
+  <div class="size">ملف APK · ٣ ميجابايت · مجاني وبدون إعلانات</div>
+
+  <div class="card">
+    <h2>بعد الضغط على التحميل</h2>
+    <ol>
+      <li>سيبدأ التنزيل — افتح الملف من <b>الإشعارات</b> أو من مجلد <b>التنزيلات</b>.</li>
+      <li>سيقول أندرويد <b>«تثبيت من مصدر غير معروف»</b> — اضغط <b>الإعدادات</b> واسمح، ثم ارجع واضغط <b>تثبيت</b>.</li>
+      <li>افتح التطبيق واسمح له بـ <b>الإشعارات</b> — بدونها لن يصلك تنبيه الأذان.</li>
+      <li>من تبويب <b>«قفل الصلاة»</b> فعّل <b>خدمة إمكانية الوصول</b>، ثم اضغط <b>«اختر الشائعة»</b>.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>ماذا يوجد في التطبيق؟</h2>
+
+    <div class="feat">
+      <div class="feat-ico">🔔</div>
+      <div class="feat-txt"><b>تنبيه الأذان</b>
+        <span>بصوت واهتزاز عند كل وقت، حتى والتطبيق مغلق</span></div>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">🔒</div>
+      <div class="feat-txt"><b>قفل وقت الصلاة</b>
+        <span>تفتح إنستغرام وقت الصلاة فيرجّعك حتى تصلّي</span></div>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">📿</div>
+      <div class="feat-txt"><b>أذكار الصباح والمساء</b>
+        <span>٢١ ذكراً لكل وقت بعدّاد مستقل وسلسلة أيام</span></div>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">📖</div>
+      <div class="feat-txt"><b>القرآن بخمسة قرّاء</b>
+        <span>وضع المصحف يُظلّل كل آية أثناء تلاوة الشيخ لها</span></div>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">🕋</div>
+      <div class="feat-txt"><b>صلِّ مع الشيخ</b>
+        <span>الكاميرا تتابع جسمك ويديك من التكبير إلى التسليم</span></div>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">🕌</div>
+      <div class="feat-txt"><b>أوقات الصلاة</b>
+        <span>محسوبة فلكياً داخل جهازك — تعمل بدون إنترنت</span></div>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>🔒 عن خدمة إمكانية الوصول</b>
+    سيحذّرك أندرويد بأنها «قد تقرأ شاشتك» — هذه رسالة عامة يعرضها النظام لكل خدمات إمكانية الوصول.
+    التطبيق مضبوط على <code>canRetrieveWindowContent="false"</code>، أي أنه <b>لا يستطيع</b> قراءة رسائلك ولا كلمات السر.
+    يعرف فقط <b>اسم</b> التطبيق المفتوح ليقارنه بقائمتك.
+  </div>
+
+  <a class="web-link" href="./index.html">أو افتح النسخة الويب بدون تثبيت ←</a>
+
+  <p class="foot">
+    صُنع بحب في الأردن 🇯🇴<br>
+    <a href="https://github.com/abdulrahmanalhamoud1673/noor-blocker" style="color:#6e8f82">الكود مفتوح على GitHub</a>
+  </p>
+
+</div>
+
+<script>
+  // على الآيفون نُخفي زر APK ونوجّهه للنسخة الويب
+  if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
+    document.getElementById('iosNote').style.display = 'block';
+    const b = document.getElementById('dlBtn');
+    b.href = './index.html';
+    b.innerHTML = '<span>🌐</span> افتح النسخة الويب';
+    document.querySelector('.size').textContent = 'تعمل مباشرة في المتصفح';
+  }
+</script>
+</body>
+</html>
