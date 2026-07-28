@@ -89,6 +89,7 @@ const Mushaf = {
 
     $("mushaf").classList.remove("hidden");
     document.body.classList.add("no-scroll");
+    if (window.Wake) Wake.sync();      // ثبّت الإضاءة فوراً لا بعد أربع ثوانٍ
     $("mushafSurah").textContent = Quran.surahName(num);
     $("mushafReciter").textContent = Quran.reciter.name;
     $("mushafPanel").classList.add("hidden");
@@ -245,6 +246,7 @@ const Mushaf = {
     this.stop();
     $("mushaf").classList.add("hidden");
     document.body.classList.remove("no-scroll");
+    if (window.Wake) Wake.sync();      // أطلق القفل فوراً حفاظاً على البطارية
   },
 
   /* ─────────── التلوين والتمرير ─────────── */

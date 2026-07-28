@@ -358,7 +358,12 @@ async function send(text) {
     if (!key) throw new Error("NO_KEY");
 
     const model = await pickModel(key);
-    const convo = history.slice(-20);          // آخر ٢٠ رسالة تكفي للسياق
+
+    // آخر ٢٠ رسالة تكفي للسياق. لكن جوجل ترفض محادثة تبدأ بردّ النموذج،
+    // والقصّ قد يقع على ردّ، فنُسقط ما تصدّر حتى تبدأ برسالة منك.
+    let convo = history.slice(-20);
+    while (convo.length && convo[0].role !== "user") convo.shift();
+
     const res = await openStream(model, key, convo);
 
     let blocked = "";

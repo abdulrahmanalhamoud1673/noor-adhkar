@@ -64,6 +64,66 @@ function toast(msg) {
 
 function vibrate(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
 
+/* ══════════════════════════════════════
+   إبقاء الشاشة مضاءة
+   ──────────────────────────────────────
+   وأنت تقرأ في المصحف يديك مشغولتان ولا تلمس الشاشة، فيطفئها
+   الهاتف في منتصف الآية. نطلب قفل الإضاءة ما دام هناك تلاوة
+   تعمل أو مصحف مفتوح أو كاميرا شغّالة، ونتركه فوراً بعدها حتى
+   لا نستهلك البطارية بلا داعٍ.
+   ══════════════════════════════════════ */
+const Wake = {
+  lock: null,
+  busy: false,
+
+  /** هل نحتاج الشاشة مضاءة الآن؟ */
+  needed() {
+    const open = id => { const e = $(id); return e && !e.classList.contains("hidden"); };
+    const playing = a => a && !a.paused && !a.ended;
+
+    if (open("mushaf")) return true;
+    if (typeof Mushaf !== "undefined" && playing(Mushaf.audio)) return true;
+    if (typeof Quran !== "undefined" && playing(Quran.audio)) return true;
+    if (window.Coach && window.Coach.running) return true;
+    if (window.Challenge && window.Challenge.running) return true;
+    return false;
+  },
+
+  async sync() {
+    if (this.busy) return;
+    const want = this.needed();
+
+    // إن كان تطبيق أندرويد يوفّر الإبقاء الأصلي فهو أضمن من قفل المتصفّح
+    if (window.NoorApp && typeof NoorApp.keepAwake === "function") {
+      try { NoorApp.keepAwake(want); } catch {}
+    }
+
+    if (want && !this.lock && document.visibilityState === "visible") {
+      if (!navigator.wakeLock) return;          // متصفّح قديم — نتجاهل بهدوء
+      this.busy = true;
+      try {
+        this.lock = await navigator.wakeLock.request("screen");
+        // النظام قد يسحب القفل وحده (مكالمة، تبديل تطبيق) فنعيد طلبه لاحقاً
+        this.lock.addEventListener("release", () => { this.lock = null; });
+      } catch { this.lock = null; }
+      this.busy = false;
+    } else if (!want && this.lock) {
+      const l = this.lock;
+      this.lock = null;
+      try { l.release(); } catch {}
+    }
+  },
+
+  init() {
+    // كل أربع ثوانٍ يكفي: مهلة إطفاء الشاشة لا تقلّ عن ١٥ ثانية
+    setInterval(() => this.sync(), 4000);
+    document.addEventListener("visibilitychange", () => this.sync());
+    this.sync();
+  }
+};
+// الملفات الأخرى تصل إليه عبر window، فـ const لا يُعلَّق على window تلقائياً
+window.Wake = Wake;
+
 /* ---------- التنقّل ---------- */
 function goto(pageId) {
   // أغلق أي شاشة عائمة أولاً، وإلا بقيت فوق الصفحة الجديدة
@@ -920,6 +980,7 @@ function boot() {
   // تنظيف عامل الخدمة القديم الذي كان يخزّن نسخاً قديمة من الملفات
   step("تحدّي الاستغفار", initChallengePickers);
   step("فضفض", () => Chat.init());
+  step("إبقاء الشاشة مضاءة", () => Wake.init());
   step("تنظيف الذاكرة المخزّنة", cleanupOldCaches);
   step("طلب فكّ القفل", applyLockRequest);
   step("طلب التحدّي", applyChallengeRequest);
