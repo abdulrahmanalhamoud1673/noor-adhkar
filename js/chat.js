@@ -263,11 +263,19 @@ function scoreModel(n) {
   return s;
 }
 
+/**
+ * المفتاح يُرسل في ترويسة لا في الرابط: الروابط تُسجَّل في السجلّات
+ * والوسائط، فلا يُوضع فيها سرّ.
+ */
+function auth(key, extra) {
+  return Object.assign({ "x-goog-api-key": key }, extra || {});
+}
+
 async function pickModel(key) {
   const cached = Store.get(MODEL_ID, "");
   if (cached) return cached;
 
-  const r = await fetch(`${API}/models?key=${encodeURIComponent(key)}`);
+  const r = await fetch(`${API}/models`, { headers: auth(key) });
   if (!r.ok) throw apiError(r.status, await r.text());
   const j = await r.json();
 
@@ -308,8 +316,12 @@ function buildBody(convo, noThinking) {
 
 /** يفتح البثّ ويعيد الاستجابة. يعيد المحاولة بلا thinkingConfig إن رفضه النموذج. */
 async function openStream(model, key, convo) {
-  const url = `${API}/models/${model}:streamGenerateContent?alt=sse&key=${encodeURIComponent(key)}`;
-  const post = body => fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body });
+  const url = `${API}/models/${model}:streamGenerateContent?alt=sse`;
+  const post = body => fetch(url, {
+    method: "POST",
+    headers: auth(key, { "Content-Type": "application/json" }),
+    body,
+  });
 
   let r = await post(buildBody(convo, true));
   if (r.status === 400) r = await post(buildBody(convo, false));
@@ -420,9 +432,9 @@ function errorText(err) {
   if (err.message === "NO_KEY") return "ما في مفتاح محفوظ. اضغط «🔑 تغيير المفتاح» وضعه.";
   if (err.status === 400 || err.status === 401) {
     Store.set(MODEL_ID, "");
-    return "المفتاح غير صحيح. انسخه من جديد من Google AI Studio واضغط «🔑 تغيير المفتاح».";
+    return "المفتاح غير صحيح أو ناقص. اضغط «🔑 تغيير المفتاح» وانسخه كاملاً بزرّ Copy key.";
   }
-  if (err.status === 403) return "المفتاح مرفوض. تأكّد أنك أخذته من Google AI Studio وأنه غير مقيَّد.";
+  if (err.status === 403) return "المفتاح مرفوض أو محذوف. أنشئ مفتاحاً جديداً من Google AI Studio.";
   if (err.status === 429) return "وصلت حدّ الاستخدام المجاني لهذه الدقيقة. انتظر دقيقة وأعد المحاولة.";
   if (err.status === 404) { Store.set(MODEL_ID, ""); return "النموذج غير متاح. أعد المحاولة."; }
   if (err.status >= 500) return "خوادم جوجل مشغولة الآن. أعد المحاولة بعد قليل.";
@@ -441,7 +453,9 @@ function initChat() {
 
   $("saveChatKey").addEventListener("click", () => {
     const v = $("chatKey").value.trim();
-    if (!v.startsWith("AIza")) { toast("مفتاح جوجل يبدأ بـ AIza"); return; }
+    // لا نتحقّق من بادئة معيّنة: جوجل غيّرت صيغة المفاتيح من AIza إلى AQ.
+    // وقد تغيّرها ثانية. نتأكّد فقط أنه نصّ متّصل معقول، والخادم يحكم.
+    if (v.length < 20 || /\s/.test(v)) { toast("المفتاح ناقص — انسخه كاملاً"); return; }
     Store.set(KEY_ID, v);
     Store.set(MODEL_ID, "");           // نعيد اختيار النموذج لهذا المفتاح
     $("chatKey").value = "";
