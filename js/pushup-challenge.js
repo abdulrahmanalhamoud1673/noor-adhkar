@@ -5,7 +5,7 @@
    كل المعالجة داخل جهازك.
    ══════════════════════════════════════════════════════════ */
 
-import { loadLandmarker, cameraConstraints } from "./pose-model.js";
+import { loadLandmarker, openCamera } from "./pose-model.js";
 
 const L = {
   lSh: 11, rSh: 12, lEl: 13, rEl: 14, lWr: 15, rWr: 16,
@@ -118,10 +118,8 @@ const Challenge = {
     this.elbowHi = -999;
 
     // الكاميرا بنفس اتجاه الهاتف، وأولاً كي ترى نفسك بينما يُحمَّل النموذج
-    this.stream = await navigator.mediaDevices.getUserMedia(cameraConstraints());
     const video = document.getElementById("chVideo");
-    video.srcObject = this.stream;
-    await video.play();
+    this.stream = await openCamera(video, t => this.diag(t));
 
     // نجعل الإطار بنفس نسبة الكاميرا، فتظهر الصورة كاملة بلا زوم ولا قصّ
     fitFrame(video, video.closest(".video-wrap"));

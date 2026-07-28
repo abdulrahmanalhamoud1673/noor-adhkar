@@ -7,7 +7,7 @@
 
 import { createSheikh, POSE_AR } from "./sheikh-figure.js";
 import { fitFrame } from "./pushup-challenge.js";
-import { loadLandmarker, cameraConstraints } from "./pose-model.js";
+import { loadLandmarker, openCamera } from "./pose-model.js";
 
 /* نقاط الهيكل */
 const L = {
@@ -368,10 +368,8 @@ const Coach = {
     if (vb) vb.classList.toggle("hidden", !verify);
 
     // الكاميرا أولاً كي ترى نفسك فوراً بينما يُحمَّل النموذج
-    this.stream = await navigator.mediaDevices.getUserMedia(cameraConstraints());
     const video = document.getElementById("camVideo");
-    video.srcObject = this.stream;
-    await video.play();
+    this.stream = await openCamera(video, t => this.diag(t));
 
     // إطار بنفس نسبة الكاميرا — بلا قصّ ولا زوم
     fitFrame(video, video.closest(".video-wrap"));

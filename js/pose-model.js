@@ -118,3 +118,77 @@ export function cameraConstraints() {
     audio: false
   };
 }
+
+/** يحوّل عطل الكاميرا إلى جملة عربية تقول ما العمل بالضبط */
+function cameraError(e) {
+  const name = (e && e.name) || "";
+  if (e && e.message === "CAM_TIMEOUT") {
+    return new Error(
+      "لم تستجب الكاميرا.\n\nغالباً إذن الكاميرا غير ممنوح للتطبيق نفسه:\n" +
+      "إعدادات الهاتف ← التطبيقات ← نور ← الأذونات ← الكاميرا ← اسمح.\n" +
+      "ثم أغلق التطبيق وافتحه من جديد."
+    );
+  }
+  if (name === "NotAllowedError" || name === "SecurityError")
+    return new Error("رُفض إذن الكاميرا. اسمح به من إعدادات التطبيق ثم أعد المحاولة.");
+  if (name === "NotFoundError" || name === "DevicesNotFoundError")
+    return new Error("لم أجد كاميرا على هذا الجهاز.");
+  if (name === "NotReadableError" || name === "TrackStartError")
+    return new Error("الكاميرا مشغولة بتطبيق آخر. أغلقه ثم أعد المحاولة.");
+  return new Error("تعذّر فتح الكاميرا. " + ((e && e.message) || ""));
+}
+
+/**
+ * يفتح الكاميرا بأمان.
+ *
+ * كان `getUserMedia` يعلّق بلا نهاية داخل تطبيق أندرويد حين لا يملك
+ * التطبيق نفسه إذن الكاميرا من النظام: الصفحة تُمنح الإذن، ثم يقف
+ * الطلب عند فتح العتاد فلا يرجع بنتيجة ولا بخطأ. لذلك: مهلة قصوى
+ * دائماً، وتنازل تدريجي عن القيود، ورسالة تقول ما العمل.
+ */
+export async function openCamera(video, onProgress = () => {}) {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    throw new Error("هذا المتصفّح لا يدعم الكاميرا. افتح التطبيق من رابط https.");
+  }
+
+  // أوقف أي بثّ سابق: كاميرا مشغولة من محاولة سابقة تجعل الطلب يعلّق
+  if (video && video.srcObject) {
+    try { video.srcObject.getTracks().forEach(t => t.stop()); } catch {}
+    video.srcObject = null;
+  }
+
+  const attempts = [
+    cameraConstraints(),
+    { video: { facingMode: "user" }, audio: false },
+    { video: true, audio: false }
+  ];
+
+  let stream = null, lastErr = null;
+  for (const constraints of attempts) {
+    try {
+      onProgress("جارٍ فتح الكاميرا…");
+      stream = await withTimeout(
+        navigator.mediaDevices.getUserMedia(constraints), 15000, "CAM_TIMEOUT"
+      );
+      break;
+    } catch (e) {
+      lastErr = e;
+      if (e && e.message === "CAM_TIMEOUT") break;   // المهلة لا تُصلحها قيود أبسط
+    }
+  }
+  if (!stream) throw cameraError(lastErr);
+
+  video.srcObject = stream;
+  // لا نُعلّق على play: مع muted/playsinline يبدأ العرض وحده
+  try { await withTimeout(video.play(), 6000, "PLAY_TIMEOUT"); } catch {}
+
+  if (!video.videoWidth) {
+    onProgress("جارٍ انتظار الصورة…");
+    await withTimeout(new Promise(done => {
+      video.addEventListener("loadedmetadata", done, { once: true });
+      video.addEventListener("playing", done, { once: true });
+    }), 8000, "FRAME_TIMEOUT").catch(() => {});
+  }
+
+  return stream;
+}

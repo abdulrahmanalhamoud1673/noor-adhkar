@@ -1057,9 +1057,12 @@ input[type=range]::-webkit-slider-thumb {
   width: 100vw;
   max-width: 100vw;
   margin-inline: calc(50% - 50vw);
-  max-height: calc(100vh - var(--nav-h) - 150px);
+  /* لا سقف للارتفاع عمداً: أي سقف يكسر تطابق الإطار مع نسبة الكاميرا
+     فتظهر أشرطة سوداء وتصغر الصورة. الصفحة تتمرّر لما تحته. */
+  max-height: none;
   border-radius: 0;
   border-inline: none;
+  margin-bottom: 14px;
 }
 @media (min-width: 641px) {
   .video-wrap.full-bleed { width: 100%; margin-inline: 0; border-radius: var(--radius); }
