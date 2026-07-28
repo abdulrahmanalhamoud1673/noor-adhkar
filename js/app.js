@@ -226,7 +226,85 @@ function tickCountdown() {
   $("countdown").textContent =
     `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 
+  Adhan.checkDue();
 }
+
+/* ══════════════════════════════════════
+   الأذان داخل الصفحة
+   ──────────────────────────────────────
+   تطبيق أندرويد هو من يؤذّن وأنت خارج التطبيق. أما إن كانت الصفحة
+   مفتوحة أمامك فترفعه هي، مرّة واحدة لكل صلاة. المتصفّح لا يسمح
+   بتشغيل صوت قبل أن تلمس الشاشة، فنُبقي زرّ تشغيل ظاهراً كبديل.
+   ══════════════════════════════════════ */
+const Adhan = {
+  audio: null,
+  playing: false,
+
+  /** مفتاح يمنع تكرار الأذان للصلاة نفسها */
+  keyOf(name) { return `${todayKey()}_${name}`; },
+
+  el() {
+    if (!this.audio) {
+      this.audio = new Audio("audio/adhan.ogg");
+      this.audio.preload = "none";
+      this.audio.addEventListener("ended", () => this.hideStop());
+    }
+    return this.audio;
+  },
+
+  /** هل دخل وقت صلاة الآن ولم نؤذّن لها بعد؟ */
+  checkDue() {
+    if (!currentTimes) return;
+    const now = nowMinutes();
+
+    for (const k of PRAYER_ORDER) {
+      if (k === "sunrise") continue;
+      const t = currentTimes[k];
+      if (isNaN(t)) continue;
+      // نافذة دقيقة واحدة بعد دخول الوقت
+      if (now >= t && now < t + 1) {
+        const name = PRAYER_NAMES[k];
+        const key = this.keyOf(k);
+        if (Store.get("adhanDone", "") === key) return;
+        Store.set("adhanDone", key);
+        this.play(name);
+        return;
+      }
+    }
+  },
+
+  play(name) {
+    const a = this.el();
+    a.currentTime = 0;
+    a.play().then(() => {
+      this.playing = true;
+      this.showStop(name);
+    }).catch(() => {
+      // المتصفّح منع التشغيل التلقائي — نعرض زرّاً يضغطه بنفسه
+      this.showStop(name, true);
+    });
+  },
+
+  showStop(name, needsTap) {
+    const bar = $("adhanBar");
+    if (!bar) return;
+    $("adhanText").textContent = needsTap
+      ? `حان وقت صلاة ${name} — اضغط لسماع الأذان`
+      : `🕌 حان الآن وقت صلاة ${name}`;
+    $("adhanStop").textContent = needsTap ? "▶ شغّل" : "■ إيقاف";
+    $("adhanStop").onclick = () => {
+      if (needsTap) { this.el().play().catch(() => {}); this.showStop(name); }
+      else { this.el().pause(); this.hideStop(); }
+    };
+    bar.classList.remove("hidden");
+  },
+
+  hideStop() {
+    this.playing = false;
+    const bar = $("adhanBar");
+    if (bar) bar.classList.add("hidden");
+  }
+};
 
 /* التاريخ الهجري */
 function renderHijri() {
