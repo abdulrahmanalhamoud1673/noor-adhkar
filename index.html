@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=21">
+<link rel="stylesheet" href="css/style.css?v=22">
 </head>
 <body>
 
@@ -170,26 +170,35 @@
     </div>
 
     <div class="coach-steps">
-      <div><b>1</b> ضع الهاتف على الأرض <b>من جانبك</b> بحيث يرى جسمك كاملاً.</div>
-      <div><b>2</b> خذ وضع الضغط: الجسم أفقي ومستقيم.</div>
-      <div><b>3</b> انزل حتى ينثني مرفقك، ثم اصعد.</div>
-      <div><b>4</b> مع كل ضغطة قل الذكر بصوت مسموع.</div>
+      <div><b>1</b> ضع الهاتف <b>بالعرض (أفقياً)</b> على الأرض من جانبك — لا أمامك.</div>
+      <div><b>2</b> ابعده عنك متراً تقريباً حتى يظهر جسمك <b>من رأسك إلى قدميك</b>.</div>
+      <div><b>3</b> خذ وضع الضغط: الجسم أفقي ومفرود، والكاميرا تراك من الجنب.</div>
+      <div><b>4</b> انزل حتى ينثني مرفقك، ثم اصعد — وقل الذكر بصوت مسموع مع كل ضغطة.</div>
     </div>
+    <p class="privacy-note">
+      💡 فوق الكاميرا سطر يخبرك بالأرقام مباشرة (أفقي / مفرود / زاوية المرفق) —
+      إن لم يَعُدّ، انظر إليه لتعرف السبب فوراً.
+    </p>
 
     <p class="privacy-note">🔒 الكاميرا والميكروفون داخل جهازك فقط — لا يُرفع شيء.</p>
     <button id="startChallenge" class="btn btn-gold btn-lg full">ابدأ التحدّي</button>
   </div>
 
   <div class="ch-stage hidden" id="chStage">
-    <div class="video-wrap">
+    <div class="video-wrap full-bleed">
       <video id="chVideo" playsinline autoplay muted></video>
       <canvas id="chCanvas"></canvas>
       <div class="ch-counter" id="chCount">0 / 10</div>
+      <div class="ch-diag" id="chDiag"></div>
     </div>
 
     <div class="ch-phrase-box card-glass">
       <div class="ch-label">قل مع كل ضغطة</div>
       <div class="ch-phrase" id="chPhrase">أَسْتَغْفِرُ اللهَ</div>
+      <div class="ch-mic hidden" id="chMic">
+        <span>🎤 أسمعك</span>
+        <div class="ch-mic-bar"><div id="chMicBar"></div></div>
+      </div>
       <div class="ch-dots" id="chDots"></div>
       <div class="progress-bar ch-progress"><div id="chBar"></div></div>
     </div>
@@ -430,10 +439,10 @@
 
 <div id="toast" class="toast"></div>
 
-<script src="js/data.js?v=21"></script>
-<script src="js/prayertimes.js?v=21"></script>
-<script src="js/app.js?v=21"></script>
-<script src="js/mushaf.js?v=21"></script>
-<script src="js/chat.js?v=21"></script>
+<script src="js/data.js?v=22"></script>
+<script src="js/prayertimes.js?v=22"></script>
+<script src="js/app.js?v=22"></script>
+<script src="js/mushaf.js?v=22"></script>
+<script src="js/chat.js?v=22"></script>
 </body>
 </html>

@@ -23,7 +23,8 @@ const BONES = [
   [11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28]
 ];
 
-const mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+const mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, z: ((a.z || 0) + (b.z || 0)) / 2 });
+const vis = p => (p && p.visibility != null) ? p.visibility : 1;
 
 /**
  * يضبط إطار العرض على نسبة أبعاد الكاميرا الحقيقية.
@@ -41,42 +42,53 @@ export function fitFrame(video, wrap) {
   video.addEventListener("resize", apply);
 }
 
-/** زاوية عند النقطة b بين a و c بالدرجات */
+/** زاوية عند b بين a و c، بثلاثة أبعاد إن توفّر z */
 function angleAt(a, b, c) {
-  const v1 = { x: a.x - b.x, y: a.y - b.y };
-  const v2 = { x: c.x - b.x, y: c.y - b.y };
-  const dot = v1.x * v2.x + v1.y * v2.y;
-  const den = (Math.hypot(v1.x, v1.y) * Math.hypot(v2.x, v2.y)) || 1;
+  const v1 = { x: a.x - b.x, y: a.y - b.y, z: (a.z || 0) - (b.z || 0) };
+  const v2 = { x: c.x - b.x, y: c.y - b.y, z: (c.z || 0) - (b.z || 0) };
+  const dot = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+  const den = (Math.hypot(v1.x, v1.y, v1.z) * Math.hypot(v2.x, v2.y, v2.z)) || 1e-6;
   return (Math.acos(Math.max(-1, Math.min(1, dot / den))) * 180) / Math.PI;
 }
 
 /**
  * يقيس وضعية الضغط.
- * الضغطة الصحيحة: الجسم مستقيم وأفقي، والذراعان تنثنيان ثم تمتدّان.
+ *
+ * مهم: نحسب الزوايا من `worldLandmarks` (إحداثيات حقيقية بالمتر) لا من
+ * الإحداثيات المُطبَّعة 0..1. الإحداثيات المطبّعة مشدودة بنسبة أبعاد
+ * الصورة، فجسم أفقي تماماً كان يظهر مائلاً بأكثر من ٤٠ درجة على كاميرا
+ * الهاتف — وهذا هو سبب امتناع العدّاد عن العدّ أصلاً.
  */
-function measurePushup(lm) {
-  const shoulder = mid(lm[L.lSh], lm[L.rSh]);
-  const hip      = mid(lm[L.lHip], lm[L.rHip]);
-  const ankle    = mid(lm[L.lAn], lm[L.rAn]);
-  const knee     = mid(lm[L.lKn], lm[L.rKn]);
+function measurePushup(lm, world) {
+  const P = world && world.length ? world : lm;   // نفضّل الحقيقي، ونرجع للمطبّع عند الحاجة
 
-  // ميل الجسم عن الأفقي — الضغط يكون الجسم فيه أفقياً
-  const dx = Math.abs(shoulder.x - ankle.x);
-  const dy = Math.abs(shoulder.y - ankle.y);
-  const bodyTilt = (Math.atan2(dy, dx || 0.0001) * 180) / Math.PI;
+  const shoulder = mid(P[L.lSh], P[L.rSh]);
+  const hip      = mid(P[L.lHip], P[L.rHip]);
+  const ankle    = mid(P[L.lAn], P[L.rAn]);
+
+  // ميل الجسم عن الأفقي: نقارن الارتفاع بالامتداد الأفقي (بعدين أفقيين)
+  const dv = Math.abs(shoulder.y - ankle.y);
+  const dh = Math.hypot(shoulder.x - ankle.x, (shoulder.z || 0) - (ankle.z || 0));
+  const bodyTilt = (Math.atan2(dv, dh || 1e-6) * 180) / Math.PI;
 
   // استقامة الجسم: الورك لا يهبط ولا يرتفع كثيراً عن خط الكتف–الكاحل
   const hipLine = angleAt(shoulder, hip, ankle);
 
-  // زاوية المرفق — الأهم في العدّ
-  const lElbow = angleAt(lm[L.lSh], lm[L.lEl], lm[L.lWr]);
-  const rElbow = angleAt(lm[L.rSh], lm[L.rEl], lm[L.rWr]);
-  const elbow = Math.max(lElbow, rElbow);   // الأوضح للكاميرا
+  // زاوية المرفق — الأهم في العدّ.
+  // نأخذ الذراع الأوضح للكاميرا لا الأكبر زاوية: حين يكون الهاتف بجانبك
+  // تكون الذراع البعيدة محجوبة وتُخمَّن زاويتها خطأً، فتُفسد العدّ.
+  const lSeen = (vis(lm[L.lSh]) + vis(lm[L.lEl]) + vis(lm[L.lWr])) / 3;
+  const rSeen = (vis(lm[L.rSh]) + vis(lm[L.rEl]) + vis(lm[L.rWr])) / 3;
+  const useLeft = lSeen >= rSeen;
+  const elbow = useLeft
+    ? angleAt(P[L.lSh], P[L.lEl], P[L.lWr])
+    : angleAt(P[L.rSh], P[L.rEl], P[L.rWr]);
 
-  const keys = [L.lSh, L.rSh, L.lEl, L.rEl, L.lWr, L.rWr, L.lHip, L.rHip];
-  const visibility = keys.reduce((s, i) => s + (lm[i].visibility ?? 1), 0) / keys.length;
+  // الظهور: نأخذ الأفضل من كل زوج، فالجانب البعيد محجوب دائماً
+  const pairs = [[L.lSh, L.rSh], [L.lEl, L.rEl], [L.lWr, L.rWr], [L.lHip, L.rHip]];
+  const visibility = pairs.reduce((s, [a, b]) => s + Math.max(vis(lm[a]), vis(lm[b])), 0) / pairs.length;
 
-  return { bodyTilt, hipLine, elbow, visibility, knee, shoulder, hip };
+  return { bodyTilt, hipLine, elbow, visibility, armSeen: Math.max(lSeen, rSeen) };
 }
 
 const Challenge = {
@@ -93,7 +105,12 @@ const Challenge = {
   awaitingDhikr: false,
   micStream: null,
   analyser: null,
-  spokeAt: 0,
+  micPeak: 0,
+  waitStart: 0,
+
+  // مدى حركة مرفقك يُقاس أثناء اللعب، فيتأقلم العدّاد مع عمق ضغطك
+  elbowLo: 999,
+  elbowHi: -999,
 
   async start(target, phrase) {
     if (this.running) return;
@@ -103,17 +120,25 @@ const Challenge = {
     this.state = "up";
     this.goodFrames = 0;
     this.awaitingDhikr = false;
+    this.elbowLo = 999;
+    this.elbowHi = -999;
 
-    // مجال رؤية واسع: الهاتف على الأرض ويجب أن يرى جسمك كاملاً
+    // نطلب الكاميرا بنفس اتجاه الهاتف. لو طلبنا أبعاداً عرضية والهاتف
+    // طولي، رجعت صورة قصيرة عريضة فظهرت شاشة الكاميرا صغيرة جداً.
+    const portrait = window.innerHeight >= window.innerWidth;
+    const size = portrait
+      ? { width: { ideal: 720 }, height: { ideal: 1280 } }
+      : { width: { ideal: 1280 }, height: { ideal: 720 } };
+
     this.stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
+      video: { facingMode: "user", ...size },
       audio: false
     });
     const video = document.getElementById("chVideo");
     video.srcObject = this.stream;
     await video.play();
 
-    // نجعل الإطار بنفس نسبة الكاميرا، فتظهر الصورة كاملة بلا زوم
+    // نجعل الإطار بنفس نسبة الكاميرا، فتظهر الصورة كاملة بلا زوم ولا قصّ
     fitFrame(video, video.closest(".video-wrap"));
 
     if (!this.landmarker) {
@@ -122,14 +147,10 @@ const Challenge = {
         baseOptions: { modelAssetPath: MODEL_URL, delegate: "GPU" },
         runningMode: "VIDEO",
         numPoses: 1,
-        minPoseDetectionConfidence: 0.5,
-        minTrackingConfidence: 0.5
+        minPoseDetectionConfidence: 0.4,
+        minTrackingConfidence: 0.4
       });
     }
-
-    const canvas = document.getElementById("chCanvas");
-    canvas.width = video.videoWidth || 720;
-    canvas.height = video.videoHeight || 960;
 
     await this.openMic();
 
@@ -143,6 +164,7 @@ const Challenge = {
     try {
       this.micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      if (ctx.state === "suspended") await ctx.resume();
       const src = ctx.createMediaStreamSource(this.micStream);
       this.analyser = ctx.createAnalyser();
       this.analyser.fftSize = 512;
@@ -177,6 +199,12 @@ const Challenge = {
     const canvas = document.getElementById("chCanvas");
     const ctx = canvas.getContext("2d");
 
+    // نبقي مقاس اللوحة مطابقاً للصورة، وإلا انزاح الهيكل عن الجسم
+    if (video.videoWidth && canvas.width !== video.videoWidth) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+    }
+
     if (video.readyState >= 2 && video.currentTime !== this.lastTime) {
       this.lastTime = video.currentTime;
       const res = this.landmarker.detectForVideo(video, performance.now());
@@ -184,24 +212,37 @@ const Challenge = {
 
       if (res.landmarks && res.landmarks.length) {
         const lm = res.landmarks[0];
+        const world = res.worldLandmarks && res.worldLandmarks[0];
         this.draw(ctx, canvas, lm);
-        this.track(measurePushup(lm));
+        this.track(measurePushup(lm, world));
       } else {
+        this.diag("");
         this.hint("لا أراك — تأكد أن جسمك كاملاً داخل الصورة");
       }
+    }
 
-      // نلتقط الصوت باستمرار كي لا تفوتنا كلمتك
-      if (this.awaitingDhikr && this.micLevel() > 0.045) {
-        this.spokeAt = performance.now();
-        this.confirmDhikr();
+    // نلتقط الصوت باستمرار كي لا تفوتنا كلمتك
+    if (this.awaitingDhikr) {
+      const lvl = this.micLevel();
+      this.micPeak = Math.max(this.micPeak * 0.92, lvl);
+      this.showMic(this.micPeak);
+      if (lvl > 0.025) this.confirmDhikr();
+
+      // لا نترك التحدّي عالقاً إن لم يسمعك: نعيد الاستماع وننبّهك
+      else if (performance.now() - this.waitStart > 6000) {
+        this.waitStart = performance.now();
+        const el = document.getElementById("chHint");
+        if (el) el.textContent = `ما سمعتك — قل «${this.phrase}» بصوت أعلى`;
+        this.relisten();
       }
     }
+
     requestAnimationFrame(() => this.loop());
   },
 
   draw(ctx, canvas, lm) {
     const W = canvas.width, H = canvas.height;
-    const seen = p => p && (p.visibility ?? 1) >= 0.4;
+    const seen = p => p && vis(p) >= 0.35;
     ctx.lineWidth = Math.max(3, W / 190);
     ctx.strokeStyle = "rgba(16,185,129,.85)";
     for (const [a, b] of BONES) {
@@ -220,32 +261,50 @@ const Challenge = {
     }
   },
 
+  /** عتبتا النزول والصعود، متأقلمتان مع مدى حركتك الفعلي */
+  thresholds() {
+    const range = this.elbowHi - this.elbowLo;
+    if (range >= 35) {
+      return { down: this.elbowLo + range * 0.35, up: this.elbowLo + range * 0.72 };
+    }
+    return { down: 112, up: 145 };   // قيم مبدئية حتى نعرف مداك
+  },
+
   /** عدّ الضغطات: نزول (المرفق ينثني) ثم صعود (يمتدّ) */
   track(m) {
-    if (m.visibility < 0.5) { this.hint("قرّب جسمك للكاميرا"); return; }
-
-    // يجب أن يكون الجسم أفقياً ومستقيماً — وإلا فليست ضغطة
-    const horizontal = m.bodyTilt < 40;
-    const straight = m.hipLine > 140;
-    if (!horizontal) { this.hint("خذ وضع الضغط — جسمك أفقي على الأرض"); return; }
-    if (!straight)   { this.hint("افرد ظهرك — لا ترفع وركك ولا تُنزله"); return; }
-
-    if (this.awaitingDhikr) {
-      this.hint(`قل: ${this.phrase}`);
+    if (m.visibility < 0.35) {
+      this.diag("");
+      this.hint("قرّب جسمك للكاميرا حتى يظهر كاملاً");
       return;
     }
 
-    if (this.state === "up" && m.elbow < 100) {
-      this.goodFrames++;
-      if (this.goodFrames >= 3) { this.state = "down"; this.goodFrames = 0; }
-      this.hint("انزل… ممتاز");
-    } else if (this.state === "down" && m.elbow > 150) {
-      this.goodFrames++;
-      if (this.goodFrames >= 3) {
-        this.state = "up";
-        this.goodFrames = 0;
-        this.onRep();
-      }
+    // الجسم أفقي ومستقيم — وإلا فليست ضغطة (عتبات واسعة عمداً)
+    const horizontal = m.bodyTilt < 55;
+    const straight = m.hipLine > 120;
+
+    this.diag(
+      `${horizontal ? "✓" : "✗"} أفقي ${Math.round(m.bodyTilt)}° · ` +
+      `${straight ? "✓" : "✗"} مفرود ${Math.round(m.hipLine)}° · ` +
+      `مرفق ${Math.round(m.elbow)}°`
+    );
+
+    if (!horizontal) { this.hint("خذ وضع الضغط — جسمك أفقي على الأرض"); return; }
+    if (!straight)   { this.hint("افرد ظهرك — لا ترفع وركك ولا تُنزله"); return; }
+
+    if (this.awaitingDhikr) { this.hint(`قل: ${this.phrase}`); return; }
+
+    // نتعلّم مدى حركتك ما دامت الوضعية صحيحة والذراع مرئية
+    if (m.armSeen > 0.4 && m.elbow > 20 && m.elbow < 180) {
+      this.elbowLo = Math.min(this.elbowLo, m.elbow);
+      this.elbowHi = Math.max(this.elbowHi, m.elbow);
+    }
+    const th = this.thresholds();
+
+    if (this.state === "up" && m.elbow < th.down) {
+      if (++this.goodFrames >= 2) { this.state = "down"; this.goodFrames = 0; }
+      this.hint("ممتاز… الآن اصعد");
+    } else if (this.state === "down" && m.elbow > th.up) {
+      if (++this.goodFrames >= 2) { this.state = "up"; this.goodFrames = 0; this.onRep(); }
       this.hint("اصعد…");
     } else {
       this.goodFrames = 0;
@@ -256,9 +315,16 @@ const Challenge = {
   /** اكتملت ضغطة — ننتظر الذكر */
   onRep() {
     this.awaitingDhikr = true;
-    this.spokeAt = 0;
+    this.micPeak = 0;
+    this.waitStart = performance.now();
     if (navigator.vibrate) navigator.vibrate(40);
     this.render();
+    this.relisten();
+  },
+
+  /** يشغّل التعرّف على الذكر (أو يحتسبه إن لم يكن هناك ميكروفون أصلاً) */
+  relisten() {
+    if (!this.awaitingDhikr) return;
 
     // إن وُجد تعرّف صوتي أصلي في التطبيق، نستخدمه للتحقق من الكلمة نفسها
     if (window.NoorApp && typeof NoorApp.listenForDhikr === "function") {
@@ -273,6 +339,7 @@ const Challenge = {
   confirmDhikr() {
     if (!this.awaitingDhikr) return;
     this.awaitingDhikr = false;
+    this.showMic(0);
     this.reps++;
     if (navigator.vibrate) navigator.vibrate([30, 40, 30]);
     this.render();
@@ -285,6 +352,7 @@ const Challenge = {
     this.stop();
     document.getElementById("chHint").textContent = "🔓 أحسنت — فُكّ الحظر";
     document.getElementById("chCount").textContent = `${this.target} / ${this.target}`;
+    this.diag("");
     if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 
     try {
@@ -296,8 +364,21 @@ const Challenge = {
 
   hint(t) {
     const el = document.getElementById("chHint");
-    if (el && !this.awaitingDhikr) el.textContent = t;
-    else if (el) el.textContent = `قل: ${this.phrase}`;
+    if (!el) return;
+    el.textContent = this.awaitingDhikr ? `قل: ${this.phrase}` : t;
+  },
+
+  /** قراءة حيّة تشرح لماذا يَعُدّ أو لا يَعُدّ — بلا تخمين */
+  diag(t) {
+    const el = document.getElementById("chDiag");
+    if (el) el.textContent = t;
+  },
+
+  showMic(level) {
+    const bar = document.getElementById("chMicBar");
+    const box = document.getElementById("chMic");
+    if (box) box.classList.toggle("hidden", !this.awaitingDhikr);
+    if (bar) bar.style.width = Math.min(100, Math.round(level * 900)) + "%";
   },
 
   render() {
@@ -305,6 +386,7 @@ const Challenge = {
     document.getElementById("chPhrase").textContent = this.phrase;
     const bar = document.getElementById("chBar");
     if (bar) bar.style.width = Math.round((this.reps / this.target) * 100) + "%";
+    this.showMic(0);
 
     const dots = document.getElementById("chDots");
     if (dots) {

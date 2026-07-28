@@ -1047,3 +1047,45 @@ input[type=range]::-webkit-slider-thumb {
   background: rgba(255,255,255,.03); border: 1px solid var(--line); border-radius: 12px;
 }
 .chat-trust b { color: var(--gold); font-weight: 700; }
+
+/* ══════════════════════════════════════
+   كاميرا التحدّي — بعرض الشاشة كاملاً بلا زوم
+   ══════════════════════════════════════ */
+/* نكسر حشوة #app لتملأ الكاميرا عرض الهاتف. الارتفاع يتبع نسبة
+   الكاميرا نفسها (يضبطها fitFrame) فلا يُقصّ شيء ولا تظهر مُكبّرة. */
+.video-wrap.full-bleed {
+  width: 100vw;
+  max-width: 100vw;
+  margin-inline: calc(50% - 50vw);
+  max-height: calc(100vh - var(--nav-h) - 150px);
+  border-radius: 0;
+  border-inline: none;
+}
+@media (min-width: 641px) {
+  .video-wrap.full-bleed { width: 100%; margin-inline: 0; border-radius: var(--radius); }
+}
+
+/* قراءة حيّة تشرح لماذا يَعُدّ أو لا يَعُدّ */
+.ch-diag {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
+  background: linear-gradient(0deg, rgba(0,0,0,.82), transparent);
+  padding: 16px 12px 9px; text-align: center;
+  font-size: 12.5px; font-weight: 700; color: var(--gold-soft);
+  direction: rtl; letter-spacing: .2px; min-height: 14px;
+}
+
+/* مؤشّر الميكروفون أثناء انتظار الذكر */
+.ch-mic {
+  display: flex; align-items: center; gap: 10px; justify-content: center;
+  margin: 10px auto 4px; max-width: 260px;
+  font-size: 12.5px; color: var(--text-dim);
+}
+.ch-mic-bar {
+  flex: 1; height: 8px; border-radius: 99px; overflow: hidden;
+  background: rgba(0,0,0,.4); border: 1px solid var(--line);
+}
+.ch-mic-bar div {
+  height: 100%; width: 0%; border-radius: 99px;
+  background: linear-gradient(90deg, var(--emerald), var(--gold));
+  transition: width .12s linear;
+}
