@@ -5,13 +5,7 @@
    كل المعالجة داخل جهازك.
    ══════════════════════════════════════════════════════════ */
 
-import { PoseLandmarker, FilesetResolver }
-  from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
-
-const MODEL_URL =
-  "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";
-const WASM_URL =
-  "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm";
+import { loadLandmarker, cameraConstraints } from "./pose-model.js";
 
 const L = {
   lSh: 11, rSh: 12, lEl: 13, rEl: 14, lWr: 15, rWr: 16,
@@ -123,17 +117,8 @@ const Challenge = {
     this.elbowLo = 999;
     this.elbowHi = -999;
 
-    // نطلب الكاميرا بنفس اتجاه الهاتف. لو طلبنا أبعاداً عرضية والهاتف
-    // طولي، رجعت صورة قصيرة عريضة فظهرت شاشة الكاميرا صغيرة جداً.
-    const portrait = window.innerHeight >= window.innerWidth;
-    const size = portrait
-      ? { width: { ideal: 720 }, height: { ideal: 1280 } }
-      : { width: { ideal: 1280 }, height: { ideal: 720 } };
-
-    this.stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "user", ...size },
-      audio: false
-    });
+    // الكاميرا بنفس اتجاه الهاتف، وأولاً كي ترى نفسك بينما يُحمَّل النموذج
+    this.stream = await navigator.mediaDevices.getUserMedia(cameraConstraints());
     const video = document.getElementById("chVideo");
     video.srcObject = this.stream;
     await video.play();
@@ -142,14 +127,7 @@ const Challenge = {
     fitFrame(video, video.closest(".video-wrap"));
 
     if (!this.landmarker) {
-      const vision = await FilesetResolver.forVisionTasks(WASM_URL);
-      this.landmarker = await PoseLandmarker.createFromOptions(vision, {
-        baseOptions: { modelAssetPath: MODEL_URL, delegate: "GPU" },
-        runningMode: "VIDEO",
-        numPoses: 1,
-        minPoseDetectionConfidence: 0.4,
-        minTrackingConfidence: 0.4
-      });
+      this.landmarker = await loadLandmarker(t => this.diag(t));
     }
 
     await this.openMic();

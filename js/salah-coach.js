@@ -5,15 +5,9 @@
    كل المعالجة داخل جهازك — لا تُرفع صورة ولا فيديو.
    ══════════════════════════════════════════════════════════ */
 
-import { PoseLandmarker, FilesetResolver }
-  from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
 import { createSheikh, POSE_AR } from "./sheikh-figure.js";
 import { fitFrame } from "./pushup-challenge.js";
-
-const MODEL_URL =
-  "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";
-const WASM_URL =
-  "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm";
+import { loadLandmarker, cameraConstraints } from "./pose-model.js";
 
 /* نقاط الهيكل */
 const L = {
@@ -30,8 +24,8 @@ const BONES = [
 ];
 
 /* ---------- أدوات ---------- */
-const mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
-const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+const mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, z: ((a.z || 0) + (b.z || 0)) / 2 });
+const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y, (a.z || 0) - (b.z || 0));
 const ramp = (v, a, b) => Math.max(0, Math.min(1, (v - a) / (b - a)));
 const bell = (v, c, w) => Math.max(0, 1 - Math.abs(v - c) / w);
 
@@ -139,19 +133,30 @@ function buildFlow(rakaat) {
 /* ══════════════════════════════════════
    قياس الجسم واليدين
    ══════════════════════════════════════ */
-function measure(lm) {
-  const shoulder = mid(lm[L.lSh], lm[L.rSh]);
-  const hip      = mid(lm[L.lHip], lm[L.rHip]);
-  const knee     = mid(lm[L.lKn], lm[L.rKn]);
-  const ankle    = mid(lm[L.lAn], lm[L.rAn]);
-  const ear      = mid(lm[L.lEar], lm[L.rEar]);
-  const wrist    = mid(lm[L.lWr], lm[L.rWr]);
-  const nose     = lm[L.nose];
+/**
+ * @param lm    النقاط المُطبَّعة 0..1 — للرسم وقياس الظهور فقط
+ * @param world النقاط الحقيقية بالمتر — كل الزوايا والنِّسب تُحسب منها
+ *
+ * لماذا؟ الإحداثيات المُطبَّعة مشدودة بنسبة أبعاد الصورة، فجذعٌ منتصبٌ
+ * تماماً يظهر مائلاً عشرات الدرجات على كاميرا الهاتف، فتختلّ الحساسية
+ * من أول خطوة. هذه بعينها كانت علّة عدّاد الضغطات وقد صُلحت هناك.
+ */
+function measure(lm, world) {
+  const P = (world && world.length) ? world : lm;
+
+  const shoulder = mid(P[L.lSh], P[L.rSh]);
+  const hip      = mid(P[L.lHip], P[L.rHip]);
+  const knee     = mid(P[L.lKn], P[L.rKn]);
+  const ankle    = mid(P[L.lAn], P[L.rAn]);
+  const ear      = mid(P[L.lEar], P[L.rEar]);
+  const wrist    = mid(P[L.lWr], P[L.rWr]);
+  const nose     = P[L.nose];
 
   const torso = Math.max(dist(shoulder, hip), 0.02);
 
   // ميل الجذع عن العمودي: 0 واقف · 90 راكع · أكثر ساجد
-  const torsoTilt = (Math.atan2(Math.abs(shoulder.x - hip.x), hip.y - shoulder.y) * 180) / Math.PI;
+  const horiz = Math.hypot(shoulder.x - hip.x, (shoulder.z || 0) - (hip.z || 0));
+  const torsoTilt = (Math.atan2(horiz, hip.y - shoulder.y) * 180) / Math.PI;
 
   const headBelowHip     = (nose.y - hip.y) / torso;
   const shoulderBelowHip = (shoulder.y - hip.y) / torso;
@@ -163,18 +168,22 @@ function measure(lm) {
                   y: shoulder.y + (hip.y - shoulder.y) * 0.6 };
 
   const handsAtNavel = dist(wrist, navel) / torso;              // صغير = اليدان على البطن/الصدر
-  const handsTogether = dist(lm[L.lWr], lm[L.rWr]) / torso;      // صغير = الكفّان متلاصقان
-  const handsAtKnees = Math.min(dist(lm[L.lWr], lm[L.lKn]),
-                                dist(lm[L.rWr], lm[L.rKn])) / torso;
-  const handsRaised  = Math.max((ear.y - lm[L.lWr].y),
-                                (ear.y - lm[L.rWr].y)) / torso;  // موجب = فوق الأذن
+  const handsTogether = dist(P[L.lWr], P[L.rWr]) / torso;        // صغير = الكفّان متلاصقان
+  const handsAtKnees = Math.min(dist(P[L.lWr], P[L.lKn]),
+                                dist(P[L.rWr], P[L.rKn])) / torso;
+  const handsRaised  = Math.max((ear.y - P[L.lWr].y),
+                                (ear.y - P[L.rWr].y)) / torso;   // موجب = فوق الأذن
   const wristAboveShoulder = (shoulder.y - wrist.y) / torso;
   const handsNearHead = dist(wrist, nose) / torso;               // صغير في السجود
 
   const headTurn = Math.abs(nose.x - shoulder.x) / torso;
 
-  const keys = [L.lSh, L.rSh, L.lHip, L.rHip, L.lKn, L.rKn, L.nose, L.lWr, L.rWr];
-  const visibility = keys.reduce((s, i) => s + (lm[i].visibility ?? 1), 0) / keys.length;
+  // الظهور يُقاس من النقاط المُطبَّعة، وبأفضل الجانبين: الجانب البعيد
+  // عن الكاميرا محجوب دائماً فلا يصحّ أن يجرّ المتوسّط إلى الأسفل
+  const pairs = [[L.lSh, L.rSh], [L.lHip, L.rHip], [L.lKn, L.rKn], [L.lWr, L.rWr]];
+  const v = i => (lm[i] && lm[i].visibility != null) ? lm[i].visibility : 1;
+  const visibility = (pairs.reduce((s, [a, b]) => s + Math.max(v(a), v(b)), 0) + v(L.nose))
+                     / (pairs.length + 1);
 
   return {
     torsoTilt, headBelowHip, shoulderBelowHip, hipToAnkle,
@@ -358,11 +367,8 @@ const Coach = {
     const vb = document.getElementById("verifyBanner");
     if (vb) vb.classList.toggle("hidden", !verify);
 
-    // مجال رؤية واسع كي يظهر جسمك من الرأس إلى القدم
-    this.stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
-      audio: false
-    });
+    // الكاميرا أولاً كي ترى نفسك فوراً بينما يُحمَّل النموذج
+    this.stream = await navigator.mediaDevices.getUserMedia(cameraConstraints());
     const video = document.getElementById("camVideo");
     video.srcObject = this.stream;
     await video.play();
@@ -371,20 +377,9 @@ const Coach = {
     fitFrame(video, video.closest(".video-wrap"));
 
     if (!this.landmarker) {
-      const vision = await FilesetResolver.forVisionTasks(WASM_URL);
-      this.landmarker = await PoseLandmarker.createFromOptions(vision, {
-        baseOptions: { modelAssetPath: MODEL_URL, delegate: "GPU" },
-        runningMode: "VIDEO",
-        numPoses: 1,
-        minPoseDetectionConfidence: 0.5,
-        minPosePresenceConfidence: 0.5,
-        minTrackingConfidence: 0.5
-      });
+      this.landmarker = await loadLandmarker(t => this.diag(t));
     }
-
-    const canvas = document.getElementById("camCanvas");
-    canvas.width = video.videoWidth || 720;
-    canvas.height = video.videoHeight || 960;
+    this.diag("");
 
     if (!this.sheikh) this.sheikh = createSheikh(document.getElementById("sheikhStage"));
 
@@ -407,6 +402,12 @@ const Coach = {
     const canvas = document.getElementById("camCanvas");
     const ctx = canvas.getContext("2d");
 
+    // نُبقي اللوحة بمقاس الصورة، وإلا انزاح الهيكل عن الجسم
+    if (video.videoWidth && canvas.width !== video.videoWidth) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+    }
+
     if (video.readyState >= 2 && video.currentTime !== this.lastTime) {
       this.lastTime = video.currentTime;
       const res = this.landmarker.detectForVideo(video, performance.now());
@@ -414,21 +415,24 @@ const Coach = {
 
       if (res.landmarks && res.landmarks.length) {
         const lm = res.landmarks[0];
-        const m = measure(lm);
+        const m = measure(lm, res.worldLandmarks && res.worldLandmarks[0]);
         this.draw(ctx, canvas, lm);
 
-        if (m.visibility < 0.5) {
+        if (m.visibility < 0.35) {
           this.badge("none", 0);
+          this.diag("ابتعد قليلاً حتى يظهر جسمك كاملاً");
           this.history = [];
           this.watchHold(null);
         } else {
           const { pose, score } = classify(m);
           this.badge(pose, score);
+          this.showExpected(pose, score);
           this.track(pose, score);
-          this.watchHold(score >= 0.4 ? pose : null);
+          this.watchHold(score >= 0.35 ? pose : null);
         }
       } else {
         this.badge("none", 0);
+        this.diag("لا أراك — تأكّد أن الكاميرا تراك كاملاً");
         this.history = [];
         this.watchHold(null);
       }
@@ -510,8 +514,27 @@ const Coach = {
     if (navigator.vibrate) navigator.vibrate([80, 60, 80]);
   },
 
+  /** رسالة حيّة تحت الكاميرا: مرحلة التحميل، أو سبب عدم التقدّم */
+  diag(text) {
+    const el = document.getElementById("coachDiag");
+    if (el) el.textContent = text;
+  },
+
+  /** يقول لك ما هو مطلوب وما الذي يراه — بلا تخمين */
+  showExpected(pose, score) {
+    const want = this.flow[this.step];
+    if (!want) return;
+    const same = fam(pose) === fam(want.pose);
+    this.diag(
+      `${same ? "✓" : "✗"} المطلوب: ${POSE_AR[want.pose] || want.pose} · ` +
+      `أراك: ${POSE_AR[pose] || "—"} (${Math.round(score * 100)}%)`
+    );
+  },
+
   track(pose, score) {
-    const need = 8, threshold = 0.5;
+    // ٥ إطارات متتالية بدل ٨، وعتبة ٠٫٤٢ بدل ٠٫٥ — كانت الخطوة أحياناً
+    // لا تُحتسب أبداً لأن التقدير يستقرّ تحت العتبة بقليل
+    const need = 5, threshold = 0.42;
     this.history.push(score >= threshold ? pose : "none");
     if (this.history.length > need) this.history.shift();
     if (this.history.length < need) return;

@@ -923,19 +923,26 @@ function applyLockRequest() {
 $("startCoach").addEventListener("click", async () => {
   const btn = $("startCoach");
   btn.disabled = true;
-  btn.textContent = "جارٍ تجهيز الكاميرا…";
+  btn.textContent = "جارٍ التجهيز…";
+
+  // نُظهر شاشة الكاميرا قبل البدء لا بعده، وإلا بقيت رسائل التقدّم
+  // مخفيّة خلفها وظهر الزرّ معلّقاً بلا سبب مفهوم
+  $("coachIntro").classList.add("hidden");
+  $("coachStage").classList.remove("hidden");
+  const diag = $("coachDiag");
+  if (diag) diag.textContent = "جارٍ فتح الكاميرا…";
+
   try {
     if (!window.Coach) await import("./salah-coach.js");
     await window.Coach.start(coachRakaat, coachVerify);
-    $("coachIntro").classList.add("hidden");
-    $("coachStage").classList.remove("hidden");
   } catch (err) {
     console.error(err);
+    $("coachStage").classList.add("hidden");
+    $("coachIntro").classList.remove("hidden");
     alert(
-      "تعذّر تشغيل الكاميرا.\n\nالأسباب المحتملة:\n" +
-      "١) لم تسمح للمتصفح باستخدام الكاميرا.\n" +
-      "٢) فتحت الملف بالنقر المزدوج — يجب فتحه عبر خادم أو رابط https.\n" +
-      "٣) لا يوجد إنترنت لتحميل نموذج التعرّف أول مرة.\n\n" + err.message
+      "تعذّر بدء المدرّب.\n\n" + (err.message || err) +
+      "\n\nإن تكرّر: تأكّد من السماح للكاميرا ومن وجود إنترنت " +
+      "(النموذج يُحمَّل مرّة واحدة فقط ثم يُحفظ في جهازك)."
     );
   } finally {
     btn.disabled = false;
@@ -986,15 +993,21 @@ function initChallengePickers() {
 $("startChallenge").addEventListener("click", async () => {
   const btn = $("startChallenge");
   btn.disabled = true;
-  btn.textContent = "جارٍ تجهيز الكاميرا…";
+  btn.textContent = "جارٍ التجهيز…";
+
+  $("chIntro").classList.add("hidden");
+  $("chStage").classList.remove("hidden");
+  const diag = $("chDiag");
+  if (diag) diag.textContent = "جارٍ فتح الكاميرا…";
+
   try {
     if (!window.Challenge) await import("./pushup-challenge.js");
     await window.Challenge.start(chReps, chPhrase);
-    $("chIntro").classList.add("hidden");
-    $("chStage").classList.remove("hidden");
   } catch (err) {
     console.error(err);
-    alert("تعذّر تشغيل الكاميرا أو الميكروفون.\n\n" + err.message);
+    $("chStage").classList.add("hidden");
+    $("chIntro").classList.remove("hidden");
+    alert("تعذّر بدء التحدّي.\n\n" + (err.message || err));
   } finally {
     btn.disabled = false;
     btn.textContent = "ابدأ التحدّي";
@@ -1083,7 +1096,11 @@ function cleanupOldCaches() {
 
   if (window.caches && caches.keys) {
     caches.keys()
-      .then(keys => Promise.all(keys.map(k => caches.delete(k))))
+      // نستثني مخزن نموذج التعرّف: حذفه يعني إعادة تنزيل ٥ ميغا
+      // في كل مرة يفتح فيها الكاميرا، وهو سبب التعليق الذي اشتكى منه
+      .then(keys => Promise.all(
+        keys.filter(k => k !== "noor-model-v1").map(k => caches.delete(k))
+      ))
       .catch(() => {});
   }
 

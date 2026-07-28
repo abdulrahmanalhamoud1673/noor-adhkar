@@ -1121,3 +1121,6 @@ input[type=range]::-webkit-slider-thumb {
   color: #fff; font-family: inherit; font-size: 13px; font-weight: 700;
   padding: 9px 15px; border-radius: 12px; cursor: pointer; white-space: nowrap;
 }
+
+/* سطر التشخيص في مدرّب الصلاة يجلس فوق شريط الثقة لا فوقه */
+#coachDiag { bottom: 5px; }
