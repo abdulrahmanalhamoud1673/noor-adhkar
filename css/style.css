@@ -1125,15 +1125,18 @@ input[type=range]::-webkit-slider-thumb {
   padding: 9px 15px; border-radius: 12px; cursor: pointer; white-space: nowrap;
 }
 
-/* سطر التشخيص في مدرّب الصلاة يجلس فوق شريط الثقة لا فوقه */
-#coachDiag { bottom: 5px; }
+/* سطر التشخيص في مدرّب الصلاة يجلس فوق شريط الثقة لا فوقه.
+   مقصور على الوضع العادي: في ملء الشاشة يعلو الشاشة بقاعدة أخرى،
+   وتثبيت bottom هنا كان يمطّطه على طول الشاشة. */
+.coach-stage:not(.cam-fs) #coachDiag { bottom: 5px; }
 
 /* ══════════════════════════════════════
    وضع ملء الشاشة للكاميرا
    ──────────────────────────────────────
-   الكاميرا تملأ شاشة الهاتف كلها، والصورة تُعرض كاملة بلا قصّ
-   (contain لا cover) فلا زوم أبداً. ما يفضل من الشاشة تجلس فوقه
-   اللوحات شفّافةً، فلا يضيع منه شيء.
+   الصورة تملأ شاشة الهاتف كلها وتُعرض كاملة بلا قصّ (contain لا
+   cover) فلا زوم أبداً. وكل الأدوات تتوزّع على أطراف الشاشة —
+   لوحة واحدة أسفل خلف ستارة متدرّجة، وأزرار صغيرة في الزوايا —
+   حتى لا يقف شيء في وسط الصورة ولا تتناثر البطاقات فوقها.
    ══════════════════════════════════════ */
 .coach-stage.cam-fs,
 .ch-stage.cam-fs {
@@ -1143,7 +1146,7 @@ input[type=range]::-webkit-slider-thumb {
   overflow: hidden;
 }
 
-/* الفيديو يفترش الشاشة كلها خلف اللوحات */
+/* الفيديو يفترش الشاشة خلف كل شيء */
 .cam-fs .video-wrap {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
@@ -1152,45 +1155,120 @@ input[type=range]::-webkit-slider-thumb {
   margin: 0; border: none; border-radius: 0;
 }
 .cam-fs .video-wrap video,
-.cam-fs .video-wrap canvas {
-  object-fit: contain;          /* الصورة كاملة — لا قصّ ولا تكبير */
+.cam-fs .video-wrap canvas { object-fit: contain; }
+
+/* ستارة واحدة أسفل الشاشة تجمع اللوحات في كتلة أنيقة بدل بطاقات متناثرة */
+.cam-fs::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0;
+  height: 48%; z-index: 2; pointer-events: none;
+  background: linear-gradient(0deg,
+    rgba(0,0,0,.94) 0%, rgba(0,0,0,.86) 34%, rgba(0,0,0,.45) 68%, transparent 100%);
 }
 
-/* اللوحات تطفو فوق الصورة في الأسفل بدل أن تزاحمها */
-.cam-fs > *:not(.video-wrap):not(.cam-exit) {
-  position: relative; z-index: 3;
-  margin: 0 8px 8px;
-  background: rgba(0, 0, 0, .74);
-  backdrop-filter: blur(14px);
+/* كل ما تحت الفيديو يجلس داخل الستارة بلا خلفية خاصة به.
+   الأزرار مستثناة: تصفير حشوتها كان يجعل زرّ الإيقاف بارتفاع
+   ٢٠ بكسل فلا تكاد تصيبه بإصبعك. */
+.cam-fs > *:not(.video-wrap):not(.cam-exit):not(.btn) {
+  position: relative; z-index: 4;
+  background: none !important; border: none !important;
+  backdrop-filter: none !important; box-shadow: none !important;
+  margin: 0 16px 9px; padding: 0;
 }
-.cam-fs > *:not(.video-wrap):not(.cam-exit):last-child {
-  margin-bottom: calc(8px + env(safe-area-inset-bottom));
+.cam-fs > *:not(.video-wrap):not(.cam-exit):not(.btn):last-child {
+  margin-bottom: calc(12px + env(safe-area-inset-bottom));
 }
-.cam-fs .card-glass { background: transparent; border: none; margin-bottom: 0; }
-.cam-fs .coach-row { border: 1px solid var(--line); border-radius: 16px; padding: 8px; }
-.cam-fs .ch-phrase-box { border: 1px solid var(--line); border-radius: 16px; padding: 12px; }
-.cam-fs .ch-hint { margin-bottom: 8px; min-height: 0; padding: 10px; }
 
-/* في ملء الشاشة نضغط عناصر المدرّب قليلاً كي تبقى الصورة سيّدة المشهد */
-.cam-fs .sheikh-stage { max-height: 88px; }
-.cam-fs .coach-panel h3 { font-size: 17px; }
-.cam-fs .coach-panel .coach-hands { font-size: 12.5px; }
+/* زرّ مباشر تحت الفيديو (إيقاف التحدّي): حبّة واضحة يسهل ضغطها */
+.cam-fs > .btn {
+  position: relative; z-index: 4;
+  display: block; width: fit-content; min-width: 150px; min-height: 46px;
+  margin: 2px auto calc(12px + env(safe-area-inset-bottom));
+}
 
-/* زرّ الخروج */
+/* ─── أزرار وشارات الزوايا ─── */
 .cam-exit { display: none; }
 .cam-fs .cam-exit {
   display: grid; place-items: center;
-  position: absolute; top: calc(10px + env(safe-area-inset-top)); left: 12px;
-  z-index: 6; width: 42px; height: 42px; border-radius: 50%;
-  background: rgba(0, 0, 0, .62); backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, .28);
-  color: #fff; font-size: 19px; font-family: inherit; cursor: pointer;
+  position: absolute; top: calc(12px + env(safe-area-inset-top)); left: 14px;
+  z-index: 6; width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(0,0,0,.5); backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,.25);
+  color: #fff; font-size: 17px; font-family: inherit; cursor: pointer;
+}
+.cam-fs .pose-badge,
+.cam-fs .ch-counter {
+  top: calc(12px + env(safe-area-inset-top)); right: 14px;
+  background: rgba(0,0,0,.5); border-color: rgba(255,255,255,.25);
+}
+.cam-fs .ch-counter { font-size: 19px; padding: 8px 15px; }
+
+/* شريط الثقة يعلو الشاشة بدل أن يختفي خلف الستارة */
+.cam-fs .conf-bar { top: 0; bottom: auto; }
+
+/* سطر الحالة: حبّة صغيرة معلّقة أعلى الوسط، بعيداً عن الصورة */
+.cam-fs .ch-diag {
+  top: calc(64px + env(safe-area-inset-top)); bottom: auto;
+  left: 0; right: 0; width: fit-content; max-width: 88%;
+  margin: 0 auto; padding: 7px 14px; border-radius: 12px;
+  background: rgba(0,0,0,.55); backdrop-filter: blur(8px);
+  font-size: 12px; min-height: 0;
+}
+.cam-fs .ch-diag:empty { display: none; }
+
+/* ─── لوحة مدرّب الصلاة ─── */
+.cam-fs .coach-row { grid-template-columns: 74px 1fr; gap: 10px; align-items: center; }
+.cam-fs .sheikh-box { padding: 0; }
+.cam-fs .sheikh-label { display: none; }
+.cam-fs .sheikh-stage { max-height: 74px; }
+.cam-fs .sheikh-pose { font-size: 10.5px; margin-top: 2px; }
+.cam-fs .coach-panel { padding: 0; }
+.cam-fs .coach-rakah { font-size: 11px; margin-bottom: 1px; }
+.cam-fs .coach-panel h3 { font-size: 17px; margin-bottom: 2px; }
+.cam-fs .coach-hands { font-size: 12.5px; line-height: 1.55; }
+.cam-fs .coach-say {
+  font-size: 15px; line-height: 1.85; text-align: center; padding: 0;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* شريط التنقّل السفلي يختفي تحت شاشة الكاميرا */
+/* ─── لوحة التحدّي ─── */
+.cam-fs .ch-phrase-box { padding: 0; text-align: center; }
+.cam-fs .ch-label { font-size: 11px; margin-bottom: 2px; }
+.cam-fs .ch-phrase { font-size: 24px; margin-bottom: 6px; }
+.cam-fs .ch-hint {
+  font-size: 13px; padding: 0; min-height: 0;
+  border-radius: 0; text-align: center;
+}
+
+/* ─── الأزرار: حبّات صغيرة متجاورة لا أزرار عريضة ─── */
+.cam-fs .coach-controls { display: flex; gap: 8px; justify-content: center; }
+.cam-fs .btn {
+  padding: 10px 18px; font-size: 13.5px; border-radius: 22px;
+  width: auto; min-width: 0; margin: 0;
+}
+.cam-fs .btn.full { width: fit-content; }
+.cam-fs .btn-danger {
+  background: rgba(239,68,68,.9) !important; border: none !important; color: #fff;
+}
+.cam-fs .btn-outline {
+  background: rgba(255,255,255,.12) !important;
+  border: 1px solid rgba(255,255,255,.28) !important; color: #fff;
+}
+
+/* الشريط السفلي يختفي تحت شاشة الكاميرا */
 body.cam-open .bottom-nav { display: none; }
 
 /* حركة دخول الصفحة تستخدم transform، وأي جدّ متحوّل يصير هو الحاوية
    لأي عنصر position: fixed بداخله — فتنحبس شاشة الكاميرا داخل الصفحة
    بدل أن تملأ الشاشة. نوقف الحركة ما دامت الكاميرا مفتوحة. */
 body.cam-open .page { animation: none !important; transform: none !important; }
+
+/* الزرّ المباشر تحت الفيديو في ملء الشاشة.
+   يجب أن تأتي هذه القاعدة بعد قواعد .cam-fs .btn وإلا غلبتها تلك
+   فأعادت الزرّ إلى حافة الشاشة بلا توسيط. والحاوية flex عمودي،
+   فالتوسيط الصحيح هنا align-self لا margin auto وحده. */
+.cam-fs > .btn {
+  align-self: center;
+  width: fit-content; min-width: 150px; min-height: 46px;
+  margin: 2px auto calc(12px + env(safe-area-inset-bottom));
+}
