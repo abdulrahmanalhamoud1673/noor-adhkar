@@ -124,6 +124,19 @@ const Wake = {
 // الملفات الأخرى تصل إليه عبر window، فـ const لا يُعلَّق على window تلقائياً
 window.Wake = Wake;
 
+/**
+ * وضع ملء الشاشة للكاميرا.
+ * الكاميرا تأخذ شاشة الهاتف كلها، والصورة تُعرض كاملة بلا قصّ،
+ * واللوحات تطفو فوقها بدل أن تزاحمها على المساحة.
+ */
+function camFullscreen(stageId, on) {
+  const el = $(stageId);
+  if (el) el.classList.toggle("cam-fs", on);
+  // الشريط السفلي يختفي، وإلا غطّى أسفل الصورة
+  document.body.classList.toggle("cam-open",
+    document.querySelector(".cam-fs") !== null);
+}
+
 /* ---------- التنقّل ---------- */
 function goto(pageId) {
   // أغلق أي شاشة عائمة أولاً، وإلا بقيت فوق الصفحة الجديدة
@@ -137,6 +150,8 @@ function goto(pageId) {
   );
   window.scrollTo({ top: 0, behavior: "smooth" });
   if (pageId !== "page-coach" && window.Coach) window.Coach.stop();
+  if (pageId !== "page-coach") camFullscreen("coachStage", false);
+  if (pageId !== "page-challenge") camFullscreen("chStage", false);
 
   // عرض الشريط لا يُقاس إلا بعد ظهور الصفحة، وإلا حُسبت الأسهم على عرض صفر
   if (pageId === "page-quran" && typeof Quran !== "undefined") {
@@ -935,8 +950,10 @@ $("startCoach").addEventListener("click", async () => {
   try {
     if (!window.Coach) await import("./salah-coach.js");
     await window.Coach.start(coachRakaat, coachVerify);
+    camFullscreen("coachStage", true);
   } catch (err) {
     console.error(err);
+    camFullscreen("coachStage", false);
     $("coachStage").classList.add("hidden");
     $("coachIntro").classList.remove("hidden");
     alert(
@@ -950,11 +967,14 @@ $("startCoach").addEventListener("click", async () => {
   }
 });
 
-$("stopCoach").addEventListener("click", () => {
+function closeCoach() {
   if (window.Coach) window.Coach.stop();
+  camFullscreen("coachStage", false);
   $("coachStage").classList.add("hidden");
   $("coachIntro").classList.remove("hidden");
-});
+}
+$("stopCoach").addEventListener("click", closeCoach);
+$("coachExit").addEventListener("click", closeCoach);
 $("prevStep").addEventListener("click", () => window.Coach && window.Coach.go(-1));
 $("nextStep").addEventListener("click", () => window.Coach && window.Coach.go(1));
 
@@ -1003,8 +1023,10 @@ $("startChallenge").addEventListener("click", async () => {
   try {
     if (!window.Challenge) await import("./pushup-challenge.js");
     await window.Challenge.start(chReps, chPhrase);
+    camFullscreen("chStage", true);
   } catch (err) {
     console.error(err);
+    camFullscreen("chStage", false);
     $("chStage").classList.add("hidden");
     $("chIntro").classList.remove("hidden");
     alert("تعذّر بدء التحدّي.\n\n" + (err.message || err));
@@ -1014,11 +1036,14 @@ $("startChallenge").addEventListener("click", async () => {
   }
 });
 
-$("stopChallenge").addEventListener("click", () => {
+function closeChallenge() {
   if (window.Challenge) window.Challenge.stop();
+  camFullscreen("chStage", false);
   $("chStage").classList.add("hidden");
   $("chIntro").classList.remove("hidden");
-});
+}
+$("stopChallenge").addEventListener("click", closeChallenge);
+$("chExit").addEventListener("click", closeChallenge);
 
 /** يفتحه تطبيق أندرويد عبر #challenge=العدد */
 function applyChallengeRequest() {

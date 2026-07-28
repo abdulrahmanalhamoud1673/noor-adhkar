@@ -1127,3 +1127,70 @@ input[type=range]::-webkit-slider-thumb {
 
 /* سطر التشخيص في مدرّب الصلاة يجلس فوق شريط الثقة لا فوقه */
 #coachDiag { bottom: 5px; }
+
+/* ══════════════════════════════════════
+   وضع ملء الشاشة للكاميرا
+   ──────────────────────────────────────
+   الكاميرا تملأ شاشة الهاتف كلها، والصورة تُعرض كاملة بلا قصّ
+   (contain لا cover) فلا زوم أبداً. ما يفضل من الشاشة تجلس فوقه
+   اللوحات شفّافةً، فلا يضيع منه شيء.
+   ══════════════════════════════════════ */
+.coach-stage.cam-fs,
+.ch-stage.cam-fs {
+  position: fixed; inset: 0; z-index: 500;
+  margin: 0; padding: 0; background: #000;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  overflow: hidden;
+}
+
+/* الفيديو يفترش الشاشة كلها خلف اللوحات */
+.cam-fs .video-wrap {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  max-width: none; max-height: none;
+  aspect-ratio: auto !important;
+  margin: 0; border: none; border-radius: 0;
+}
+.cam-fs .video-wrap video,
+.cam-fs .video-wrap canvas {
+  object-fit: contain;          /* الصورة كاملة — لا قصّ ولا تكبير */
+}
+
+/* اللوحات تطفو فوق الصورة في الأسفل بدل أن تزاحمها */
+.cam-fs > *:not(.video-wrap):not(.cam-exit) {
+  position: relative; z-index: 3;
+  margin: 0 8px 8px;
+  background: rgba(0, 0, 0, .74);
+  backdrop-filter: blur(14px);
+}
+.cam-fs > *:not(.video-wrap):not(.cam-exit):last-child {
+  margin-bottom: calc(8px + env(safe-area-inset-bottom));
+}
+.cam-fs .card-glass { background: transparent; border: none; margin-bottom: 0; }
+.cam-fs .coach-row { border: 1px solid var(--line); border-radius: 16px; padding: 8px; }
+.cam-fs .ch-phrase-box { border: 1px solid var(--line); border-radius: 16px; padding: 12px; }
+.cam-fs .ch-hint { margin-bottom: 8px; min-height: 0; padding: 10px; }
+
+/* في ملء الشاشة نضغط عناصر المدرّب قليلاً كي تبقى الصورة سيّدة المشهد */
+.cam-fs .sheikh-stage { max-height: 88px; }
+.cam-fs .coach-panel h3 { font-size: 17px; }
+.cam-fs .coach-panel .coach-hands { font-size: 12.5px; }
+
+/* زرّ الخروج */
+.cam-exit { display: none; }
+.cam-fs .cam-exit {
+  display: grid; place-items: center;
+  position: absolute; top: calc(10px + env(safe-area-inset-top)); left: 12px;
+  z-index: 6; width: 42px; height: 42px; border-radius: 50%;
+  background: rgba(0, 0, 0, .62); backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, .28);
+  color: #fff; font-size: 19px; font-family: inherit; cursor: pointer;
+}
+
+/* شريط التنقّل السفلي يختفي تحت شاشة الكاميرا */
+body.cam-open .bottom-nav { display: none; }
+
+/* حركة دخول الصفحة تستخدم transform، وأي جدّ متحوّل يصير هو الحاوية
+   لأي عنصر position: fixed بداخله — فتنحبس شاشة الكاميرا داخل الصفحة
+   بدل أن تملأ الشاشة. نوقف الحركة ما دامت الكاميرا مفتوحة. */
+body.cam-open .page { animation: none !important; transform: none !important; }
