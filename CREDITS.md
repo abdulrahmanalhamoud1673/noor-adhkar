@@ -52,3 +52,18 @@
 - **الرخصة:** CC0 1.0 — تنازل عن الحقوق في الملك العام، لا تُشترط نسبة
 
 النسبة مذكورة هنا احتراماً للمصدر وإن لم تكن الرخصة تُلزم بها.
+
+## أصوات الطبيعة (`audio/ambient/`)
+
+كلّها تسجيلات حقيقية برخص حرّة، قُصّت وسُوّيت مستوياتها وبُنيت حلقاتٍ
+متّصلة (يُمزَج آخر المقطع ببدايته فلا يُسمع قطع عند التكرار).
+
+| الصوت | المصدر | الرخصة |
+|---|---|---|
+| 🌧️ مطر — `rain.ogg` | [Rain on leaves (Gravity Sound)](https://commons.wikimedia.org/wiki/File:Rain_on_leaves_(Gravity_Sound).wav) | CC BY 4.0 — Gravity Sound |
+| 🔥 نار — `fire.ogg` | [Spadelsberg, Neuffen — fireplace](https://archive.org/details/aporee_51595_58873) (radio aporee، تسجيل ميداني للمصوّر Hoerma) | Public Domain Mark 1.0 |
+| 🍃 رياح — `wind.ogg` | [Wind in forest (Gravity Sound)](https://commons.wikimedia.org/wiki/File:Wind_in_forest_(Gravity_Sound).wav) | CC BY 4.0 — Gravity Sound |
+| 🐦 عصافير — `birds.ogg` | [Forest ambience (Gravity Sound)](https://commons.wikimedia.org/wiki/File:Forest_ambience_(Gravity_Sound).wav) | CC BY 4.0 — Gravity Sound |
+
+رخصة **CC BY 4.0 تُلزم بنسبة العمل إلى صاحبه**، فهذا الجدول جزء من
+شروط الاستخدام ولا يجوز حذفه.

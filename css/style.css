@@ -1272,3 +1272,76 @@ body.cam-open .page { animation: none !important; transform: none !important; }
   width: fit-content; min-width: 150px; min-height: 46px;
   margin: 2px auto calc(12px + env(safe-area-inset-bottom));
 }
+
+/* ══════════════════════════════════════
+   أصوات الطبيعة
+   ──────────────────────────────────────
+   زرّ واحد في الشريط العلوي — لا تبويب جديد ولا بطاقة في الرئيسية،
+   فلا يزدحم التطبيق. يضيء ويحمل أيقونة الصوت العامل، ولوحة تنزلق
+   من الأسفل عند الضغط.
+   ══════════════════════════════════════ */
+.amb-btn { font-size: 20px; line-height: 1; transition: .25s; }
+.amb-btn.on {
+  border-color: var(--emerald);
+  background: rgba(16,185,129,.16);
+  box-shadow: 0 0 16px rgba(16,185,129,.35);
+}
+
+.amb-sheet {
+  position: fixed; inset: 0; z-index: 520;
+  background: rgba(0,0,0,.62); backdrop-filter: blur(3px);
+  display: flex; align-items: flex-end; justify-content: center;
+  animation: ambFade .22s ease;
+}
+@keyframes ambFade { from { opacity: 0 } to { opacity: 1 } }
+
+.amb-panel {
+  width: 100%; max-width: 640px;
+  background: linear-gradient(180deg, #0a3227, var(--bg-1));
+  border: 1px solid var(--line); border-bottom: none;
+  border-radius: 24px 24px 0 0;
+  padding: 10px 18px calc(20px + env(safe-area-inset-bottom));
+  animation: ambUp .28s cubic-bezier(.2,.8,.3,1);
+}
+@keyframes ambUp { from { transform: translateY(100%) } to { transform: none } }
+
+.amb-grip {
+  width: 42px; height: 4px; border-radius: 99px;
+  background: rgba(255,255,255,.22); margin: 0 auto 14px;
+}
+.amb-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+.amb-head > div { flex: 1; }
+.amb-head h3 { font-size: 18px; font-weight: 800; margin-bottom: 3px; }
+.amb-head p { font-size: 12.5px; color: var(--text-dim); line-height: 1.7; }
+.amb-head p b { color: var(--gold); font-weight: 700; }
+.amb-head button {
+  background: rgba(255,255,255,.07); border: 1px solid var(--line);
+  color: var(--text); width: 34px; height: 34px; border-radius: 50%;
+  font-size: 14px; font-family: inherit; cursor: pointer; flex-shrink: 0;
+}
+
+.amb-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; margin-bottom: 18px; }
+.amb-card {
+  background: rgba(255,255,255,.05); border: 1px solid var(--line);
+  border-radius: 16px; padding: 14px 4px 11px; cursor: pointer;
+  color: var(--text-dim); font-family: inherit; font-size: 12.5px; font-weight: 700;
+  display: flex; flex-direction: column; align-items: center; gap: 7px; transition: .2s;
+}
+.amb-card:active { transform: scale(.95); }
+.amb-icon { font-size: 25px; line-height: 1; }
+.amb-card.on {
+  border-color: var(--emerald); color: #fff;
+  background: linear-gradient(160deg, rgba(16,185,129,.28), rgba(16,185,129,.08));
+  box-shadow: 0 0 18px rgba(16,185,129,.25);
+}
+.amb-card.on .amb-icon { animation: ambPulse 2.6s ease-in-out infinite; }
+@keyframes ambPulse { 0%,100% { transform: scale(1) } 50% { transform: scale(1.14) } }
+
+.amb-vol { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; font-size: 12.5px; color: var(--text-dim); }
+.amb-vol input { flex: 1; accent-color: var(--gold); }
+.amb-vol b { color: var(--gold); min-width: 38px; text-align: left; direction: ltr; }
+
+/* من يفضّل تقليل الحركة يرى اللوحة في مكانها مباشرة بلا انزلاق */
+@media (prefers-reduced-motion: reduce) {
+  .amb-sheet, .amb-panel, .adhan-bar { animation: none !important; }
+}

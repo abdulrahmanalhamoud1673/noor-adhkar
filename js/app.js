@@ -291,6 +291,8 @@ const Adhan = {
   play(name) {
     const a = this.el();
     a.currentTime = 0;
+    // نخفض صوت الخلفية كي لا يزاحم الأذان
+    if (window.Ambient) Ambient.duck(true);
     a.play().then(() => {
       this.playing = true;
       this.showStop(name);
@@ -316,6 +318,7 @@ const Adhan = {
 
   hideStop() {
     this.playing = false;
+    if (window.Ambient) Ambient.duck(false);   // يعود صوت الخلفية لمستواه
     const bar = $("adhanBar");
     if (bar) bar.classList.add("hidden");
   }
@@ -1096,6 +1099,7 @@ function boot() {
   // تنظيف عامل الخدمة القديم الذي كان يخزّن نسخاً قديمة من الملفات
   step("تحدّي الاستغفار", initChallengePickers);
   step("فضفض", () => Chat.init());
+  step("أصوات الطبيعة", () => Ambient.init());
   step("إبقاء الشاشة مضاءة", () => Wake.init());
   step("تنظيف الذاكرة المخزّنة", cleanupOldCaches);
   step("طلب فكّ القفل", applyLockRequest);

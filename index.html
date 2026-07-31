@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=33">
+<link rel="stylesheet" href="css/style.css?v=35">
 </head>
 <body>
 
@@ -25,6 +25,7 @@
         <div class="brand-sub" id="hijriDate">—</div>
       </div>
     </div>
+    <button class="icon-btn amb-btn" id="ambBtn" aria-label="أصوات الطبيعة">🌿</button>
   </div>
 </header>
 
@@ -443,6 +444,30 @@
   <button class="nav-btn" data-goto="page-coach"><span>🕋</span>صلِّ معي</button>
 </nav>
 
+<!-- ══════════ لوحة أصوات الطبيعة ══════════ -->
+<div id="ambSheet" class="amb-sheet hidden">
+  <div class="amb-panel">
+    <div class="amb-grip"></div>
+    <div class="amb-head">
+      <div>
+        <h3>🌿 صوت الخلفية</h3>
+        <p>يعمل <b>تحت التلاوة</b> لا بدلاً منها — شغّل القرآن ثم اختر صوتاً</p>
+      </div>
+      <button id="ambClose" aria-label="إغلاق">✕</button>
+    </div>
+
+    <div class="amb-list" id="ambList"></div>
+
+    <div class="amb-vol">
+      <span>🔉 مستوى الخلفية</span>
+      <input type="range" id="ambVol" min="0" max="100" value="45">
+      <b id="ambVolLabel">45%</b>
+    </div>
+
+    <button class="btn btn-outline full hidden" id="ambStop">■ إيقاف الصوت</button>
+  </div>
+</div>
+
 <!-- شريط الأذان — يظهر عند دخول الوقت والصفحة مفتوحة -->
 <div id="adhanBar" class="adhan-bar hidden">
   <span id="adhanText">🕌 حان وقت الصلاة</span>
@@ -451,10 +476,11 @@
 
 <div id="toast" class="toast"></div>
 
-<script src="js/data.js?v=33"></script>
-<script src="js/prayertimes.js?v=33"></script>
-<script src="js/app.js?v=33"></script>
-<script src="js/mushaf.js?v=33"></script>
-<script src="js/chat.js?v=33"></script>
+<script src="js/data.js?v=35"></script>
+<script src="js/prayertimes.js?v=35"></script>
+<script src="js/app.js?v=35"></script>
+<script src="js/mushaf.js?v=35"></script>
+<script src="js/chat.js?v=35"></script>
+<script src="js/ambient.js?v=35"></script>
 </body>
 </html>
