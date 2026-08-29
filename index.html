@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=35">
+<link rel="stylesheet" href="css/style.css?v=36">
 </head>
 <body>
 
@@ -130,6 +130,28 @@
     <button class="rec-arrow rec-right" id="recRight" aria-label="السابق">›</button>
     <div class="reciters" id="recitersRow"></div>
     <button class="rec-arrow rec-left" id="recLeft" aria-label="التالي">‹</button>
+  </div>
+
+  <!-- تابِع من حيث وقفت -->
+  <button class="resume-bar hidden" id="resumeBar">
+    <span class="resume-icon">🔖</span>
+    <span id="resumeText">—</span>
+    <span class="resume-arrow">‹</span>
+  </button>
+
+  <!-- ورد اليوم: ماذا أقرأ الآن؟ -->
+  <div class="plan-box">
+    <div class="plan-head">
+      <h3>📅 ورد اليوم</h3>
+      <span id="planNow">—</span>
+    </div>
+    <div class="plan-slots" id="planSlots"></div>
+  </div>
+
+  <!-- السور المفضّلة -->
+  <div class="fav-box hidden" id="favBox">
+    <div class="fav-head">★ المفضّلة</div>
+    <div class="fav-list" id="favList"></div>
   </div>
 
   <div class="quran-search">
@@ -444,6 +466,21 @@
   <button class="nav-btn" data-goto="page-coach"><span>🕋</span>صلِّ معي</button>
 </nav>
 
+<!-- ══════════ لوحة ورد اليوم ══════════ -->
+<div id="planSheet" class="amb-sheet hidden">
+  <div class="amb-panel plan-panel">
+    <div class="amb-grip"></div>
+    <div class="amb-head">
+      <div>
+        <h3 id="planTitle">—</h3>
+        <p>اقرأها بالترتيب — ومعها دليلُها من السنّة</p>
+      </div>
+      <button id="planClose" aria-label="إغلاق">✕</button>
+    </div>
+    <div class="plan-items" id="planItems"></div>
+  </div>
+</div>
+
 <!-- ══════════ لوحة أصوات الطبيعة ══════════ -->
 <div id="ambSheet" class="amb-sheet hidden">
   <div class="amb-panel">
@@ -476,11 +513,13 @@
 
 <div id="toast" class="toast"></div>
 
-<script src="js/data.js?v=35"></script>
-<script src="js/prayertimes.js?v=35"></script>
-<script src="js/app.js?v=35"></script>
-<script src="js/mushaf.js?v=35"></script>
-<script src="js/chat.js?v=35"></script>
-<script src="js/ambient.js?v=35"></script>
+<script src="js/data.js?v=36"></script>
+<script src="js/prayertimes.js?v=36"></script>
+<script src="js/app.js?v=36"></script>
+<script src="js/mushaf.js?v=36"></script>
+<script src="js/chat.js?v=36"></script>
+<script src="js/reading-plan.js?v=36"></script>
+<script src="js/quran-extras.js?v=36"></script>
+<script src="js/ambient.js?v=36"></script>
 </body>
 </html>

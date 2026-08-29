@@ -309,4 +309,5 @@ function renderLastRead() {
     goto("page-quran");
     Mushaf.openSurah(last.surah, last.ayah);
   };
+  if (window.QuranExtras) QuranExtras.renderResumeBar();
 }

@@ -1345,3 +1345,110 @@ body.cam-open .page { animation: none !important; transform: none !important; }
 @media (prefers-reduced-motion: reduce) {
   .amb-sheet, .amb-panel, .adhan-bar { animation: none !important; }
 }
+
+/* ══════════════════════════════════════
+   القرآن: المتابعة والمفضّلة وورد اليوم
+   ══════════════════════════════════════ */
+
+/* ── تابِع من حيث وقفت ── */
+.resume-bar {
+  width: 100%; display: flex; align-items: center; gap: 12px;
+  background: linear-gradient(120deg, rgba(212,175,55,.20), rgba(16,185,129,.10));
+  border: 1px solid var(--gold); border-radius: 16px;
+  padding: 13px 15px; margin-bottom: 12px; cursor: pointer;
+  color: var(--text); font-family: inherit; font-size: 14px; text-align: right;
+}
+.resume-bar span:nth-child(2) { flex: 1; }
+.resume-bar b { color: var(--gold-soft); font-weight: 800; }
+.resume-icon { font-size: 20px; }
+.resume-arrow { font-size: 22px; color: var(--gold); }
+.resume-bar:active { transform: scale(.98); }
+
+/* ── ورد اليوم ── */
+.plan-box {
+  background: var(--glass); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 15px; margin-bottom: 14px;
+}
+.plan-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+.plan-head h3 { font-size: 16px; font-weight: 800; }
+.plan-head span { font-size: 12px; color: var(--gold); font-weight: 700; }
+
+.plan-slots { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+.plan-slots::-webkit-scrollbar { display: none; }
+.plan-slot {
+  flex: 0 0 auto; min-width: 96px;
+  background: rgba(255,255,255,.05); border: 1px solid var(--line);
+  border-radius: 15px; padding: 12px 10px; cursor: pointer;
+  color: var(--text-dim); font-family: inherit;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  position: relative; transition: .2s;
+}
+.plan-slot:active { transform: scale(.96); }
+.plan-slot-icon { font-size: 21px; }
+.plan-slot-name { font-size: 11.5px; font-weight: 700; text-align: center; line-height: 1.4; }
+.plan-slot-count {
+  position: absolute; top: 6px; left: 8px;
+  background: rgba(0,0,0,.45); border-radius: 99px;
+  font-size: 10px; padding: 1px 6px; color: var(--gold);
+}
+.plan-slot.now {
+  border-color: var(--emerald); color: #fff;
+  background: linear-gradient(160deg, rgba(16,185,129,.26), rgba(16,185,129,.06));
+  box-shadow: 0 0 18px rgba(16,185,129,.22);
+}
+
+/* لوحة تفاصيل الورد */
+.plan-panel { max-height: 84vh; overflow-y: auto; }
+.plan-items { display: flex; flex-direction: column; gap: 10px; padding-bottom: 6px; }
+.plan-item {
+  display: flex; gap: 11px;
+  background: rgba(255,255,255,.04); border: 1px solid var(--line);
+  border-radius: 16px; padding: 13px;
+}
+.plan-order {
+  flex: 0 0 26px; height: 26px; border-radius: 50%;
+  background: rgba(212,175,55,.16); border: 1px solid var(--line);
+  color: var(--gold); font-size: 12.5px; font-weight: 800;
+  display: grid; place-items: center;
+}
+.plan-body { flex: 1; }
+.plan-name { font-size: 15.5px; font-weight: 800; margin-bottom: 2px; }
+.plan-label { font-size: 12px; color: var(--gold); margin-bottom: 7px; }
+.plan-why {
+  font-size: 13px; line-height: 1.9; color: var(--text);
+  background: rgba(0,0,0,.22); border-right: 2px solid var(--gold);
+  border-radius: 10px; padding: 9px 11px;
+}
+.plan-src { font-size: 11.5px; color: var(--text-dim); margin-top: 6px; }
+.plan-go {
+  margin-top: 10px; background: rgba(212,175,55,.16);
+  border: 1px solid var(--line); border-radius: 12px;
+  color: var(--gold-soft); font-family: inherit; font-size: 13px; font-weight: 700;
+  padding: 8px 16px; cursor: pointer;
+}
+
+/* ── المفضّلة ── */
+.fav-box {
+  background: var(--glass); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 13px 15px; margin-bottom: 14px;
+}
+.fav-head { font-size: 13px; font-weight: 800; color: var(--gold); margin-bottom: 10px; }
+.fav-list { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 3px; }
+.fav-list::-webkit-scrollbar { display: none; }
+.fav-chip {
+  flex: 0 0 auto; background: rgba(212,175,55,.12);
+  border: 1px solid var(--line); border-radius: 20px;
+  color: var(--text); font-family: inherit; font-size: 13px; font-weight: 700;
+  padding: 8px 14px; cursor: pointer; white-space: nowrap;
+}
+.fav-chip span { color: var(--gold); }
+.fav-chip:active { transform: scale(.95); }
+
+/* نجمة المفضّلة في صف السورة */
+.surah-fav {
+  background: none; border: none; cursor: pointer;
+  color: var(--text-dim); font-size: 19px; line-height: 1;
+  padding: 6px 4px; transition: .2s; flex-shrink: 0;
+}
+.surah-fav.on { color: var(--gold); text-shadow: 0 0 10px rgba(212,175,55,.5); }
+.surah-fav:active { transform: scale(1.25); }

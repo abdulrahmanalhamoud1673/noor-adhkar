@@ -654,6 +654,7 @@ const Quran = {
 
     SURAHS.forEach(([num, name, ayahs, place]) => {
       if (q && !norm(name).includes(q) && String(num) !== q) return;
+      const fav = window.Favs ? Favs.has(num) : false;
       const el = document.createElement("button");
       el.className = "surah" + (this.surah === num ? " playing" : "");
       el.innerHTML = `
@@ -662,10 +663,17 @@ const Quran = {
           <div class="surah-name">سورة ${name}</div>
           <div class="surah-sub">${ayahs} آية · ${place} · اضغط للقراءة 📖</div>
         </div>
+        <button class="surah-fav${fav ? " on" : ""}" data-fav="${num}" aria-label="مفضّلة">${fav ? "★" : "☆"}</button>
         <button class="surah-listen" data-listen="${num}">${this.surah === num && !this.audio.paused ? "❚❚ إيقاف" : "استماع"}</button>`;
 
       // الضغط على السورة يفتح المصحف مع تلوين الآيات
       el.addEventListener("click", () => Mushaf.openSurah(num));
+
+      // النجمة: حفظ السورة في المفضّلة
+      el.querySelector("[data-fav]").addEventListener("click", ev => {
+        ev.stopPropagation();
+        if (window.Favs) Favs.toggle(num);
+      });
 
       // الزر الجانبي: استماع للسورة كاملة بالخلفية
       el.querySelector("[data-listen]").addEventListener("click", ev => {
@@ -1081,6 +1089,7 @@ function boot() {
   step("القرآن", () => Quran.init());
   step("المصحف", () => Mushaf.init());
   step("آخر ما قرأت", renderLastRead);
+  step("المفضّلة وورد اليوم", () => QuranExtras.init());
 
   const hour = new Date().getHours();
   step("الأذكار", () => showAdhkar(hour >= 12 ? "masaa" : "sabah"));
