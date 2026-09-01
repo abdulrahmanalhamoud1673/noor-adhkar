@@ -1090,6 +1090,7 @@ function boot() {
   step("المصحف", () => Mushaf.init());
   step("آخر ما قرأت", renderLastRead);
   step("المفضّلة وورد اليوم", () => QuranExtras.init());
+  step("منبّه المهمّات", () => Alarm.init());
 
   const hour = new Date().getHours();
   step("الأذكار", () => showAdhkar(hour >= 12 ? "masaa" : "sabah"));
@@ -1113,6 +1114,7 @@ function boot() {
   step("تنظيف الذاكرة المخزّنة", cleanupOldCaches);
   step("طلب فكّ القفل", applyLockRequest);
   step("طلب التحدّي", applyChallengeRequest);
+  step("طلب المنبّه", () => Alarm.applyRequest());
 }
 
 /**
@@ -1123,6 +1125,7 @@ function boot() {
 window.addEventListener("hashchange", () => {
   step("طلب فكّ القفل", applyLockRequest);
   step("طلب التحدّي", applyChallengeRequest);
+  step("طلب المنبّه", () => Alarm.applyRequest());
 });
 
 /**

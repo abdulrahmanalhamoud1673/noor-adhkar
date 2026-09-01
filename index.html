@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=36">
+<link rel="stylesheet" href="css/style.css?v=38">
 </head>
 <body>
 
@@ -83,6 +83,15 @@
     <div>
       <div class="quran-cta-title">فضفض</div>
       <div class="quran-cta-sub">احكِ همّك… ويذكّرك بآية وحديث يعينانك</div>
+    </div>
+    <span class="quran-cta-arrow">‹</span>
+  </button>
+
+  <button class="quran-cta alarm-cta" data-goto="page-alarm">
+    <span class="quran-cta-icon">⏰</span>
+    <div>
+      <div class="quran-cta-title">منبّه المهمّات</div>
+      <div class="quran-cta-sub">لا يسكت إلا أن تقوم وتصوّر ما يطلبه</div>
     </div>
     <span class="quran-cta-arrow">‹</span>
   </button>
@@ -364,6 +373,91 @@
   </div>
 </section>
 
+<!-- ══════════ صفحة: منبّه الفجر بالمهمّات ══════════ -->
+<section class="page" id="page-alarm">
+  <div class="page-head">
+    <h2>⏰ منبّه المهمّات</h2>
+    <p>لا يسكت بضغطة — يطلب منك تصوير أشياء في بيتك، فتقوم فعلاً</p>
+  </div>
+
+  <!-- الإعداد -->
+  <div id="almSetup">
+    <div class="card-glass">
+      <label class="pick-label">كم مهمّة قبل أن يسكت؟</label>
+      <div class="reps-pick" id="almCountPick">
+        <button data-count="1">١</button>
+        <button data-count="2">٢</button>
+        <button data-count="3" class="on">٣</button>
+        <button data-count="4">٤</button>
+        <button data-count="5">٥</button>
+      </div>
+
+      <label class="pick-label">الأهداف — أشياء بعيدة عن سريرك</label>
+      <div class="alm-targets" id="almTargets"></div>
+      <p class="alm-warn hidden" id="almWarn"></p>
+
+      <div class="alm-add">
+        <input type="text" id="almInput" placeholder="اكتب هدفاً… مثل: إبريق الشاي" autocomplete="off">
+        <button id="almAdd">إضافة</button>
+      </div>
+
+      <label class="pick-label">اقتراحات</label>
+      <div class="alm-suggest" id="almSuggest"></div>
+
+      <p class="privacy-note">
+        📷 الصورة تُرسل إلى Gemini للتحقّق فقط ولا تُحفظ في أي مكان.
+        يلزمك مفتاحه المجاني من صفحة 💬 فضفض.
+      </p>
+      <button class="btn btn-gold btn-lg full" id="almTry">🔔 جرّب المهمّات الآن</button>
+    </div>
+  </div>
+
+  <!-- الجولة -->
+  <div class="hidden" id="almRun">
+    <div class="alm-task-box card-glass">
+      <div class="alm-label">صوّر الآن</div>
+      <div class="alm-task" id="almTask">—</div>
+      <div class="alm-dots" id="almDots"></div>
+      <div class="alm-progress" id="almProgress">0 / 3</div>
+    </div>
+
+    <div class="video-wrap full-bleed">
+      <video id="almVideo" playsinline autoplay muted></video>
+      <div class="ch-diag" id="almHint"></div>
+    </div>
+
+    <button class="btn btn-gold btn-lg full" id="almShoot">📸 صوّر</button>
+    <button class="btn btn-outline full hidden" id="almEscape">الكاميرا لا تعمل — تحدّي الكتابة</button>
+    <button class="btn btn-outline full" id="almCancel">إلغاء</button>
+  </div>
+
+  <!-- البديل حين يتعذّر التحقّق (لا إنترنت / لا مفتاح) -->
+  <div class="hidden" id="almType">
+    <div class="alm-task-box card-glass">
+      <div class="alm-label">اكتب الرمز كما هو</div>
+      <div class="alm-code" id="almCode">—</div>
+      <div class="alm-dots" id="almTypeDots"></div>
+      <div class="alm-progress" id="almTypeProgress">0 / 3</div>
+    </div>
+    <div class="card-glass">
+      <p class="alm-why" id="almWhy">تعذّر التحقّق من الصور — لن يسكت المنبّه حتّى تكتب هذه الرموز.</p>
+      <input type="text" id="almTypeInput" class="alm-type-input" placeholder="اكتب هنا…"
+             autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
+      <button class="btn btn-gold btn-lg full" id="almTypeOk">تحقّق</button>
+    </div>
+  </div>
+
+  <!-- الختام -->
+  <div class="hidden" id="almDone">
+    <div class="card-glass alm-done">
+      <div class="alm-done-icon">🌅</div>
+      <h3>قمتَ — والحمد لله</h3>
+      <p>سكت المنبّه. الصلاة خير من النوم.</p>
+      <button class="btn btn-outline full" id="almBack">رجوع</button>
+    </div>
+  </div>
+</section>
+
 <!-- ══════════ صفحة: تعلّم الصلاة ══════════ -->
 <section class="page" id="page-learn">
   <div class="page-head">
@@ -513,13 +607,14 @@
 
 <div id="toast" class="toast"></div>
 
-<script src="js/data.js?v=36"></script>
-<script src="js/prayertimes.js?v=36"></script>
-<script src="js/app.js?v=36"></script>
-<script src="js/mushaf.js?v=36"></script>
-<script src="js/chat.js?v=36"></script>
-<script src="js/reading-plan.js?v=36"></script>
-<script src="js/quran-extras.js?v=36"></script>
-<script src="js/ambient.js?v=36"></script>
+<script src="js/data.js?v=38"></script>
+<script src="js/prayertimes.js?v=38"></script>
+<script src="js/app.js?v=38"></script>
+<script src="js/mushaf.js?v=38"></script>
+<script src="js/chat.js?v=38"></script>
+<script src="js/reading-plan.js?v=38"></script>
+<script src="js/quran-extras.js?v=38"></script>
+<script src="js/alarm-mission.js?v=38"></script>
+<script src="js/ambient.js?v=38"></script>
 </body>
 </html>
