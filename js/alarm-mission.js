@@ -6,10 +6,17 @@
    إسكاته إلا أن تقوم فعلاً وتمشي إليها. وحين تقف على قدميك في
    المطبخ يكون النوم قد ذهب.
 
-   التحقّق من الصورة عبر Gemini المجاني (نفس مفتاح «فضفض»): نسأله
-   «هل في هذه الصورة كذا؟» فيجيب بنعم أو لا. لا نقارن بصورة مرجعية
-   محفوظة، لأن الزاوية والإضاءة تختلفان كل ليلة فتفشل المقارنة،
-   والسؤال المباشر أدقّ وأبسط.
+   لا زرّ تصوير: تُوجّه الكاميرا الخلفية نحو الشيء فيتعرّف عليه
+   وحده وينتقل للمهمّة التالية. وأنت في الرابعة فجراً بعينٍ نصف
+   مفتوحة، لا تحتاج أن تبحث عن زرّ.
+
+   وكي لا نستنزف الحصّة المجانية: لا نسأل Gemini في كل لحظة، بل
+   نراقب الصورة محلياً ولا نسأله إلا حين تثبت الكاميرا على مشهد
+   جديد. المشي إلى المطبخ لا يُكلّف طلباً واحداً.
+
+   التحقّق سؤال واحد مغلق: «هل تُظهر هذه الصورة كذا؟» — لا نقارن
+   بصورة مرجعية محفوظة، لأن الزاوية والإضاءة تختلفان كل ليلة
+   فتفشل المقارنة، والسؤال المباشر أدقّ وأبسط.
 
    ولأن الإنترنت قد ينقطع في الرابعة فجراً، ولأن منبّهاً لا يمكن
    إسكاته أبداً خطرٌ لا ميزة، هناك بديل يعمل بلا إنترنت: كتابة
@@ -30,6 +37,17 @@ const SUGGESTED = [
 /* حروف بلا لبس: بلا O و0 و I و1 */
 const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
+/* ─── ضبط المراقبة المحلية ───
+   نأخذ صورة مصغّرة كل 400 ملّي ثانية ونقارنها بسابقتها. الفرق
+   الصغير يعني أن يدك ثبتت، والفرق الكبير عن آخر لقطة أرسلناها
+   يعني أن المشهد تغيّر فيستحقّ سؤالاً جديداً. */
+const TICK_MS = 400;      // كل كم نلتقط مصغّرة
+const STILL = 7;          // أقل من هذا الفرق = الكاميرا ثابتة
+const CHANGED = 9;        // أكبر من هذا عن آخر سؤال = مشهد جديد
+const STILL_TICKS = 2;    // كم مرة متتالية تثبت قبل أن نسأل
+const MIN_GAP_MS = 3000;  // أقل فاصل بين سؤالين مهما حدث
+const MAX_PER_MIN = 9;    // سقف الطلبات في الدقيقة (الحصّة المجانية ١٠)
+
 const Alarm = {
   targets: Store.get(TARGETS_KEY, SUGGESTED.slice(0, 5)),
   count: Store.get(COUNT_KEY, 3),
@@ -40,6 +58,16 @@ const Alarm = {
   busy: false,
   netFails: 0,
   escapeTimer: null,
+
+  /* المراقبة المحلية */
+  scanTimer: null,
+  thumbCtx: null,
+  prevThumb: null,
+  sentThumb: null,
+  stillFor: 0,
+  lastAsk: 0,
+  asks: [],
+  paused: false,
 
   /* وضع البديل */
   typing: false,
@@ -108,6 +136,10 @@ const Alarm = {
   },
 
   /* ─────────── تشغيل الجولة ─────────── */
+
+  /** أثناء الجولة نُخفي زينة التطبيق كلّها فتظهر الكاميرا كاملة بلا قصّ */
+  live(on) { document.body.classList.toggle("alm-live", !!on); },
+
   pane(id) {
     ["almSetup", "almRun", "almType", "almDone"].forEach(p => {
       const e = $(p);
@@ -134,8 +166,10 @@ const Alarm = {
     this.done = 0;
     this.netFails = 0;
     this.typing = false;
+    this.asks = [];
 
     this.pane("almRun");
+    this.live(true);
     $("almCancel").classList.toggle("hidden", this.forced);
     $("almEscape").classList.add("hidden");
     this.renderRun();
@@ -150,10 +184,13 @@ const Alarm = {
   },
 
   async openCam() {
+    const v = $("almVideo");
     try {
-      const mod = await import("./pose-model.js");
-      this.stream = await mod.openCamera($("almVideo"), t => this.say(t));
-      this.say("");
+      const mod = await import("./pose-model.js?v=39");
+      // الخلفية: أنت تصوّر الثلاجة لا وجهك
+      this.stream = await mod.openCamera(v, t => this.say(t), "environment");
+      this.fit(v);
+      this.startScan();
     } catch (e) {
       this.say((e && e.message) || "تعذّر فتح الكاميرا");
       const b = $("almEscape");
@@ -161,7 +198,22 @@ const Alarm = {
     }
   },
 
+  /** يضبط الإطار على نسبة الكاميرا فلا تظهر الصورة مقصوصة ومُكبّرة */
+  fit(video) {
+    const wrap = video.closest(".video-wrap");
+    if (!wrap) return;
+    const apply = () => {
+      if (video.videoWidth && video.videoHeight) {
+        wrap.style.aspectRatio = video.videoWidth + " / " + video.videoHeight;
+      }
+    };
+    apply();
+    video.addEventListener("loadedmetadata", apply, { once: true });
+    video.addEventListener("resize", apply);
+  },
+
   stopCam() {
+    this.stopScan();
     if (this.stream) { this.stream.getTracks().forEach(t => t.stop()); this.stream = null; }
     const v = $("almVideo");
     if (v) v.srcObject = null;
@@ -184,6 +236,83 @@ const Alarm = {
     $("almTask").textContent = this.queue[this.done] || "";
     $("almProgress").textContent = this.done + " / " + this.count;
     this.dots("almDots", this.done);
+    this.say("وجّه الكاميرا نحو: " + (this.queue[this.done] || ""));
+  },
+
+  /* ─────────── المراقبة المحلية ─────────── */
+
+  /** صورة رمادية ٣٢×٢٤ تكفي لمعرفة: هل ثبتت اليد؟ هل تغيّر المشهد؟ */
+  thumb() {
+    const v = $("almVideo");
+    if (!v || !v.videoWidth) return null;
+    if (!this.thumbCtx) {
+      const c = document.createElement("canvas");
+      c.width = 32; c.height = 24;
+      this.thumbCtx = c.getContext("2d", { willReadFrequently: true });
+    }
+    this.thumbCtx.drawImage(v, 0, 0, 32, 24);
+    const d = this.thumbCtx.getImageData(0, 0, 32, 24).data;
+    const g = new Uint8Array(32 * 24);
+    for (let i = 0, j = 0; i < d.length; i += 4, j++) {
+      g[j] = (d[i] * 77 + d[i + 1] * 150 + d[i + 2] * 29) >> 8;
+    }
+    return g;
+  },
+
+  diff(a, b) {
+    if (!a || !b) return 255;
+    let s = 0;
+    for (let i = 0; i < a.length; i++) s += Math.abs(a[i] - b[i]);
+    return s / a.length;
+  },
+
+  /** هل تجاوزنا سقف الطلبات في الدقيقة؟ */
+  quotaFree() {
+    const now = Date.now();
+    this.asks = this.asks.filter(t => now - t < 60000);
+    return this.asks.length < MAX_PER_MIN;
+  },
+
+  startScan() {
+    this.stopScan();
+    this.prevThumb = null;
+    this.sentThumb = null;
+    this.stillFor = 0;
+    this.paused = false;
+    // مهلة قصيرة تستقرّ فيها الكاميرا قبل أول سؤال
+    this.lastAsk = Date.now() - MIN_GAP_MS + 1500;
+    this.scanTimer = setInterval(() => this.tick(), TICK_MS);
+  },
+
+  stopScan() {
+    if (this.scanTimer) { clearInterval(this.scanTimer); this.scanTimer = null; }
+  },
+
+  tick() {
+    if (this.busy || this.paused || this.typing) return;
+    const cur = this.thumb();
+    if (!cur) return;
+
+    const moved = this.diff(this.prevThumb, cur);
+    this.prevThumb = cur;
+
+    if (moved > STILL) {           // اليد تتحرّك — لا نُتعب الخدمة
+      this.stillFor = 0;
+      return;
+    }
+    this.stillFor++;
+    if (this.stillFor < STILL_TICKS) return;
+
+    // ثبتت — لكن هل هو مشهد جديد فعلاً؟
+    if (this.sentThumb && this.diff(this.sentThumb, cur) < CHANGED) {
+      this.say("لم أرَ " + this.queue[this.done] + " — قرّب أكثر أو غيّر الزاوية");
+      return;
+    }
+    if (Date.now() - this.lastAsk < MIN_GAP_MS) return;
+    if (!this.quotaFree()) return;
+
+    this.sentThumb = cur;
+    this.check(true);
   },
 
   /** يلتقط إطاراً من الكاميرا ويعيده base64 بلا ترويسة */
@@ -198,7 +327,11 @@ const Alarm = {
     return c.toDataURL("image/jpeg", 0.75).split(",")[1];
   },
 
-  async shoot() {
+  /**
+   * سؤال واحد عن الإطار الحالي.
+   * @param {boolean} auto جاء من المراقبة لا من ضغطة زرّ
+   */
+  async check(auto) {
     if (this.busy) return;
     const target = this.queue[this.done];
     if (!target) return;
@@ -207,31 +340,64 @@ const Alarm = {
     if (!key) { this.toType("لا يوجد مفتاح Gemini للتحقّق من الصور"); return; }
 
     this.busy = true;
-    $("almShoot").disabled = true;
-    this.say("جارٍ التحقّق…");
+    this.lastAsk = Date.now();
+    this.asks.push(this.lastAsk);
+    const btn = $("almShoot");
+    if (btn) btn.disabled = true;
+    this.say("جارٍ التحقّق من " + target + "…");
 
     try {
       const ok = await this.verify(key, target, this.grab());
       this.netFails = 0;
       if (ok) {
-        this.done++;
-        vibrate([40, 60, 40]);
-        if (this.done >= this.count) { this.finish(); return; }
-        this.renderRun();
-        this.say("أحسنت — التالي");
-      } else {
-        vibrate(200);
-        this.say("لم أرَ " + target + " في الصورة. قرّب وصوّر مرة أخرى.");
+        this.hit(target);
+        return;
       }
+      vibrate(60);
+      this.say(auto
+        ? "لم أرَ " + target + " — قرّب أكثر أو غيّر الزاوية"
+        : "لم أرَ " + target + " في الصورة. قرّب وصوّر مرة أخرى.");
     } catch (e) {
-      this.netFails++;
-      if (this.netFails >= 3) { this.toType("تعذّر الاتصال بخدمة التحقّق"); return; }
-      this.say("تعذّر التحقّق — تحقّق من الإنترنت. محاولة " + this.netFails + " من ٣.");
+      const rate = e && /429/.test(e.message || "");
+      if (rate) {
+        // تجاوزنا الحصّة لحظياً — نهدأ قليلاً لا نسقط
+        this.paused = true;
+        this.say("الخدمة مزدحمة — لحظة…");
+        setTimeout(() => { this.paused = false; this.sentThumb = null; }, 20000);
+      } else {
+        this.netFails++;
+        if (this.netFails >= 3) { this.toType("تعذّر الاتصال بخدمة التحقّق"); return; }
+        this.say("تعذّر التحقّق — تحقّق من الإنترنت. محاولة " + this.netFails + " من ٣.");
+      }
     } finally {
       this.busy = false;
       const b = $("almShoot");
       if (b) b.disabled = false;
     }
+  },
+
+  /** أصاب الهدف: نُظهر النجاح لحظة ثم ننتقل وحدنا */
+  hit(target) {
+    vibrate([40, 60, 40]);
+    this.done++;
+    this.paused = true;
+    this.say("✓ " + target);
+    const box = $("almTaskBox");
+    if (box) box.classList.add("hit");
+    this.dots("almDots", this.done);
+    $("almProgress").textContent = this.done + " / " + this.count;
+
+    setTimeout(() => {
+      if (box) box.classList.remove("hit");
+      if (this.done >= this.count) { this.finish(); return; }
+      this.renderRun();
+      // نُبقي آخر مشهد ناجح مرجعاً: الهدف التالي شيء آخر في مكان آخر،
+      // فلا يُحسب مرّتين لأنك ما زلت واقفاً أمام نفس الشيء.
+      this.sentThumb = this.thumb() || this.sentThumb;
+      this.stillFor = 0;
+      this.lastAsk = Date.now() - MIN_GAP_MS + 1200;
+      this.paused = false;
+    }, 900);
   },
 
   /** سؤال واحد مغلق فيسهل الحكم على جوابه */
@@ -278,6 +444,7 @@ const Alarm = {
   toType(why) {
     clearTimeout(this.escapeTimer);
     this.stopCam();
+    this.live(false);
     this.typing = true;
     this.typed = 0;
     this.busy = false;
@@ -317,6 +484,7 @@ const Alarm = {
   finish() {
     clearTimeout(this.escapeTimer);
     this.stopCam();
+    this.live(false);
     this.pane("almDone");
     vibrate([200, 100, 200]);
     // نُخبر تطبيق أندرويد فيُسكت المنبّه
@@ -329,6 +497,7 @@ const Alarm = {
     if (this.forced) return;          // في الرنين الحقيقي لا إلغاء
     clearTimeout(this.escapeTimer);
     this.stopCam();
+    this.live(false);
     this.typing = false;
     this.pane("almSetup");
   },
@@ -363,7 +532,7 @@ const Alarm = {
     });
 
     $("almTry").addEventListener("click", () => this.begin());
-    $("almShoot").addEventListener("click", () => this.shoot());
+    $("almShoot").addEventListener("click", () => { this.sentThumb = null; this.check(false); });
     $("almEscape").addEventListener("click", () => this.toType("الكاميرا لا تعمل"));
     $("almCancel").addEventListener("click", () => this.cancel());
     $("almBack").addEventListener("click", () => this.cancel());

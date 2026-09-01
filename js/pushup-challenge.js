@@ -5,7 +5,7 @@
    كل المعالجة داخل جهازك.
    ══════════════════════════════════════════════════════════ */
 
-import { loadLandmarker, openCamera } from "./pose-model.js";
+import { loadLandmarker, openCamera } from "./pose-model.js?v=39";
 
 const L = {
   lSh: 11, rSh: 12, lEl: 13, rEl: 14, lWr: 15, rWr: 16,

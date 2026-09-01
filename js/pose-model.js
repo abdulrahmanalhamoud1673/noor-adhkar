@@ -108,13 +108,21 @@ export async function loadLandmarker(onProgress = () => {}) {
   }
 }
 
-/** قيود الكاميرا بنفس اتجاه الهاتف — وإلا ظهرت الصورة صغيرة ومقصوصة */
-export function cameraConstraints() {
+/**
+ * قيود الكاميرا بنفس اتجاه الهاتف — وإلا ظهرت الصورة صغيرة ومقصوصة.
+ *
+ * والوجه يختلف باختلاف المهمّة: مدرّب الصلاة يراك فيحتاج
+ * الأمامية (user)، ومنبّه المهمّات يصوّر الثلاجة فيحتاج الخلفية
+ * (environment). ونطلبه بـ ideal لا exact كي لا يفشل الطلب على
+ * جهاز بكاميرا واحدة.
+ */
+export function cameraConstraints(facing = "user") {
   const portrait = window.innerHeight >= window.innerWidth;
+  const size = portrait
+    ? { width: { ideal: 720 }, height: { ideal: 1280 } }
+    : { width: { ideal: 1280 }, height: { ideal: 720 } };
   return {
-    video: portrait
-      ? { facingMode: "user", width: { ideal: 720 }, height: { ideal: 1280 } }
-      : { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
+    video: Object.assign({ facingMode: { ideal: facing } }, size),
     audio: false
   };
 }
@@ -146,7 +154,7 @@ function cameraError(e) {
  * الطلب عند فتح العتاد فلا يرجع بنتيجة ولا بخطأ. لذلك: مهلة قصوى
  * دائماً، وتنازل تدريجي عن القيود، ورسالة تقول ما العمل.
  */
-export async function openCamera(video, onProgress = () => {}) {
+export async function openCamera(video, onProgress = () => {}, facing = "user") {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     throw new Error("هذا المتصفّح لا يدعم الكاميرا. افتح التطبيق من رابط https.");
   }
@@ -158,8 +166,8 @@ export async function openCamera(video, onProgress = () => {}) {
   }
 
   const attempts = [
-    cameraConstraints(),
-    { video: { facingMode: "user" }, audio: false },
+    cameraConstraints(facing),
+    { video: { facingMode: { ideal: facing } }, audio: false },
     { video: true, audio: false }
   ];
 

@@ -1521,3 +1521,49 @@ body.cam-open .page { animation: none !important; transform: none !important; }
 }
 .alm-type-input:focus{outline:none;border-color:var(--gold)}
 .alarm-cta .quran-cta-icon{filter:none}
+
+/* كاميرا المنبّه — خلفية، بلا قلب ولا زوم.
+   بلا هذه القاعدة يأخذ الفيديو مقاسه الأصلي (٧٢٠×١٢٨٠)
+   فيفيض عن الإطار ويُقصّ — فتبدو الصورة مُكبّرة. */
+#almVideo {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: contain;          /* لا قصّ — ترى ما تراه العدسة كاملاً */
+  transform: none;              /* الخلفية لا تُقلب كالمرآة */
+}
+.alm-cam { aspect-ratio: 3/4; max-height: 74vh; }
+
+/* وميض أخضر لحظة التعرّف — تراه بطرف عينك وأنت تمشي */
+.alm-task-box.hit {
+  border-color: rgba(16,185,129,.6);
+  box-shadow: 0 0 0 2px rgba(16,185,129,.25);
+}
+.alm-task-box.hit .alm-task { color: #10B981; }
+
+/* ══════════════════════════════════════
+   المنبّه يعمل — الشاشة كلّها للمهمّة
+   ══════════════════════════════════════ */
+body.alm-live .topbar,
+body.alm-live .bottom-nav,
+body.alm-live #page-alarm .page-head { display: none; }
+
+body.alm-live { padding-bottom: 0; }   /* حشوة شريط التنقّل ولا شريط */
+body.alm-live #app { padding: 0; }
+
+body.alm-live .page { animation: none !important; transform: none !important; }
+
+/* بطاقة المهمّة تصير شريطاً رفيعاً: الاسم هو المهمّ لا الزخرفة */
+body.alm-live .alm-task-box {
+  margin: 0; border-radius: 0; border-inline: none; border-top: none;
+  padding: 9px 14px 11px; text-align: center;
+}
+body.alm-live .alm-task-box .alm-label { font-size: 12.5px; margin-bottom: 1px; }
+body.alm-live .alm-task-box .alm-task { font-size: 26px; margin: 0; }
+body.alm-live .alm-task-box .alm-dots { margin: 5px 0 0; transform: scale(.85); }
+body.alm-live .alm-task-box .alm-progress { display: none; }
+
+/* سقف الارتفاع = الشاشة ناقص الشريط والزرّ، فيظهر كل شيء بلا تمرير.
+   مع contain يعني هذا شريطين جانبيين رفيعين لا قصّاً ولا تكبيراً. */
+body.alm-live .alm-cam { margin-bottom: 0; max-height: calc(100vh - 152px); }
+
+/* الزرّان أسفل الشاشة بلا حشوة زائدة */
+body.alm-live #almRun > .btn { margin: 8px 12px 0; width: calc(100% - 24px); }
