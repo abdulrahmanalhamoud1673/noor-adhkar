@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=40">
+<link rel="stylesheet" href="css/style.css?v=41">
 </head>
 <body>
 
@@ -407,6 +407,9 @@
       <label class="pick-label">الجهوزية</label>
       <div class="alm-ready" id="almReady"></div>
 
+      <button class="btn btn-outline full" id="almTest">🔎 افحص المفتاح والنموذج</button>
+      <div class="alm-test" id="almTestOut"></div>
+
       <div class="alm-keyrow hidden" id="almKeyRow">
         <input type="password" id="almKeyInput" placeholder="الصق مفتاح Gemini هنا…" autocomplete="off">
         <button id="almKeySave">حفظ</button>
@@ -423,7 +426,7 @@
   <!-- الجولة -->
   <div class="hidden" id="almRun">
     <div class="alm-task-box card-glass" id="almTaskBox">
-      <div class="alm-label">وجّه الكاميرا نحو</div>
+      <div class="alm-label" id="almLabel">وجّه الكاميرا نحو</div>
       <div class="alm-task" id="almTask">—</div>
       <div class="alm-dots" id="almDots"></div>
       <div class="alm-progress" id="almProgress">0 / 3</div>
@@ -431,6 +434,7 @@
 
     <div class="video-wrap full-bleed alm-cam">
       <video id="almVideo" playsinline autoplay muted></video>
+      <div class="alm-saw hidden" id="almSaw"></div>
       <div class="ch-diag" id="almHint"></div>
 
       <!-- يظهر حين ينقص المفتاح — والكاميرا تبقى تعمل خلفه -->
@@ -440,31 +444,14 @@
           <p>الصق مفتاح Gemini المجاني وأكمِل بالتصوير.</p>
           <input type="password" id="almRunKey" placeholder="الصق المفتاح…" autocomplete="off">
           <button class="btn btn-gold full" id="almRunKeySave">حفظ ومتابعة</button>
-          <button class="alm-link" id="almUseType">لا أملكه — استخدم تحدّي الكتابة</button>
+          <button class="alm-link" id="almUseLocal">لا أملكه — صوّر أماكن مختلفة بدلاً منه</button>
         </div>
       </div>
     </div>
 
     <button class="btn btn-outline full" id="almShoot">📸 تحقّق الآن</button>
-    <button class="btn btn-outline full hidden" id="almEscape">الكاميرا لا تعمل — تحدّي الكتابة</button>
+    <button class="btn btn-outline full hidden" id="almGiveUp">الكاميرا لا تعمل — أوقِف المنبّه</button>
     <button class="btn btn-outline full" id="almCancel">إلغاء</button>
-  </div>
-
-  <!-- البديل حين يتعذّر التحقّق (لا إنترنت / لا مفتاح) -->
-  <div class="hidden" id="almType">
-    <div class="alm-task-box card-glass">
-      <div class="alm-label">اكتب الرمز كما هو</div>
-      <div class="alm-code" id="almCode">—</div>
-      <div class="alm-dots" id="almTypeDots"></div>
-      <div class="alm-progress" id="almTypeProgress">0 / 3</div>
-    </div>
-    <div class="card-glass">
-      <p class="alm-why" id="almWhy">تعذّر التحقّق من الصور — لن يسكت المنبّه حتّى تكتب هذه الرموز.</p>
-      <input type="text" id="almTypeInput" class="alm-type-input" placeholder="اكتب هنا…"
-             autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
-      <button class="btn btn-gold btn-lg full" id="almTypeOk">تحقّق</button>
-      <button class="btn btn-outline full" id="almBackToCam">↩ رجوع للتصوير</button>
-    </div>
   </div>
 
   <!-- الختام -->
@@ -627,14 +614,14 @@
 
 <div id="toast" class="toast"></div>
 
-<script src="js/data.js?v=40"></script>
-<script src="js/prayertimes.js?v=40"></script>
-<script src="js/app.js?v=40"></script>
-<script src="js/mushaf.js?v=40"></script>
-<script src="js/chat.js?v=40"></script>
-<script src="js/reading-plan.js?v=40"></script>
-<script src="js/quran-extras.js?v=40"></script>
-<script src="js/alarm-mission.js?v=40"></script>
-<script src="js/ambient.js?v=40"></script>
+<script src="js/data.js?v=41"></script>
+<script src="js/prayertimes.js?v=41"></script>
+<script src="js/app.js?v=41"></script>
+<script src="js/mushaf.js?v=41"></script>
+<script src="js/chat.js?v=41"></script>
+<script src="js/reading-plan.js?v=41"></script>
+<script src="js/quran-extras.js?v=41"></script>
+<script src="js/alarm-mission.js?v=41"></script>
+<script src="js/ambient.js?v=41"></script>
 </body>
 </html>

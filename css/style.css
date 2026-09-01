@@ -1612,3 +1612,14 @@ body.alm-live #almRun > .btn { margin: 8px 12px 0; width: calc(100% - 24px); }
   background:none;border:none;color:var(--muted);font-size:13.5px;
   font-family:inherit;text-decoration:underline;margin-top:12px;padding:6px;
 }
+
+/* ما رآه النموذج فعلاً — كي لا تحزر سبب الرفض */
+.alm-saw{
+  position:absolute;left:0;right:0;top:0;z-index:3;
+  background:linear-gradient(180deg,rgba(0,0,0,.8),transparent);
+  padding:10px 12px 18px;text-align:center;
+  font-size:13px;line-height:1.6;color:#BFD8CC;
+}
+.alm-test{font-size:13.5px;line-height:1.7;margin:6px 0 12px;color:var(--muted);min-height:1px}
+.alm-test.ok{color:#10B981}
+.alm-test.bad{color:#EF4444}

@@ -6,21 +6,17 @@
    إسكاته إلا أن تقوم فعلاً وتمشي إليها. وحين تقف على قدميك في
    المطبخ يكون النوم قد ذهب.
 
-   لا زرّ تصوير: تُوجّه الكاميرا الخلفية نحو الشيء فيتعرّف عليه
-   وحده وينتقل للمهمّة التالية. وأنت في الرابعة فجراً بعينٍ نصف
-   مفتوحة، لا تحتاج أن تبحث عن زرّ.
+   لا كتابة رموز ولا أحجيات: الطلب هو التصوير، والتصوير وحده.
 
-   وكي لا نستنزف الحصّة المجانية: لا نسأل Gemini في كل لحظة، بل
-   نراقب الصورة محلياً ولا نسأله إلا حين تثبت الكاميرا على مشهد
-   جديد. المشي إلى المطبخ لا يُكلّف طلباً واحداً.
+   ولماذا لا نسأله «هل هذه ثلاجة؟» فحسب؟ لأن سؤال نعم/لا يفشل
+   كثيراً: لقطة قريبة من باب ثلاجة بيضاء قد لا يجزم فيها النموذج،
+   فيقول «لا» وأنت واقف أمامها. فنسأله بدل ذلك: «ماذا ترى؟» ثم
+   نبحث عن هدفنا في جوابه — ومعه مرادفاته. وهذا أكثر تسامحاً،
+   وفوق ذلك نعرض لك ما رآه فتفهم سبب الرفض بدل أن تحزر.
 
-   التحقّق سؤال واحد مغلق: «هل تُظهر هذه الصورة كذا؟» — لا نقارن
-   بصورة مرجعية محفوظة، لأن الزاوية والإضاءة تختلفان كل ليلة
-   فتفشل المقارنة، والسؤال المباشر أدقّ وأبسط.
-
-   ولأن الإنترنت قد ينقطع في الرابعة فجراً، ولأن منبّهاً لا يمكن
-   إسكاته أبداً خطرٌ لا ميزة، هناك بديل يعمل بلا إنترنت: كتابة
-   رموز عشوائية. يبقى القيام مطلوباً، ولا يبقى الهاتف أسيراً.
+   وإن انقطع الإنترنت فلا حكم لنموذج، لكن يبقى ما لا يحتاج شبكة:
+   أن تصوّر ثلاثة أماكن مختلفة فعلاً. الهاتف يرى بنفسه أن المشهد
+   تغيّر، ولا يتغيّر المشهد وأنت في فراشك.
    ══════════════════════════════════════════════════════════ */
 (function () {
 
@@ -34,19 +30,41 @@ const SUGGESTED = [
   "مفتاح النور في المطبخ", "الشبّاك", "باب البيت", "المغسلة", "الفرن"
 ];
 
-/* حروف بلا لبس: بلا O و0 و I و1 */
-const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+/* مرادفات شائعة — النموذج قد يسمّي الشيء باسم آخر صحيح */
+const SYNONYMS = {
+  "ثلاجة": ["براد", "برّاد", "فريزر", "refrigerator", "fridge", "freezer"],
+  "ميكروويف": ["مايكروويف", "ميكرويف", "فرن كهربائي", "microwave"],
+  "غسالة": ["غسّالة", "غسيل", "washing machine", "washer"],
+  "حنفية": ["صنبور", "صنبورة", "حنفيه", "خلاط ماء", "tap", "faucet", "sink"],
+  "مغسلة": ["حوض", "مغسله", "sink", "basin", "washbasin"],
+  "فرن": ["طباخ", "بوتاجاز", "غاز", "oven", "stove", "cooker"],
+  "شباك": ["شبّاك", "نافذة", "window"],
+  "باب": ["door"],
+  "مفتاح النور": ["مفتاح كهرباء", "مفتاح إضاءة", "قابس", "switch", "light switch"],
+  "سرير": ["bed"],
+  "مرآة": ["مراية", "mirror"],
+  "تلفزيون": ["تلفاز", "شاشة", "tv", "television"]
+};
+
+/* أسماء الغرف والحشو: لا يُبنى عليها حكم، وإلا قُبِلت
+   أي لقطة في المطبخ على أنها «مفتاح النور في المطبخ» */
+const STOPWORDS = [
+  "مطبخ", "حمام", "غرفه", "بيت", "منزل", "صاله", "نوم", "معيشه",
+  "داخل", "عند", "فوق", "تحت", "كبير", "صغير", "ابيض", "اسود",
+  "kitchen", "bathroom", "bedroom", "room", "house", "living"
+];
 
 /* ─── ضبط المراقبة المحلية ───
    نأخذ صورة مصغّرة كل 400 ملّي ثانية ونقارنها بسابقتها. الفرق
    الصغير يعني أن يدك ثبتت، والفرق الكبير عن آخر لقطة أرسلناها
    يعني أن المشهد تغيّر فيستحقّ سؤالاً جديداً. */
-const TICK_MS = 400;      // كل كم نلتقط مصغّرة
-const STILL = 7;          // أقل من هذا الفرق = الكاميرا ثابتة
-const CHANGED = 9;        // أكبر من هذا عن آخر سؤال = مشهد جديد
-const STILL_TICKS = 2;    // كم مرة متتالية تثبت قبل أن نسأل
-const MIN_GAP_MS = 3000;  // أقل فاصل بين سؤالين مهما حدث
-const MAX_PER_MIN = 9;    // سقف الطلبات في الدقيقة (الحصّة المجانية ١٠)
+const TICK_MS = 400;
+const STILL = 7;           // أقل من هذا الفرق = الكاميرا ثابتة
+const CHANGED = 9;         // أكبر من هذا عن آخر سؤال = مشهد جديد
+const STILL_TICKS = 2;     // كم مرة متتالية تثبت قبل أن نسأل
+const MIN_GAP_MS = 3000;   // أقل فاصل بين سؤالين مهما حدث
+const MAX_PER_MIN = 9;     // سقف الطلبات في الدقيقة (الحصّة المجانية ١٠)
+const MOVED = 26;          // فرق يكفي للقول: هذا مكان آخر (وضع بلا إنترنت)
 
 const Alarm = {
   targets: Store.get(TARGETS_KEY, SUGGESTED.slice(0, 5)),
@@ -57,7 +75,7 @@ const Alarm = {
   stream: null,
   busy: false,
   netFails: 0,
-  escapeTimer: null,
+  lastError: "",
 
   /* المراقبة المحلية */
   scanTimer: null,
@@ -69,10 +87,10 @@ const Alarm = {
   asks: [],
   paused: false,
 
-  /* وضع البديل */
-  typing: false,
-  code: "",
-  typed: 0,
+  /* وضع «أماكن مختلفة» حين يتعذّر التحقّق بالذكاء */
+  local: false,
+  homeThumb: null,     // مشهد البداية — غرفة نومك
+  okThumbs: [],        // مشاهد قُبلت
 
   /** رنين حقيقي من تطبيق أندرويد — لا مهرب إلا بالإتمام */
   get forced() { return /[#&]alarm=1/.test(location.hash); },
@@ -141,7 +159,7 @@ const Alarm = {
   live(on) { document.body.classList.toggle("alm-live", !!on); },
 
   pane(id) {
-    ["almSetup", "almRun", "almType", "almDone"].forEach(p => {
+    ["almSetup", "almRun", "almDone"].forEach(p => {
       const e = $(p);
       if (e) e.classList.toggle("hidden", p !== id);
     });
@@ -150,9 +168,7 @@ const Alarm = {
   begin() {
     goto("page-alarm");
 
-    // رنّ المنبّه ولا أهداف كافية؟ لا نتركه يصرخ بلا مخرج
     if (this.targets.length < this.count) {
-      if (this.forced) { this.toType("لا توجد أهداف كافية للتصوير"); return; }
       toast("أضف أهدافاً أولاً");
       this.pane("almSetup");
       return;
@@ -165,38 +181,34 @@ const Alarm = {
     }
     this.done = 0;
     this.netFails = 0;
-    this.typing = false;
     this.asks = [];
+    this.local = false;
+    this.homeThumb = null;
+    this.okThumbs = [];
+    this.lastError = "";
 
     this.pane("almRun");
     this.live(true);
     $("almCancel").classList.toggle("hidden", this.forced);
-    $("almEscape").classList.add("hidden");
     $("almNeedKey").classList.add("hidden");
-    $("almBackToCam").classList.add("hidden");
+    $("almGiveUp").classList.add("hidden");
     this.renderRun();
     this.openCam();
-
-    // بعد دقيقة من العجز: مخرجٌ لا يُسقط الشرط، بل يبدّله
-    clearTimeout(this.escapeTimer);
-    this.escapeTimer = setTimeout(() => {
-      const e = $("almEscape");
-      if (e && !this.typing) e.classList.remove("hidden");
-    }, 60000);
   },
 
   async openCam() {
     const v = $("almVideo");
     try {
-      const mod = await import("./pose-model.js?v=40");
+      const mod = await import("./pose-model.js?v=41");
       // الخلفية: أنت تصوّر الثلاجة لا وجهك
       this.stream = await mod.openCamera(v, t => this.say(t), "environment");
       this.fit(v);
+      setTimeout(() => { this.homeThumb = this.thumb(); }, 700);
       this.startScan();
     } catch (e) {
+      // الكاميرا نفسها معطّلة: لا مهمّة ممكنة، ولا نحبس الهاتف
       this.say((e && e.message) || "تعذّر فتح الكاميرا");
-      const b = $("almEscape");
-      if (b) b.classList.remove("hidden");
+      $("almGiveUp").classList.remove("hidden");
     }
   },
 
@@ -223,8 +235,16 @@ const Alarm = {
 
   say(t) { const e = $("almHint"); if (e) e.textContent = t; },
 
-  dots(boxId, filled) {
-    const dots = $(boxId);
+  /** ما رآه النموذج فعلاً — كي لا تحزر سبب الرفض */
+  saw(t) {
+    const e = $("almSaw");
+    if (!e) return;
+    e.textContent = t || "";
+    e.classList.toggle("hidden", !t);
+  },
+
+  dots(filled) {
+    const dots = $("almDots");
     if (!dots) return;
     dots.innerHTML = "";
     for (let i = 0; i < this.count; i++) {
@@ -235,15 +255,28 @@ const Alarm = {
   },
 
   renderRun() {
-    $("almTask").textContent = this.queue[this.done] || "";
+    $("almTask").textContent = this.local
+      ? "مكان مختلف (" + (this.done + 1) + ")"
+      : (this.queue[this.done] || "");
+    $("almLabel").textContent = this.local ? "صوّر مكاناً آخر في البيت" : "وجّه الكاميرا نحو";
     $("almProgress").textContent = this.done + " / " + this.count;
-    this.dots("almDots", this.done);
-    this.say("وجّه الكاميرا نحو: " + (this.queue[this.done] || ""));
+    this.dots(this.done);
+    this.saw("");
+    this.say(this.local
+      ? "امشِ إلى غرفة أخرى وصوّرها"
+      : "وجّه الكاميرا نحو: " + (this.queue[this.done] || ""));
   },
 
   /* ─────────── المراقبة المحلية ─────────── */
 
-  /** صورة رمادية ٣٢×٢٤ تكفي لمعرفة: هل ثبتت اليد؟ هل تغيّر المشهد؟ */
+  /**
+   * صورة مصغّرة ٣٢×٢٤ بألوانها تكفي لمعرفة: هل ثبتت اليد؟ هل
+   * تغيّر المشهد؟
+   *
+   * ولماذا بالألوان لا بالرمادي؟ لأن غرفتين مختلفتين قد تتساويان
+   * في الإضاءة فتبدوان واحدة للرمادي، فيقال لك «هذا نفس المكان»
+   * وأنت في غرفة أخرى.
+   */
   thumb() {
     const v = $("almVideo");
     if (!v || !v.videoWidth) return null;
@@ -254,9 +287,9 @@ const Alarm = {
     }
     this.thumbCtx.drawImage(v, 0, 0, 32, 24);
     const d = this.thumbCtx.getImageData(0, 0, 32, 24).data;
-    const g = new Uint8Array(32 * 24);
-    for (let i = 0, j = 0; i < d.length; i += 4, j++) {
-      g[j] = (d[i] * 77 + d[i + 1] * 150 + d[i + 2] * 29) >> 8;
+    const g = new Uint8Array(32 * 24 * 3);
+    for (let i = 0, j = 0; i < d.length; i += 4, j += 3) {
+      g[j] = d[i]; g[j + 1] = d[i + 1]; g[j + 2] = d[i + 2];
     }
     return g;
   },
@@ -268,7 +301,6 @@ const Alarm = {
     return s / a.length;
   },
 
-  /** هل تجاوزنا سقف الطلبات في الدقيقة؟ */
   quotaFree() {
     const now = Date.now();
     this.asks = this.asks.filter(t => now - t < 60000);
@@ -281,7 +313,6 @@ const Alarm = {
     this.sentThumb = null;
     this.stillFor = 0;
     this.paused = false;
-    // مهلة قصيرة تستقرّ فيها الكاميرا قبل أول سؤال
     this.lastAsk = Date.now() - MIN_GAP_MS + 1500;
     this.scanTimer = setInterval(() => this.tick(), TICK_MS);
   },
@@ -291,25 +322,21 @@ const Alarm = {
   },
 
   tick() {
-    if (this.busy || this.paused || this.typing) return;
+    if (this.busy || this.paused) return;
     const cur = this.thumb();
     if (!cur) return;
+    if (!this.homeThumb) this.homeThumb = cur;
 
     const moved = this.diff(this.prevThumb, cur);
     this.prevThumb = cur;
 
-    if (moved > STILL) {           // اليد تتحرّك — لا نُتعب الخدمة
-      this.stillFor = 0;
-      return;
-    }
+    if (moved > STILL) { this.stillFor = 0; return; }   // اليد تتحرّك
     this.stillFor++;
     if (this.stillFor < STILL_TICKS) return;
 
-    // ثبتت — لكن هل هو مشهد جديد فعلاً؟
-    if (this.sentThumb && this.diff(this.sentThumb, cur) < CHANGED) {
-      this.say("لم أرَ " + this.queue[this.done] + " — قرّب أكثر أو غيّر الزاوية");
-      return;
-    }
+    if (this.local) { this.judgeLocal(cur); return; }
+
+    if (this.sentThumb && this.diff(this.sentThumb, cur) < CHANGED) return;
     if (Date.now() - this.lastAsk < MIN_GAP_MS) return;
     if (!this.quotaFree()) return;
 
@@ -317,22 +344,39 @@ const Alarm = {
     this.check(true);
   },
 
+  /* ─────────── الحكم بلا إنترنت: أماكن مختلفة ─────────── */
+
+  /**
+   * لا نموذج يحكم، لكن الهاتف يرى بنفسه أن المشهد تغيّر.
+   * نشترط أن تختلف اللقطة عن غرفة البداية وعن كل ما قُبِل قبلها،
+   * فلا سبيل إلى إتمامها وأنت في فراشك.
+   */
+  judgeLocal(cur) {
+    const far = t => this.diff(t, cur) >= MOVED;
+    if (!far(this.homeThumb)) {
+      this.say("هذا نفس المكان — امشِ إلى غرفة أخرى");
+      return;
+    }
+    if (!this.okThumbs.every(far)) {
+      this.say("صوّرتَ هذا المكان — اذهب إلى مكان ثالث");
+      return;
+    }
+    this.okThumbs.push(cur);
+    this.hit("مكان جديد");
+  },
+
   /** يلتقط إطاراً من الكاميرا ويعيده base64 بلا ترويسة */
   grab() {
     const v = $("almVideo");
     const c = document.createElement("canvas");
-    const w = 640;
+    const w = 768;
     const scale = w / (v.videoWidth || w);
     c.width = w;
-    c.height = Math.round((v.videoHeight || 480) * scale);
+    c.height = Math.round((v.videoHeight || 576) * scale);
     c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);
-    return c.toDataURL("image/jpeg", 0.75).split(",")[1];
+    return c.toDataURL("image/jpeg", 0.8).split(",")[1];
   },
 
-  /**
-   * سؤال واحد عن الإطار الحالي.
-   * @param {boolean} auto جاء من المراقبة لا من ضغطة زرّ
-   */
   async check(auto) {
     if (this.busy) return;
     const target = this.queue[this.done];
@@ -346,30 +390,30 @@ const Alarm = {
     this.asks.push(this.lastAsk);
     const btn = $("almShoot");
     if (btn) btn.disabled = true;
-    this.say("جارٍ التحقّق من " + target + "…");
+    this.say("جارٍ النظر…");
 
     try {
-      const ok = await this.verify(key, target, this.grab());
+      const r = await this.look(key, this.grab());
       this.netFails = 0;
-      if (ok) {
-        this.hit(target);
-        return;
-      }
+      this.saw(r.seen ? "أرى: " + r.seen : "");
+
+      if (this.matches(target, r)) { this.hit(target); return; }
+
       vibrate(60);
-      this.say(auto
-        ? "لم أرَ " + target + " — قرّب أكثر أو غيّر الزاوية"
-        : "لم أرَ " + target + " في الصورة. قرّب وصوّر مرة أخرى.");
+      this.say("لم أجد " + target + " — ابتعد قليلاً ليظهر كاملاً، أو غيّر الزاوية");
     } catch (e) {
-      const rate = e && /429/.test(e.message || "");
-      if (rate) {
-        // تجاوزنا الحصّة لحظياً — نهدأ قليلاً لا نسقط
+      this.lastError = (e && e.message) || "خطأ";
+      if (/429/.test(this.lastError)) {
         this.paused = true;
         this.say("الخدمة مزدحمة — لحظة…");
         setTimeout(() => { this.paused = false; this.sentThumb = null; }, 20000);
       } else {
+        // عطل شبكة لا حكم على المشهد: أعِد المحاولة على نفس اللقطة
         this.netFails++;
-        if (this.netFails >= 5) { this.toType("تعذّر الاتصال بخدمة التحقّق"); return; }
-        this.say("تعذّر التحقّق — تحقّق من الإنترنت. محاولة " + this.netFails + " من ٥.");
+        this.sentThumb = null;
+        this.saw("سبب العطل: " + this.lastError);
+        this.say("تعذّر التحقّق (" + this.netFails + "/٣)");
+        if (this.netFails >= 3) this.toLocal();
       }
     } finally {
       this.busy = false;
@@ -378,68 +422,132 @@ const Alarm = {
     }
   },
 
-  /** أصاب الهدف: نُظهر النجاح لحظة ثم ننتقل وحدنا */
-  hit(target) {
-    vibrate([40, 60, 40]);
-    this.done++;
-    this.paused = true;
-    this.say("✓ " + target);
-    const box = $("almTaskBox");
-    if (box) box.classList.add("hit");
-    this.dots("almDots", this.done);
-    $("almProgress").textContent = this.done + " / " + this.count;
-
-    setTimeout(() => {
-      if (box) box.classList.remove("hit");
-      if (this.done >= this.count) { this.finish(); return; }
-      this.renderRun();
-      // نُبقي آخر مشهد ناجح مرجعاً: الهدف التالي شيء آخر في مكان آخر،
-      // فلا يُحسب مرّتين لأنك ما زلت واقفاً أمام نفس الشيء.
-      this.sentThumb = this.thumb() || this.sentThumb;
-      this.stillFor = 0;
-      this.lastAsk = Date.now() - MIN_GAP_MS + 1200;
-      this.paused = false;
-    }, 900);
+  /** يتحوّل إلى «أماكن مختلفة» — بلا رموز ولا أحجيات */
+  toLocal() {
+    this.local = true;
+    this.netFails = 0;
+    this.sentThumb = null;
+    this.okThumbs = [];
+    this.homeThumb = this.thumb() || this.homeThumb;
+    toast("تعذّر التحقّق — صوّر أماكن مختلفة");
+    this.renderRun();
+    this.saw("");
   },
 
-  /** سؤال واحد مغلق فيسهل الحكم على جوابه */
-  async verify(key, target, b64) {
-    const model = Store.get("aiModel", "") || "gemini-2.5-flash";
+  /* ─────────── سؤال النموذج ─────────── */
+
+  /** يجرّد الكلمة من «ال» والتشكيل ويوحّد الهاء والتاء المربوطة */
+  norm(s) {
+    return (s || "")
+      .replace(/[ً-ْٰ]/g, "")
+      .replace(/[إأآا]/g, "ا")
+      .replace(/ة/g, "ه")
+      .replace(/ى/g, "ي")
+      .replace(/^ال/, "")
+      .toLowerCase()
+      .trim();
+  },
+
+  /** كل الأسماء التي تعني هذا الهدف */
+  words(target) {
+    const out = [];
+    this.norm(target).split(/\s+/).forEach(w => {
+      const x = w.replace(/^ال/, "");
+      if (x.length > 2 && STOPWORDS.indexOf(x) === -1) out.push(x);
+    });
+    Object.keys(SYNONYMS).forEach(k => {
+      const nk = this.norm(k);
+      if (out.some(w => w.includes(nk) || nk.includes(w))) {
+        SYNONYMS[k].forEach(s => out.push(this.norm(s)));
+      }
+    });
+    return out;
+  },
+
+  /** هل جواب النموذج يشمل هدفنا؟ */
+  matches(target, r) {
+    const words = this.words(target);
+    if (!words.length) return false;              // هدف كلّه أسماء غرف: لا حكم
+    const objects = this.norm(r.objects || "");
+    return words.some(w => w && objects.includes(w));
+  },
+
+  /**
+   * سؤال واحد بجوابين: ماذا ترى؟ وهل فيه هدفنا؟
+   *
+   * ونطلب جواباً قصيراً بحدّ مرتفع للمخرجات: نماذج ٢٫٥ تُنفق من
+   * حدّ المخرجات على تفكيرها، فإن ضاق الحدّ عاد الجواب فارغاً —
+   * وهو ما يبدو للمستخدم «لم أرَ شيئاً» بلا سبب.
+   */
+  async look(key, b64) {
+    const model = Store.get("aiModel", "") || "gemini-flash-latest";
+    const body = {
+      contents: [{
+        role: "user",
+        parts: [
+          { inline_data: { mime_type: "image/jpeg", data: b64 } },
+          { text:
+            "انظر إلى الصورة وأجب بسطرين فقط، بلا مقدّمات:\n" +
+            "الأشياء: (اذكر أبرز ٤ إلى ٨ أشياء تراها، مفصولة بفواصل)\n" +
+            "المكان: (اسم الغرفة أو المكان بكلمة أو كلمتين)" }
+        ]
+      }],
+      generationConfig: {
+        temperature: 0,
+        maxOutputTokens: 2048,
+        thinkingConfig: { thinkingBudget: 0 }
+      }
+    };
+
+    let j = await this.post(key, model, body);
+    let txt = this.textOf(j);
+
+    // جواب فارغ = التفكير التهم حدّ المخرجات: أعِد بلا ضبط تفكير
+    if (!txt) {
+      delete body.generationConfig.thinkingConfig;
+      body.generationConfig.maxOutputTokens = 4096;
+      j = await this.post(key, model, body);
+      txt = this.textOf(j);
+    }
+    if (!txt) throw new Error("جواب فارغ من النموذج");
+
+    const m = /الأشياء\s*:?\s*(.+)/.exec(txt);
+    const place = (/المكان\s*:?\s*(.+)/.exec(txt) || [])[1] || "";
+    // لم يتبع القالب? نأخذ النص كلّه أفضل من أن نُضيّع جواباً صحيحاً
+    const objects = m ? m[1] : txt.replace(/المكان\s*:?.*/g, "");
+    return {
+      objects: objects,
+      seen: (objects + (place ? " — " + place : "")).trim().slice(0, 160),
+      raw: txt
+    };
+  },
+
+  async post(key, model, body) {
     const res = await fetch(API + "/models/" + model + ":generateContent", {
       method: "POST",
       headers: { "x-goog-api-key": key, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{
-          role: "user",
-          parts: [
-            { inline_data: { mime_type: "image/jpeg", data: b64 } },
-            { text: "هل تُظهر هذه الصورة: " + target + "؟ " +
-                    "كن متساهلاً ما دام الشيء المقصود ظاهراً ولو جزئياً. " +
-                    "أجب بكلمة واحدة فقط: نعم أو لا." }
-          ]
-        }],
-        generationConfig: {
-          temperature: 0,
-          maxOutputTokens: 800,
-          thinkingConfig: { thinkingBudget: 0 }
-        }
-      })
+      body: JSON.stringify(body)
     });
-    if (!res.ok) throw new Error("http " + res.status);
-    const j = await res.json();
+    if (!res.ok) {
+      let why = "";
+      try {
+        const e = await res.json();
+        why = (e.error && e.error.message) || "";
+      } catch (x) {}
+      if (res.status === 404 || res.status === 400) Store.set("aiModel", "");
+      throw new Error(res.status + (why ? ": " + why.slice(0, 90) : ""));
+    }
+    return res.json();
+  },
+
+  textOf(j) {
     const cand = (j.candidates || [])[0];
     const parts = (cand && cand.content && cand.content.parts) || [];
-    const txt = parts.map(p => p.text || "").join(" ");
-    return /نعم|yes/i.test(txt);
+    return parts.map(p => p.text || "").join(" ").trim();
   },
 
   /* ─────────── المفتاح ─────────── */
 
-  /**
-   * ينقص المفتاح: لا نرميه إلى الكتابة: هو يريد أن يقوم
-   * ويصوّر. نُظهِر صندوقاً فوق الكاميرا يلصق فيه المفتاح
-   * ويُكمل — والكاميرا تبقى تعمل خلفه.
-   */
   needKey() {
     this.paused = true;
     const box = $("almNeedKey");
@@ -453,6 +561,7 @@ const Alarm = {
     const v = (value || "").trim();
     if (v.length < 20 || /\s/.test(v)) { toast("المفتاح غير مكتمل"); return false; }
     Store.set("aiKey", v);
+    Store.set("aiModel", "");        // نعيد اختيار النموذج لهذا المفتاح
     toast("حُفظ المفتاح ✓");
     if (onDone) onDone();
     return true;
@@ -469,16 +578,14 @@ const Alarm = {
   },
 
   /** لوحة الجهوزية: تقول قبل الفجر ما الذي ينقص */
-  async renderReady() {
+  renderReady() {
     const box = $("almReady");
     if (!box) return;
     const key = Store.get("aiKey", "");
     const rows = [
-      ["🎯", "الأهداف", this.targets.length + " هدفاً",
-        this.targets.length >= this.count],
-      ["🔑", "مفتاح التحقّق", key ? "محفوظ" : "ناقص — بدونه لا تصوير", !!key],
-      ["📷", "الكاميرا", navigator.mediaDevices ? "مدعومة" : "غير مدعومة",
-        !!navigator.mediaDevices]
+      ["🎯", "الأهداف", this.targets.length + " هدفاً", this.targets.length >= this.count],
+      ["🔑", "مفتاح التحقّق", key ? "محفوظ" : "ناقص — بدونه لا تعرّف", !!key],
+      ["📷", "الكاميرا", navigator.mediaDevices ? "مدعومة" : "غير مدعومة", !!navigator.mediaDevices]
     ];
     box.innerHTML = "";
     rows.forEach(([icon, name, val, ok]) => {
@@ -494,65 +601,68 @@ const Alarm = {
     if (row) row.classList.toggle("hidden", !!key);
   },
 
-  /* ─────────── البديل: كتابة الرموز ─────────── */
-  newCode() {
-    let s = "";
-    for (let i = 0; i < 6; i++) {
-      s += CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)];
+  /** فحص المفتاح والنموذج قبل الفجر لا عنده */
+  async testKey() {
+    const out = $("almTestOut");
+    const key = Store.get("aiKey", "");
+    if (!key) { out.textContent = "لا يوجد مفتاح محفوظ."; out.className = "alm-test bad"; return; }
+    out.textContent = "جارٍ الفحص…";
+    out.className = "alm-test";
+    try {
+      const r = await fetch(API + "/models", { headers: { "x-goog-api-key": key } });
+      if (!r.ok) {
+        let why = "";
+        try { const e = await r.json(); why = (e.error && e.error.message) || ""; } catch (x) {}
+        out.textContent = "✕ المفتاح مرفوض (" + r.status + ") " + why.slice(0, 80);
+        out.className = "alm-test bad";
+        return;
+      }
+      const j = await r.json();
+      const names = (j.models || [])
+        .filter(m => (m.supportedGenerationMethods || []).includes("generateContent"))
+        .map(m => m.name.replace(/^models\//, ""))
+        .filter(n => /flash/.test(n) && !/lite|embedding|tts|image/.test(n));
+      const pick = names.find(n => n === "gemini-flash-latest") || names[0] || "";
+      if (pick) Store.set("aiModel", pick);
+      out.textContent = pick ? "✓ المفتاح يعمل — النموذج: " + pick : "✓ المفتاح يعمل";
+      out.className = "alm-test ok";
+      this.renderReady();
+    } catch (e) {
+      out.textContent = "✕ لا يوجد اتصال بالإنترنت";
+      out.className = "alm-test bad";
     }
-    return s;
-  },
-
-  /** ينتقل إلى تحدّي الكتابة — لا يُسقط الشرط بل يبدّله */
-  toType(why) {
-    clearTimeout(this.escapeTimer);
-    this.stopCam();
-    this.live(false);
-    this.typing = true;
-    this.typed = 0;
-    this.busy = false;
-    this.pane("almType");
-    $("almWhy").textContent =
-      why + " — لن يسكت المنبّه حتّى تكتب " + this.count + " رموز.";
-    const back = $("almBackToCam");
-    if (back) back.classList.remove("hidden");
-    this.nextCode();
-  },
-
-  nextCode() {
-    this.code = this.newCode();
-    $("almCode").textContent = this.code;
-    $("almTypeProgress").textContent = this.typed + " / " + this.count;
-    this.dots("almTypeDots", this.typed);
-    const inp = $("almTypeInput");
-    inp.value = "";
-    inp.focus();
-  },
-
-  checkCode() {
-    const inp = $("almTypeInput");
-    const v = (inp.value || "").trim().toUpperCase().replace(/\s+/g, "");
-    if (v !== this.code) {
-      vibrate(200);
-      $("almWhy").textContent = "الرمز غير مطابق — انظر جيّداً واكتبه كما هو.";
-      inp.value = "";
-      inp.focus();
-      return;
-    }
-    this.typed++;
-    vibrate([40, 60, 40]);
-    if (this.typed >= this.count) { this.finish(); return; }
-    this.nextCode();
   },
 
   /* ─────────── الختام ─────────── */
+
+  hit(label) {
+    vibrate([40, 60, 40]);
+    this.done++;
+    this.paused = true;
+    this.say("✓ " + label);
+    this.saw("");
+    const box = $("almTaskBox");
+    if (box) box.classList.add("hit");
+    this.dots(this.done);
+    $("almProgress").textContent = this.done + " / " + this.count;
+
+    setTimeout(() => {
+      if (box) box.classList.remove("hit");
+      if (this.done >= this.count) { this.finish(); return; }
+      this.renderRun();
+      // نُبقي آخر مشهد ناجح مرجعاً: الهدف التالي شيء آخر في مكان آخر
+      this.sentThumb = this.thumb() || this.sentThumb;
+      this.stillFor = 0;
+      this.lastAsk = Date.now() - MIN_GAP_MS + 1200;
+      this.paused = false;
+    }, 900);
+  },
+
   finish() {
-    clearTimeout(this.escapeTimer);
     this.stopCam();
     this.live(false);
     this.pane("almDone");
     vibrate([200, 100, 200]);
-    // نُخبر تطبيق أندرويد فيُسكت المنبّه
     try {
       if (window.NoorApp && typeof NoorApp.alarmSolved === "function") NoorApp.alarmSolved();
     } catch (e) {}
@@ -560,23 +670,20 @@ const Alarm = {
 
   cancel() {
     if (this.forced) return;          // في الرنين الحقيقي لا إلغاء
-    clearTimeout(this.escapeTimer);
     this.stopCam();
     this.live(false);
-    this.typing = false;
     this.pane("almSetup");
+    this.renderReady();
   },
 
-  /** يعود من الكتابة إلى التصوير — الكتابة خيار لا سجن */
-  backToCam() {
-    this.typing = false;
-    this.typed = 0;
-    this.netFails = 0;
-    this.pane("almRun");
-    this.live(true);
-    $("almCancel").classList.toggle("hidden", this.forced);
-    this.renderRun();
-    this.openCam();
+  /** الكاميرا معطّلة تماماً: لا مهمّة ممكنة، ولا نحبس الهاتف */
+  giveUp() {
+    this.stopCam();
+    this.live(false);
+    this.pane("almDone");
+    try {
+      if (window.NoorApp && typeof NoorApp.alarmSolved === "function") NoorApp.alarmSolved();
+    } catch (e) {}
   },
 
   /** يفتحه تطبيق أندرويد عند رنين المنبّه: #alarm=1 */
@@ -606,20 +713,20 @@ const Alarm = {
         document.querySelectorAll("#almCountPick button")
           .forEach(x => x.classList.toggle("on", +x.dataset.count === this.count));
         this.renderTargets();
+        this.renderReady();
       });
     });
 
     $("almTry").addEventListener("click", () => this.begin());
-    $("almShoot").addEventListener("click", () => { this.sentThumb = null; this.check(false); });
-    $("almEscape").addEventListener("click", () => this.toType("الكاميرا لا تعمل"));
+    $("almShoot").addEventListener("click", () => {
+      this.sentThumb = null;
+      if (this.local) { const t = this.thumb(); if (t) this.judgeLocal(t); }
+      else this.check(false);
+    });
     $("almCancel").addEventListener("click", () => this.cancel());
     $("almBack").addEventListener("click", () => this.cancel());
-    $("almTypeOk").addEventListener("click", () => this.checkCode());
-    $("almTypeInput").addEventListener("keydown", e => {
-      if (e.key === "Enter") this.checkCode();
-    });
+    $("almGiveUp").addEventListener("click", () => this.giveUp());
 
-    /* المفتاح: من صفحة الإعداد ومن فوق الكاميرا */
     $("almKeySave").addEventListener("click", () => {
       if (this.saveKey($("almKeyInput").value)) {
         $("almKeyInput").value = "";
@@ -636,11 +743,12 @@ const Alarm = {
       if (e.key !== "Enter") return;
       if (this.saveKey(e.target.value)) { e.target.value = ""; this.resumeAfterKey(); }
     });
-    $("almUseType").addEventListener("click", () => {
+    $("almUseLocal").addEventListener("click", () => {
       $("almNeedKey").classList.add("hidden");
-      this.toType("اخترتَ الكتابة");
+      this.paused = false;
+      this.toLocal();
     });
-    $("almBackToCam").addEventListener("click", () => this.backToCam());
+    $("almTest").addEventListener("click", () => this.testKey());
 
     // الجهوزية تتغيّر خارج هذه الصفحة (يحفظ المفتاح في فضفض مثلاً)
     document.querySelectorAll('[data-goto="page-alarm"]').forEach(b => {
