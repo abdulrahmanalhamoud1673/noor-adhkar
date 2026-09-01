@@ -172,6 +172,8 @@ const Alarm = {
     this.live(true);
     $("almCancel").classList.toggle("hidden", this.forced);
     $("almEscape").classList.add("hidden");
+    $("almNeedKey").classList.add("hidden");
+    $("almBackToCam").classList.add("hidden");
     this.renderRun();
     this.openCam();
 
@@ -186,7 +188,7 @@ const Alarm = {
   async openCam() {
     const v = $("almVideo");
     try {
-      const mod = await import("./pose-model.js?v=39");
+      const mod = await import("./pose-model.js?v=40");
       // الخلفية: أنت تصوّر الثلاجة لا وجهك
       this.stream = await mod.openCamera(v, t => this.say(t), "environment");
       this.fit(v);
@@ -337,7 +339,7 @@ const Alarm = {
     if (!target) return;
 
     const key = Store.get("aiKey", "");
-    if (!key) { this.toType("لا يوجد مفتاح Gemini للتحقّق من الصور"); return; }
+    if (!key) { this.needKey(); return; }
 
     this.busy = true;
     this.lastAsk = Date.now();
@@ -366,8 +368,8 @@ const Alarm = {
         setTimeout(() => { this.paused = false; this.sentThumb = null; }, 20000);
       } else {
         this.netFails++;
-        if (this.netFails >= 3) { this.toType("تعذّر الاتصال بخدمة التحقّق"); return; }
-        this.say("تعذّر التحقّق — تحقّق من الإنترنت. محاولة " + this.netFails + " من ٣.");
+        if (this.netFails >= 5) { this.toType("تعذّر الاتصال بخدمة التحقّق"); return; }
+        this.say("تعذّر التحقّق — تحقّق من الإنترنت. محاولة " + this.netFails + " من ٥.");
       }
     } finally {
       this.busy = false;
@@ -431,6 +433,67 @@ const Alarm = {
     return /نعم|yes/i.test(txt);
   },
 
+  /* ─────────── المفتاح ─────────── */
+
+  /**
+   * ينقص المفتاح: لا نرميه إلى الكتابة: هو يريد أن يقوم
+   * ويصوّر. نُظهِر صندوقاً فوق الكاميرا يلصق فيه المفتاح
+   * ويُكمل — والكاميرا تبقى تعمل خلفه.
+   */
+  needKey() {
+    this.paused = true;
+    const box = $("almNeedKey");
+    if (box) box.classList.remove("hidden");
+    this.say("");
+    const inp = $("almRunKey");
+    if (inp) { inp.value = ""; setTimeout(() => inp.focus(), 200); }
+  },
+
+  saveKey(value, onDone) {
+    const v = (value || "").trim();
+    if (v.length < 20 || /\s/.test(v)) { toast("المفتاح غير مكتمل"); return false; }
+    Store.set("aiKey", v);
+    toast("حُفظ المفتاح ✓");
+    if (onDone) onDone();
+    return true;
+  },
+
+  resumeAfterKey() {
+    const box = $("almNeedKey");
+    if (box) box.classList.add("hidden");
+    this.sentThumb = null;
+    this.stillFor = 0;
+    this.lastAsk = Date.now() - MIN_GAP_MS + 800;
+    this.paused = false;
+    this.renderRun();
+  },
+
+  /** لوحة الجهوزية: تقول قبل الفجر ما الذي ينقص */
+  async renderReady() {
+    const box = $("almReady");
+    if (!box) return;
+    const key = Store.get("aiKey", "");
+    const rows = [
+      ["🎯", "الأهداف", this.targets.length + " هدفاً",
+        this.targets.length >= this.count],
+      ["🔑", "مفتاح التحقّق", key ? "محفوظ" : "ناقص — بدونه لا تصوير", !!key],
+      ["📷", "الكاميرا", navigator.mediaDevices ? "مدعومة" : "غير مدعومة",
+        !!navigator.mediaDevices]
+    ];
+    box.innerHTML = "";
+    rows.forEach(([icon, name, val, ok]) => {
+      const r = document.createElement("div");
+      r.className = "alm-ready-row" + (ok ? " ok" : " bad");
+      r.innerHTML = "<span>" + icon + "</span><b></b><i></i><em></em>";
+      r.querySelector("b").textContent = name;
+      r.querySelector("i").textContent = val;
+      r.querySelector("em").textContent = ok ? "✓" : "✕";
+      box.appendChild(r);
+    });
+    const row = $("almKeyRow");
+    if (row) row.classList.toggle("hidden", !!key);
+  },
+
   /* ─────────── البديل: كتابة الرموز ─────────── */
   newCode() {
     let s = "";
@@ -451,6 +514,8 @@ const Alarm = {
     this.pane("almType");
     $("almWhy").textContent =
       why + " — لن يسكت المنبّه حتّى تكتب " + this.count + " رموز.";
+    const back = $("almBackToCam");
+    if (back) back.classList.remove("hidden");
     this.nextCode();
   },
 
@@ -502,6 +567,18 @@ const Alarm = {
     this.pane("almSetup");
   },
 
+  /** يعود من الكتابة إلى التصوير — الكتابة خيار لا سجن */
+  backToCam() {
+    this.typing = false;
+    this.typed = 0;
+    this.netFails = 0;
+    this.pane("almRun");
+    this.live(true);
+    $("almCancel").classList.toggle("hidden", this.forced);
+    this.renderRun();
+    this.openCam();
+  },
+
   /** يفتحه تطبيق أندرويد عند رنين المنبّه: #alarm=1 */
   applyRequest() {
     if (!this.forced) return;
@@ -510,6 +587,7 @@ const Alarm = {
 
   init() {
     this.renderTargets();
+    this.renderReady();
 
     $("almAdd").addEventListener("click", () => {
       const inp = $("almInput");
@@ -539,6 +617,34 @@ const Alarm = {
     $("almTypeOk").addEventListener("click", () => this.checkCode());
     $("almTypeInput").addEventListener("keydown", e => {
       if (e.key === "Enter") this.checkCode();
+    });
+
+    /* المفتاح: من صفحة الإعداد ومن فوق الكاميرا */
+    $("almKeySave").addEventListener("click", () => {
+      if (this.saveKey($("almKeyInput").value)) {
+        $("almKeyInput").value = "";
+        this.renderReady();
+      }
+    });
+    $("almRunKeySave").addEventListener("click", () => {
+      if (this.saveKey($("almRunKey").value)) {
+        $("almRunKey").value = "";
+        this.resumeAfterKey();
+      }
+    });
+    $("almRunKey").addEventListener("keydown", e => {
+      if (e.key !== "Enter") return;
+      if (this.saveKey(e.target.value)) { e.target.value = ""; this.resumeAfterKey(); }
+    });
+    $("almUseType").addEventListener("click", () => {
+      $("almNeedKey").classList.add("hidden");
+      this.toType("اخترتَ الكتابة");
+    });
+    $("almBackToCam").addEventListener("click", () => this.backToCam());
+
+    // الجهوزية تتغيّر خارج هذه الصفحة (يحفظ المفتاح في فضفض مثلاً)
+    document.querySelectorAll('[data-goto="page-alarm"]').forEach(b => {
+      b.addEventListener("click", () => this.renderReady());
     });
   }
 };

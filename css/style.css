@@ -1567,3 +1567,48 @@ body.alm-live .alm-cam { margin-bottom: 0; max-height: calc(100vh - 152px); }
 
 /* الزرّان أسفل الشاشة بلا حشوة زائدة */
 body.alm-live #almRun > .btn { margin: 8px 12px 0; width: calc(100% - 24px); }
+
+/* لوحة الجهوزية — تقول قبل الفجر ما الذي ينقص */
+.alm-ready{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
+.alm-ready-row{
+  display:grid;grid-template-columns:24px 1fr auto 22px;align-items:center;gap:9px;
+  padding:9px 11px;border-radius:12px;background:rgba(0,0,0,.22);
+  border:1px solid var(--line);font-size:14px;
+}
+.alm-ready-row b{font-weight:700;color:var(--text)}
+.alm-ready-row i{font-style:normal;color:var(--muted);font-size:13px}
+.alm-ready-row em{font-style:normal;font-weight:800;text-align:center}
+.alm-ready-row.ok em{color:#10B981}
+.alm-ready-row.bad{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.08)}
+.alm-ready-row.bad em{color:#EF4444}
+
+.alm-keyrow{display:flex;gap:8px;margin-bottom:12px}
+.alm-keyrow input{
+  flex:1;padding:13px;border-radius:12px;border:1px solid var(--line);
+  background:rgba(0,0,0,.28);color:var(--text);font-size:15px;font-family:inherit;
+}
+.alm-keyrow input:focus{outline:none;border-color:var(--gold)}
+.alm-keyrow button{
+  padding:0 18px;border:none;border-radius:12px;background:var(--gold);
+  color:#16130A;font-weight:800;font-size:15px;font-family:inherit;
+}
+
+/* صندوق المفتاح فوق الكاميرا — الكاميرا تبقى تعمل خلفه */
+.alm-overlay{
+  position:absolute;inset:0;z-index:5;display:flex;align-items:center;
+  justify-content:center;padding:18px;background:rgba(4,21,15,.9);
+  backdrop-filter:blur(6px);
+}
+.alm-overlay-card{width:100%;max-width:340px;text-align:center}
+.alm-overlay-title{font-size:18px;font-weight:800;margin-bottom:8px;color:var(--gold)}
+.alm-overlay-card p{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:14px}
+.alm-overlay-card input{
+  width:100%;padding:14px;margin-bottom:10px;border-radius:12px;
+  border:1px solid var(--line);background:rgba(0,0,0,.4);color:var(--text);
+  font-size:15px;font-family:inherit;text-align:center;
+}
+.alm-overlay-card input:focus{outline:none;border-color:var(--gold)}
+.alm-link{
+  background:none;border:none;color:var(--muted);font-size:13.5px;
+  font-family:inherit;text-decoration:underline;margin-top:12px;padding:6px;
+}
