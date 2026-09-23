@@ -199,7 +199,7 @@ const Alarm = {
   async openCam() {
     const v = $("almVideo");
     try {
-      const mod = await import("./pose-model.js?v=41");
+      const mod = await import("./pose-model.js?v=42");
       // الخلفية: أنت تصوّر الثلاجة لا وجهك
       this.stream = await mod.openCamera(v, t => this.say(t), "environment");
       this.fit(v);

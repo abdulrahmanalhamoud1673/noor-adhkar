@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>شاشة البث — المسبحة الجماعية</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tasbeeh.css?v=1">
+</head>
+<body class="l-body">
+
+<div class="l-stage" id="stage">
+  <header class="l-head">
+    <div class="l-title" id="title">📿 المسبحة الجماعية</div>
+    <div class="l-dhikr" id="dhikr"></div>
+  </header>
+
+  <section class="l-total l-panel">
+    <div class="l-total-num" id="total">٠</div>
+    <div class="l-total-label" id="totalLabel"></div>
+    <div class="l-goal hidden" id="goal">
+      <div class="l-goal-bar"><i id="goalFill"></i></div>
+      <div class="l-goal-text"><span id="goalPct"></span><span id="goalText"></span></div>
+    </div>
+    <div class="l-people"><i class="l-live-dot"></i><span id="people"></span></div>
+  </section>
+
+  <section class="l-board l-panel">
+    <div class="l-board-head">🏅 المسبّحون</div>
+    <div class="l-rows" id="board"></div>
+    <div class="l-empty" id="empty">كن أول من يسبّح — امسح الرمز</div>
+  </section>
+
+  <aside class="l-join l-panel">
+    <div class="l-qr" id="qr"></div>
+    <div class="l-join-text">
+      <b>امسح وسبّح معنا</b>
+      <span class="l-code">أو ادخل بالكود <b id="code"></b></span>
+      <span class="l-url" id="url"></span>
+    </div>
+  </aside>
+</div>
+
+<div class="l-toasts" id="toasts"></div>
+
+<div class="l-celebrate hidden" id="celebrate">
+  <div class="l-cel-icon">🎉</div>
+  <div class="l-cel-title">بلغنا الهدف</div>
+  <div class="l-cel-num" id="celNum"></div>
+  <div class="l-cel-sub">تقبّل الله منّا ومنكم</div>
+</div>
+
+<div class="l-msg hidden" id="msg"></div>
+
+<script src="shared.js?v=1"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script type="module">
+/* ══════════════════════════════════════════════════════════
+   شاشة البث
+   ----------------------------------------------------------
+   تستمع للغرفة لحظةً بلحظة، وتكتب كل ثانيتين «ملخّصاً» صغيراً
+   (المجموع وعدد المشاركين وقائمة الأعداد) تقرؤه هواتف المشاركين
+   — فلا يُنزّل كل هاتف قائمة الجميع كاملة كل بضع ثوانٍ.
+   ══════════════════════════════════════════════════════════ */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue, set, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const $ = id => document.getElementById(id);
+const params = new URLSearchParams(location.search);
+const code = T.cleanCode(params.get("r") || location.hash.replace("#", ""));
+if (params.has("obs")) document.body.classList.add("obs");
+
+function message(t) {
+  $("stage").classList.add("hidden");
+  $("msg").textContent = t;
+  $("msg").classList.remove("hidden");
+}
+function unmessage() {
+  $("stage").classList.remove("hidden");
+  $("msg").classList.add("hidden");
+}
+
+const layout = () => document.body.classList.toggle("wide", innerWidth > innerHeight * 1.1);
+layout();
+
+if (!T.validCode(code)) {
+  message("أضف كود الغرفة إلى الرابط هكذا: live.html?r=الكود — تجده في صفحة المضيف.");
+  throw new Error("no room code");
+}
+
+$("code").textContent = code;
+const JOIN = T.joinUrl(code);
+$("url").textContent = JOIN.replace("https://", "").replace("http://", "");
+try {
+  const qr = qrcode(0, "M");
+  qr.addData(JOIN);
+  qr.make();
+  $("qr").innerHTML = qr.createSvgTag({ cellSize: 4, margin: 1, scalable: true });
+} catch (e) { $("qr").classList.add("hidden"); }
+
+const db = getDatabase(initializeApp({ databaseURL: T.DB }, "tasbeeh-live"));
+let offset = 0;
+onValue(ref(db, ".info/serverTimeOffset"), s => { offset = s.val() || 0; });
+const now = () => Date.now() + offset;
+
+const room = { m: null, p: null, k: null };
+let metaLoaded = false;
+["m", "p", "k"].forEach(key => {
+  onValue(ref(db, T.path(code, key)), snap => {
+    room[key] = snap.val();
+    if (key === "m") metaLoaded = true;
+    schedule();
+  }, () => message("تعذّر الاتصال بقاعدة البيانات — تحقّق من الإنترنت."));
+});
+
+/* ─────────── الرسم ─────────── */
+const compute = T.makeBoard();
+let queued = false, first = true, list = [], total = 0;
+function schedule() {
+  if (queued) return;
+  queued = true;
+  setTimeout(() => { queued = false; render(); }, 80);
+}
+setInterval(render, 1000);          // تنطفئ النقطة الخضراء حين يتوقّف أحدهم
+addEventListener("resize", () => { layout(); render(); });
+
+function render() {
+  const m = room.m;
+  if (!m) {
+    if (metaLoaded) message("لا توجد غرفة بالكود " + code + " بعد — أنشئها من صفحة المضيف، وستظهر هنا وحدها.");
+    return;
+  }
+  unmessage();
+  const d = T.dhikr(m.d);
+  $("title").textContent = "📿 " + (m.ti || "المسبحة الجماعية");
+  $("dhikr").textContent = d.text;
+  $("totalLabel").textContent = d.noun + " معاً";
+
+  list = compute(room, now());
+  total = list.reduce((a, x) => a + x.n, 0);
+  const active = list.filter(x => x.active).length;
+  $("people").textContent = T.fmt(active) + " يسبّحون الآن"
+    + (list.length > active ? " · " + T.fmt(list.length) + " شاركوا" : "");
+
+  countTo(total);
+  paintGoal(+m.g || 0);
+  paintBoard();
+  announce(+m.g || 0, d);
+  first = false;
+}
+
+/* الرقم الكبير يعدّ صعوداً بدل أن يقفز */
+let shown = 0, target = 0, ticking = false;
+function countTo(v) {
+  target = v;
+  if (ticking) return;
+  ticking = true;
+  (function step() {
+    const diff = target - shown;
+    if (Math.abs(diff) < 1) { shown = target; $("total").textContent = T.fmt(shown); ticking = false; return; }
+    shown += diff * 0.2 + Math.sign(diff);
+    if ((diff > 0 && shown > target) || (diff < 0 && shown < target)) shown = target;
+    $("total").textContent = T.fmt(Math.round(shown));
+    setTimeout(step, 33);
+  })();
+}
+
+function paintGoal(g) {
+  $("goal").classList.toggle("hidden", !g);
+  if (!g) return;
+  const pct = Math.min(100, total / g * 100);
+  $("goalFill").style.width = pct + "%";
+  $("goalPct").textContent = T.fmt(Math.floor(pct)) + "٪";
+  $("goalText").textContent = total >= g ? "بلغنا الهدف 🎉" : "الهدف " + T.fmt(g);
+}
+
+/* القائمة تتحرّك بسلاسة حين يتقدّم أحدهم على غيره */
+const rows = new Map();
+function paintBoard() {
+  const box = $("board");
+  const vmin = Math.min(innerWidth, innerHeight) / 100;
+  const fit = Math.floor((box.clientHeight + 0.8 * vmin) / (7.4 * vmin));
+  const top = list.slice(0, Math.max(3, Math.min(15, fit || 8)));
+  $("empty").classList.toggle("hidden", list.length > 0);
+
+  const before = new Map();
+  rows.forEach((el, id) => before.set(id, el.getBoundingClientRect().top));
+  const keep = new Set(top.map(x => x.id));
+  rows.forEach((el, id) => { if (!keep.has(id)) { el.remove(); rows.delete(id); } });
+
+  top.forEach((x, i) => {
+    let el = rows.get(x.id);
+    if (!el) {
+      el = document.createElement("div");
+      el.className = "l-row" + (first ? "" : " enter");
+      el.innerHTML = '<span class="l-rank"></span><span class="l-name"><i class="dot"></i><span class="nm"></span></span><span class="l-n"></span>';
+      rows.set(x.id, el);
+      setTimeout(() => el.classList.remove("enter"), 700);
+    }
+    el.classList.toggle("r1", i === 0);
+    el.classList.toggle("r2", i === 1);
+    el.classList.toggle("r3", i === 2);
+    el.classList.toggle("idle", !x.active);
+    el.querySelector(".l-rank").textContent = T.fmt(i + 1);
+    el.querySelector(".nm").textContent = x.name;
+    const nEl = el.querySelector(".l-n");
+    const txt = T.fmt(x.n);
+    if (nEl.textContent !== txt) {
+      nEl.textContent = txt;
+      if (!first) { el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); }
+    }
+    if (box.children[i] !== el) box.insertBefore(el, box.children[i] || null);
+  });
+
+  rows.forEach((el, id) => {
+    const b = before.get(id);
+    if (b == null) return;
+    const dy = b - el.getBoundingClientRect().top;
+    if (Math.abs(dy) > 1) {
+      el.animate([{ transform: "translateY(" + dy + "px)" }, { transform: "none" }],
+                 { duration: 500, easing: "cubic-bezier(.2,.8,.2,1)" });
+    }
+  });
+}
+
+/* ─────────── الإعلانات: انضمام، ومحطّات، والهدف ─────────── */
+const MARKS = [100, 500, 1000, 3000, 5000, 10000, 33000, 100000];
+const known = new Set();
+const reached = {};
+let thousands = 0, goalDone = false;
+
+function announce(g, d) {
+  if (first) {                        // أوّل رسم: لا نعلن عمّن كان موجوداً أصلاً
+    list.forEach(x => { known.add(x.id); reached[x.id] = MARKS.filter(v => x.n >= v).pop() || 0; });
+    thousands = Math.floor(total / 1000);
+    goalDone = !!g && total >= g;
+    return;
+  }
+  list.forEach(x => {
+    if (!known.has(x.id)) { known.add(x.id); toast("🤍 انضمّ " + x.name); }
+    const r = MARKS.filter(v => x.n >= v).pop() || 0;
+    if (r > (reached[x.id] || 0)) {
+      reached[x.id] = r;
+      toast("🌟 " + x.name + " بلغ " + T.fmt(r) + " " + d.noun, "gold");
+    }
+  });
+  const k = Math.floor(total / 1000);
+  if (k > thousands) {
+    thousands = k;
+    if (!(g && total >= g)) toast("✨ بلغنا " + T.fmt(k * 1000) + " معاً", "big");
+  }
+  if (g && total >= g && !goalDone) { goalDone = true; celebrate(g, d); }
+  if (g && total < g) goalDone = false;          // رفع المضيف الهدف
+}
+
+function toast(text, kind) {
+  const box = $("toasts");
+  const el = document.createElement("div");
+  el.className = "l-toast" + (kind ? " " + kind : "");
+  el.textContent = text;
+  box.appendChild(el);
+  while (box.children.length > 3) box.firstElementChild.remove();
+  setTimeout(() => { el.classList.add("out"); setTimeout(() => el.remove(), 420); }, 4500);
+}
+
+function celebrate(g, d) {
+  $("celNum").textContent = T.fmt(g) + " " + d.noun;
+  const c = $("celebrate");
+  c.classList.remove("hidden");
+  for (let i = 0; i < 70; i++) {
+    const s = document.createElement("i");
+    s.className = "spark";
+    const a = Math.random() * Math.PI * 2, r = 20 + Math.random() * 45;
+    s.style.left = "50%";
+    s.style.top = "45%";
+    s.style.setProperty("--dx", Math.cos(a) * r + "vmin");
+    s.style.setProperty("--dy", Math.sin(a) * r + "vmin");
+    s.style.animationDelay = Math.random() * 0.4 + "s";
+    s.style.background = Math.random() < 0.5 ? "#d4af37" : "#f0d98a";
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 2600);
+  }
+  setTimeout(() => c.classList.add("hidden"), 9000);
+}
+
+/* ─────────── الملخّص الذي تقرؤه الهواتف ─────────── */
+let lastKey = "", lastWrite = 0;
+setInterval(() => {
+  const m = room.m;
+  if (!m) return;
+  const s = {
+    total,
+    people: list.length,
+    active: list.filter(x => x.active).length,
+    top: list.slice(0, 10).map(x => [x.name, x.n]),
+    counts: list.slice(0, 300).map(x => x.n),
+    sid: m.sid || "",
+    x: Object.keys(room.k || {}),
+    d: m.d || "",
+    g: +m.g || 0,
+    ti: m.ti || "",
+    t: serverTimestamp()
+  };
+  const key = JSON.stringify([s.total, s.people, s.active, s.counts, s.sid, s.x, s.d, s.g, s.ti]);
+  if (key === lastKey && Date.now() - lastWrite < 20000) return;
+  lastKey = key;
+  lastWrite = Date.now();
+  set(ref(db, T.path(code, "s")), s).catch(() => {});
+}, 2000);
+</script>
+</body>
+</html>

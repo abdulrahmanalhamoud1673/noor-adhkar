@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#04150f">
+<title>المضيف — المسبحة الجماعية</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tasbeeh.css?v=1">
+</head>
+<body>
+<main class="h-app">
+  <header class="h-top">
+    <div class="h-logo">📿</div>
+    <div>
+      <h1>المسبحة الجماعية</h1>
+      <p>صفحة المضيف — منها تُنشئ الغرفة وتديرها أثناء البث</p>
+    </div>
+  </header>
+
+  <!-- إنشاء غرفة -->
+  <section class="card hidden" id="create">
+    <h2>✨ غرفة جديدة</h2>
+    <label>عنوان الجلسة</label>
+    <input class="field" id="cTitle" maxlength="40" value="المسبحة الجماعية">
+    <label>الذكر</label>
+    <div class="chips" id="cDhikr"></div>
+    <label>الهدف الجماعي</label>
+    <div class="chips" id="cGoal"></div>
+    <label>كود الغرفة <small>— حروف إنجليزية وأرقام، سهل التذكّر مثل ABOD</small></label>
+    <div class="h-coderow">
+      <input class="field code-field" id="cCode" maxlength="12" autocomplete="off" spellcheck="false">
+      <button class="btn btn-ghost" id="cRand" type="button" title="كود عشوائي">🎲</button>
+    </div>
+    <button class="btn btn-gold" id="cGo">أنشئ الغرفة</button>
+    <p class="p-err" id="cErr"></p>
+    <button class="p-link" id="cOpen" type="button">عندي غرفة بهذا الكود — افتحها للإدارة</button>
+  </section>
+
+  <!-- إدارة الغرفة -->
+  <section class="hidden" id="manage" style="display:flex;flex-direction:column;gap:14px">
+    <div class="card h-live">
+      <div class="h-code-big">كود الغرفة <b id="mCode"></b></div>
+      <div class="h-nums">
+        <div><b id="mTotal">٠</b><span id="mNoun">معاً</span></div>
+        <div><b id="mActive">٠</b><span>يسبّحون الآن</span></div>
+        <div><b id="mPeople">٠</b><span>شاركوا</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🔗 الروابط</h2>
+      <div class="h-link">
+        <div class="h-link-top"><b>رابط المشاركين</b><span>ضعه في وصف البث وثبّته في التعليقات</span></div>
+        <div class="h-url" id="lJoin"></div>
+        <div class="h-btns">
+          <button class="btn btn-ghost" data-copy="join">📋 نسخ</button>
+          <button class="btn btn-ghost" id="wa">واتساب</button>
+        </div>
+      </div>
+      <div class="h-link">
+        <div class="h-link-top"><b>شاشة البث</b><span>تعرضها بملء الشاشة، أو تشاركها من الموبايل</span></div>
+        <div class="h-url" id="lLive"></div>
+        <div class="h-btns">
+          <a class="btn btn-ghost" id="openLive" target="_blank" rel="noopener">فتح</a>
+          <button class="btn btn-ghost" data-copy="live">📋 نسخ</button>
+        </div>
+      </div>
+      <div class="h-link">
+        <div class="h-link-top"><b>رابط OBS</b><span>نفس الشاشة بخلفية شفّافة فوق الكاميرا</span></div>
+        <div class="h-url" id="lObs"></div>
+        <div class="h-btns"><button class="btn btn-ghost" data-copy="obs">📋 نسخ</button></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>⚙️ الجلسة</h2>
+      <label>العنوان</label>
+      <input class="field" id="sTitle" maxlength="40">
+      <label>الذكر</label>
+      <div class="chips" id="sDhikr"></div>
+      <label>الهدف</label>
+      <div class="chips" id="sGoal"></div>
+      <button class="btn btn-gold" id="sSave">حفظ — يتغيّر على البث فوراً</button>
+    </div>
+
+    <div class="card">
+      <h2>👥 المشاركون</h2>
+      <p class="h-hint">اسم لا يليق؟ «إخفاء» يُزيله من الشاشة فوراً. والأسماء البذيئة تُحجب وحدها.</p>
+      <div class="h-list" id="list"></div>
+    </div>
+
+    <div class="card">
+      <h2>🎥 البث بـ OBS</h2>
+      <ol class="h-steps">
+        <li>في OBS: <b>Sources</b> ← <b>+</b> ← <b>Browser</b>.</li>
+        <li>الصق <b>رابط OBS</b> في خانة URL.</li>
+        <li>البث العمودي: العرض <b>1080</b> والارتفاع <b>1920</b> — والعادي <b>1920 × 1080</b>.</li>
+        <li>ضع <b>رابط المشاركين</b> في وصف البث، وثبّته في التعليقات.</li>
+      </ol>
+    </div>
+
+    <div class="card h-danger">
+      <button class="btn btn-ghost" id="reset">🔄 جلسة جديدة — تصفير كل العدّادات</button>
+      <button class="btn btn-ghost" id="leave">↩ غرفة أخرى</button>
+      <button class="btn btn-danger" id="remove">🗑 حذف الغرفة نهائياً</button>
+    </div>
+  </section>
+</main>
+<div class="toast hidden" id="toast"></div>
+
+<script src="shared.js?v=1"></script>
+<script type="module">
+/* ══════════════════════════════════════════════════════════
+   صفحة المضيف
+   ----------------------------------------------------------
+   الغرفة تبقى محفوظة في هذا المتصفّح، فتعود إليها كل بث بلا
+   إعادة إعداد. و«جلسة جديدة» تصفّر العدّادات مع إبقاء الكود
+   والروابط كما هي — فرابط الوصف ورابط OBS لا يتغيّران أبداً.
+   ══════════════════════════════════════════════════════════ */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue, get, set, update, remove, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const $ = id => document.getElementById(id);
+const db = getDatabase(initializeApp({ databaseURL: T.DB }, "tasbeeh-host"));
+
+const GOALS = [0, 1000, 5000, 10000, 33000, 100000];
+const DH = T.DHIKR.map(d => ({ value: d.id, label: d.text }));
+const GL = GOALS.map(g => ({ value: g, label: g ? T.fmt(g) : "بلا هدف" }));
+
+let code = T.load("hostRoom", "");
+let data = { m: null, p: null, k: null };
+let subs = [];
+let links = {};
+let offset = 0;
+onValue(ref(db, ".info/serverTimeOffset"), s => { offset = s.val() || 0; });
+
+function toast(t) {
+  const e = $("toast");
+  e.textContent = t;
+  e.classList.remove("hidden");
+  clearTimeout(toast.h);
+  toast.h = setTimeout(() => e.classList.add("hidden"), 2800);
+}
+const titleOf = id => ($(id).value || "").replace(/[<>]/g, "").replace(/\s+/g, " ").trim().slice(0, 40)
+  || "المسبحة الجماعية";
+
+function chips(box, items, value, onPick) {
+  box.innerHTML = "";
+  items.forEach(it => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip" + (it.value === value ? " on" : "");
+    b.textContent = it.label;
+    b.addEventListener("click", () => {
+      box.querySelectorAll(".chip").forEach(c => c.classList.remove("on"));
+      b.classList.add("on");
+      onPick(it.value);
+    });
+    box.appendChild(b);
+  });
+}
+
+function unsubscribe() { subs.forEach(u => u()); subs = []; }
+
+/* ─────────── إنشاء ─────────── */
+const pick = { d: "istighfar", g: 10000 };
+
+function showCreate() {
+  unsubscribe();
+  $("manage").classList.add("hidden");
+  $("create").classList.remove("hidden");
+  chips($("cDhikr"), DH, pick.d, v => { pick.d = v; });
+  chips($("cGoal"), GL, pick.g, v => { pick.g = v; });
+  if (!$("cCode").value) $("cCode").value = T.randomCode(5);
+}
+
+async function create() {
+  const c = T.cleanCode($("cCode").value);
+  const err = $("cErr");
+  if (!T.validCode(c)) { err.textContent = "الكود من ٣ إلى ١٢ حرفاً إنجليزياً أو رقماً"; return; }
+  err.textContent = "";
+  $("cGo").disabled = true;
+  try {
+    const exists = (await get(ref(db, T.path(c, "m")))).val();
+    if (exists) { err.textContent = "هذا الكود مستخدم — اختر غيره، أو افتحه إن كان لك."; return; }
+    await set(ref(db, T.path(c, "m")), {
+      ti: titleOf("cTitle"), d: pick.d, g: pick.g, sid: T.rid(8), c: serverTimestamp()
+    });
+    code = c;
+    T.save("hostRoom", code);
+    showManage();
+    toast("✅ الغرفة جاهزة");
+  } catch (e) {
+    err.textContent = "تعذّر الاتصال — تحقّق من الإنترنت";
+  } finally {
+    $("cGo").disabled = false;
+  }
+}
+
+async function openExisting() {
+  const c = T.cleanCode($("cCode").value);
+  if (!T.validCode(c)) { $("cErr").textContent = "اكتب كود غرفتك في الخانة أولاً"; return; }
+  try {
+    const m = (await get(ref(db, T.path(c, "m")))).val();
+    if (!m) { $("cErr").textContent = "لا توجد غرفة بهذا الكود"; return; }
+    code = c;
+    T.save("hostRoom", code);
+    showManage();
+  } catch (e) {
+    $("cErr").textContent = "تعذّر الاتصال — تحقّق من الإنترنت";
+  }
+}
+
+/* ─────────── إدارة ─────────── */
+function showManage() {
+  $("create").classList.add("hidden");
+  $("manage").classList.remove("hidden");
+  $("mCode").textContent = code;
+  links = { join: T.joinUrl(code), live: T.liveUrl(code), obs: T.liveUrl(code, true) };
+  $("lJoin").textContent = links.join;
+  $("lLive").textContent = links.live;
+  $("lObs").textContent = links.obs;
+  $("openLive").href = links.live;
+  editing = false;
+  unsubscribe();
+  subs = ["m", "p", "k"].map(key => onValue(ref(db, T.path(code, key)), snap => {
+    data[key] = snap.val();
+    if (key === "m") {
+      if (!data.m) { toast("لم تعد الغرفة موجودة"); T.save("hostRoom", ""); showCreate(); return; }
+      paintMeta();
+    }
+    scheduleStats();
+  }));
+}
+
+let editing = false;
+const setting = { d: "istighfar", g: 0 };
+function paintMeta() {
+  const m = data.m;
+  $("mNoun").textContent = T.dhikr(m.d).noun + " معاً";
+  if (editing) return;               // لا نمسح ما يكتبه الآن
+  $("sTitle").value = m.ti || "";
+  setting.d = m.d || "istighfar";
+  setting.g = +m.g || 0;
+  chips($("sDhikr"), DH, setting.d, v => { setting.d = v; editing = true; });
+  chips($("sGoal"), GL, setting.g, v => { setting.g = v; editing = true; });
+}
+
+/* الأرقام نفسها التي على البث: نفس الحساب ونفس القصّ */
+const compute = T.makeBoard();
+let statsQueued = false;
+function scheduleStats() {
+  if (statsQueued) return;
+  statsQueued = true;
+  setTimeout(() => { statsQueued = false; paintStats(); paintList(); }, 400);
+}
+setInterval(() => { if (data.m) paintStats(); }, 5000);
+
+function paintStats() {
+  const list = compute(data, Date.now() + offset);
+  $("mTotal").textContent = T.fmt(list.reduce((a, x) => a + x.n, 0));
+  $("mActive").textContent = T.fmt(list.filter(x => x.active).length);
+  $("mPeople").textContent = T.fmt(list.length);
+}
+
+function paintList() {
+  const box = $("list");
+  const P = data.p || {}, K = data.k || {};
+  const sid = (data.m && data.m.sid) || "";
+  const arr = [];
+  for (const id in P) {
+    const p = P[id];
+    if (!p || typeof p !== "object" || (sid && p.sid !== sid)) continue;
+    arr.push({
+      id, name: T.cleanName(p.name) || "—", n: Math.max(0, +p.n || 0),
+      hidden: !!K[id], bad: T.isBad(p.name)
+    });
+  }
+  arr.sort((a, b) => b.n - a.n);
+  box.innerHTML = "";
+  if (!arr.length) {
+    const e = document.createElement("div");
+    e.className = "h-empty";
+    e.textContent = "لا أحد بعد — شارك رابط المشاركين.";
+    box.appendChild(e);
+    return;
+  }
+  arr.forEach(x => {
+    const row = document.createElement("div");
+    row.className = "h-row" + (x.hidden || x.bad ? " off" : "");
+    const nm = document.createElement("span");
+    nm.className = "nm";
+    nm.textContent = x.name;
+    if (x.bad) {
+      const f = document.createElement("span");
+      f.className = "flag";
+      f.textContent = "محجوب تلقائياً";
+      nm.appendChild(f);
+    }
+    const n = document.createElement("span");
+    n.className = "n";
+    n.textContent = T.fmt(x.n);
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = x.hidden ? "إظهار" : "إخفاء";
+    b.addEventListener("click", () => {
+      const r = ref(db, T.path(code, "k/" + x.id));
+      (x.hidden ? remove(r) : set(r, true)).catch(() => toast("تعذّر — تحقّق من الإنترنت"));
+    });
+    row.append(nm, n, b);
+    box.appendChild(row);
+  });
+}
+
+/* ─────────── الأزرار ─────────── */
+$("cRand").addEventListener("click", () => { $("cCode").value = T.randomCode(5); });
+$("cCode").addEventListener("input", e => {
+  const v = T.cleanCode(e.target.value);
+  if (v !== e.target.value) e.target.value = v;
+});
+$("cGo").addEventListener("click", create);
+$("cOpen").addEventListener("click", openExisting);
+
+$("sTitle").addEventListener("input", () => { editing = true; });
+$("sSave").addEventListener("click", async () => {
+  try {
+    await update(ref(db, T.path(code, "m")), { ti: titleOf("sTitle"), d: setting.d, g: setting.g });
+    editing = false;
+    toast("✅ حُفظ — وتغيّر على البث");
+  } catch (e) { toast("تعذّر الحفظ — تحقّق من الإنترنت"); }
+});
+
+document.querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", async () => {
+  const u = links[b.dataset.copy];
+  try { await navigator.clipboard.writeText(u); toast("✅ نُسخ الرابط"); }
+  catch (e) { window.prompt("انسخ الرابط:", u); }
+}));
+$("wa").addEventListener("click", () => {
+  const text = "📿 سبّح معنا في البث المباشر — واسمك يظهر على الشاشة مع عدد أذكارك:\n" + links.join;
+  window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
+});
+
+$("reset").addEventListener("click", async () => {
+  if (!confirm("تصفير كل العدّادات وبدء جلسة جديدة؟\nالكود والروابط تبقى كما هي.")) return;
+  try {
+    await update(ref(db, T.path(code)), {
+      "m/sid": T.rid(8), "m/c": serverTimestamp(), p: null, k: null, s: null
+    });
+    toast("🔄 بدأت جلسة جديدة");
+  } catch (e) { toast("تعذّر — تحقّق من الإنترنت"); }
+});
+$("leave").addEventListener("click", () => {
+  T.save("hostRoom", "");
+  $("cCode").value = code;
+  code = "";
+  showCreate();
+});
+$("remove").addEventListener("click", async () => {
+  if (!confirm("حذف الغرفة وكل ما فيها نهائياً؟")) return;
+  const c = code;
+  unsubscribe();
+  try {
+    await remove(ref(db, T.path(c)));
+    T.save("hostRoom", "");
+    code = "";
+    $("cCode").value = "";
+    showCreate();
+    toast("🗑 حُذفت الغرفة");
+  } catch (e) { toast("تعذّر الحذف — تحقّق من الإنترنت"); showManage(); }
+});
+
+if (code) showManage(); else showCreate();
+</script>
+</body>
+</html>

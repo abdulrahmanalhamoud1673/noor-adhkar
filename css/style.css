@@ -1623,3 +1623,6 @@ body.alm-live #almRun > .btn { margin: 8px 12px 0; width: calc(100% - 24px); }
 .alm-test{font-size:13.5px;line-height:1.7;margin:6px 0 12px;color:var(--muted);min-height:1px}
 .alm-test.ok{color:#10B981}
 .alm-test.bad{color:#EF4444}
+
+/* بطاقة المسبحة الجماعية — رابط لا زرّ، فنوحّد مظهره */
+a.quran-cta { text-decoration: none; color: inherit; }

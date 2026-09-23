@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#04150f">
+<title>المسبحة الجماعية</title>
+<meta name="description" content="سبّح معنا — واسمك وعدد أذكارك يظهران على البث مباشرة">
+<meta property="og:title" content="📿 المسبحة الجماعية">
+<meta property="og:description" content="سبّح معنا — واسمك وعدد أذكارك يظهران على البث مباشرة">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tasbeeh.css?v=1">
+</head>
+<body>
+<main class="p-app">
+
+  <!-- لا كود في الرابط: اكتبه -->
+  <section class="p-screen hidden" id="sCode">
+    <div class="p-center">
+      <div class="p-logo">📿</div>
+      <h1 class="p-h1">المسبحة الجماعية</h1>
+      <p class="p-sub">اكتب كود الغرفة الظاهر على البث</p>
+      <input class="field code-field" id="codeIn" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABOD">
+      <button class="btn btn-gold" id="codeGo">دخول</button>
+      <p class="p-err" id="codeErr"></p>
+    </div>
+  </section>
+
+  <!-- الاسم -->
+  <section class="p-screen hidden" id="sName">
+    <div class="p-center">
+      <div class="p-room" id="nRoom"></div>
+      <div class="p-dhikr" id="nDhikr"></div>
+      <p class="p-sub">اكتب اسمك — يظهر على البث مع عدد أذكارك</p>
+      <input class="field" id="nameIn" maxlength="20" autocomplete="nickname" placeholder="اسمك">
+      <button class="btn btn-gold" id="nameGo">ابدأ التسبيح</button>
+      <p class="p-err" id="nameErr"></p>
+    </div>
+  </section>
+
+  <!-- المسبحة -->
+  <section class="p-screen hidden" id="sCount">
+    <header class="p-head">
+      <div class="p-room" id="cRoom"></div>
+      <div class="p-dhikr" id="cDhikr"></div>
+    </header>
+
+    <div class="p-stats">
+      <div class="p-stat"><b id="stTotal">—</b><span id="stNoun">معاً</span></div>
+      <div class="p-stat"><b id="stPeople">—</b><span>مشارك</span></div>
+      <div class="p-stat"><b id="stRank">—</b><span>ترتيبك</span></div>
+    </div>
+    <div class="p-goal"><i id="goalFill"></i></div>
+    <div class="p-goal-text" id="goalText"></div>
+    <div class="p-note hidden" id="kicked">أخفى المضيف اسمك من الشاشة — وتسبيحك محفوظ عند الله 🤍</div>
+
+    <div class="p-tapzone" id="tap" role="button" tabindex="0" aria-label="اضغط مع كل ذكر">
+      <div class="p-bead-wrap">
+        <svg viewBox="0 0 200 200" id="beads" aria-hidden="true"></svg>
+        <div class="p-btn" id="btn">
+          <span class="p-count" id="count">٠</span>
+          <span class="p-hint">اضغط مع كل ذكر</span>
+          <span class="p-cycles" id="cycles"></span>
+        </div>
+      </div>
+    </div>
+
+    <footer class="p-foot">
+      <span><i class="net" id="net"></i><span id="me"></span></span>
+      <button class="p-link" id="rename">تغيير الاسم</button>
+    </footer>
+  </section>
+
+  <!-- رسالة -->
+  <section class="p-screen hidden" id="sMsg">
+    <div class="p-center">
+      <div class="p-logo">📿</div>
+      <p class="p-sub" id="msgText"></p>
+      <button class="btn btn-ghost" id="msgBack">جرّب كوداً آخر</button>
+    </div>
+  </section>
+
+</main>
+<div class="toast hidden" id="toast"></div>
+
+<script src="shared.js?v=1"></script>
+<script>
+/* ══════════════════════════════════════════════════════════
+   صفحة المشارك
+   ----------------------------------------------------------
+   كل ضغطة تُحفظ في الهاتف فوراً ثم تُرفع دفعةً كل ثانية ونصف.
+   فلو انقطع النت لا يضيع شيء، ويُكمل الرفع حين يعود.
+   ══════════════════════════════════════════════════════════ */
+(function () {
+const $ = id => document.getElementById(id);
+const SCREENS = ["sCode", "sName", "sCount", "sMsg"];
+const show = id => SCREENS.forEach(s => $(s).classList.toggle("hidden", s !== id));
+
+const me = T.uid();
+const GAP = 1000 / T.MAX_RATE;       // ربع ثانية بين ذكرين على الأقل
+
+let code = "";
+let room = null;                     // وصف الغرفة: العنوان والذكر والهدف
+let st = null;                       // حالتي فيها: { name, n, sid }
+let dirty = false, syncing = false, started = false, lastTap = 0;
+const beads = [];
+
+function toast(t) {
+  const e = $("toast");
+  e.textContent = t;
+  e.classList.remove("hidden");
+  clearTimeout(toast.h);
+  toast.h = setTimeout(() => e.classList.add("hidden"), 2800);
+}
+function msg(t) { $("msgText").textContent = t; show("sMsg"); }
+function setNet(ok) { $("net").classList.toggle("off", !ok); }
+
+/* ─────────── الدخول ─────────── */
+async function enter(raw) {
+  code = T.cleanCode(raw);
+  if (!T.validCode(code)) { show("sCode"); return; }
+  try { room = await T.get(code, "m"); }
+  catch (e) { return msg("تعذّر الاتصال — تأكّد من الإنترنت ثم أعد المحاولة."); }
+  if (!room) return msg("لا توجد غرفة بالكود «" + code + "» — تأكّد منه على البث.");
+
+  history.replaceState(null, "", "?r=" + code);
+  paintRoom();
+
+  st = T.load("room_" + code, null);
+  // بدأ المضيف جلسة جديدة منذ آخر زيارة: العدّ من الصفر
+  if (st && (st.sid || "") !== (room.sid || "")) st = { name: st.name, n: 0, sid: room.sid || "" };
+  if (!st || !st.name) {
+    $("nameIn").value = T.load("lastName", "");
+    show("sName");
+    setTimeout(() => $("nameIn").focus(), 150);
+    return;
+  }
+  begin();
+}
+
+function paintRoom() {
+  const d = T.dhikr(room.d);
+  $("nRoom").textContent = $("cRoom").textContent = room.ti || "المسبحة الجماعية";
+  $("nDhikr").textContent = $("cDhikr").textContent = d.text;
+  $("stNoun").textContent = d.noun + " معاً";
+  document.title = d.text + " — المسبحة الجماعية";
+}
+
+/* ─────────── الاسم ─────────── */
+async function setName() {
+  const name = T.cleanName($("nameIn").value);
+  if (name.length < 2) { $("nameErr").textContent = "اكتب اسماً من حرفين على الأقل"; return; }
+  if (T.isBad(name)) { $("nameErr").textContent = "اختر اسماً يليق بمجلس ذكر 🤍"; return; }
+  $("nameErr").textContent = "";
+  $("nameGo").disabled = true;
+
+  const fresh = !st;
+  st = st || { n: 0, sid: room.sid || "" };
+  st.name = name;
+  T.save("room_" + code, st);
+  T.save("lastName", name);
+
+  const body = { name, n: st.n, sid: st.sid, t: T.NOW };
+  if (fresh) body.j = T.NOW;
+  try { await T.patch(code, "p/" + me, body); setNet(true); }
+  catch (e) { setNet(false); dirty = true; }
+  $("nameGo").disabled = false;
+  begin();
+}
+
+/* ─────────── المسبحة ─────────── */
+function begin() {
+  show("sCount");
+  $("me").textContent = st.name;
+  drawBeads();
+  paint(false);
+  if (started) return;
+  started = true;
+  dirty = true;                      // نُسجّل حضوره فوراً ولو لم يضغط بعد
+  sync();
+  poll();
+  setInterval(sync, 1500);
+  setInterval(poll, 5000);
+}
+
+function tap(e) {
+  if (e && e.cancelable) e.preventDefault();
+  const t = performance.now();
+  if (t - lastTap < GAP) return;     // أسرع من ذكرٍ حقيقي
+  lastTap = t;
+  st.n++;
+  dirty = true;
+  T.save("room_" + code, st);
+  paint(true);
+  haptic(st.n);
+  wake();
+  if (e && e.clientX) floatPlus(e.clientX, e.clientY);
+}
+
+/** ٣٣ حبّة حول الزرّ — تمتلئ واحدة مع كل ذكر كالمسبحة في اليد */
+function drawBeads() {
+  if (beads.length) return;
+  const svg = $("beads");
+  const NS = "http://www.w3.org/2000/svg";
+  const R = 91, GAP_DEG = 22;
+  for (let i = 0; i < 33; i++) {
+    const a = (-90 + GAP_DEG / 2 + (360 - GAP_DEG) * i / 32) * Math.PI / 180;
+    const c = document.createElementNS(NS, "circle");
+    c.setAttribute("cx", (100 + R * Math.cos(a)).toFixed(2));
+    c.setAttribute("cy", (100 + R * Math.sin(a)).toFixed(2));
+    c.setAttribute("r", "5.4");
+    c.setAttribute("class", "bead");
+    svg.appendChild(c);
+    beads.push(c);
+  }
+  const imam = document.createElementNS(NS, "circle");      // الحبّة الكبيرة
+  imam.setAttribute("cx", "100");
+  imam.setAttribute("cy", String(100 - R));
+  imam.setAttribute("r", "7.6");
+  imam.setAttribute("class", "bead imam");
+  svg.appendChild(imam);
+}
+
+function paint(bump) {
+  $("count").textContent = T.fmt(st.n);
+  const cycles = Math.floor(st.n / 33);
+  $("cycles").textContent = cycles ? "× " + T.fmt(cycles) + " مسبحة" : "";
+  const k = st.n % 33;
+  const full = st.n > 0 && k === 0;
+  beads.forEach((b, i) => {
+    b.classList.toggle("on", full || i < k);
+    b.classList.toggle("now", !full && i === k - 1);
+  });
+  $("beads").classList.toggle("full", full);
+  if (bump) {
+    const b = $("btn");
+    b.classList.remove("p-pulse");
+    void b.offsetWidth;
+    b.classList.add("p-pulse");
+  }
+}
+
+function haptic(n) {
+  if (!navigator.vibrate) return;
+  if (n % 100 === 0) navigator.vibrate([70, 50, 70]);
+  else if (n % 33 === 0) navigator.vibrate([45, 35, 45]);
+  else navigator.vibrate(10);
+}
+
+function floatPlus(x, y) {
+  const s = document.createElement("span");
+  s.className = "plus";
+  s.textContent = "+١";
+  s.style.left = x + "px";
+  s.style.top = y + "px";
+  document.body.appendChild(s);
+  setTimeout(() => s.remove(), 750);
+}
+
+/* ─────────── الرفع والمتابعة ─────────── */
+async function sync(keep) {
+  if (!dirty || syncing || !st) return;
+  syncing = true;
+  const n = st.n;
+  try {
+    await (keep ? T.patchKeep : T.patch)(code, "p/" + me, { n, name: st.name, sid: st.sid, t: T.NOW });
+    if (st.n === n) dirty = false;
+    setNet(true);
+  } catch (e) {
+    setNet(false);
+  } finally {
+    syncing = false;
+  }
+}
+
+async function poll() {
+  let s;
+  try { s = await T.get(code, "s"); setNet(true); }
+  catch (e) { setNet(false); return; }
+
+  if (!s) {                          // شاشة البث مغلقة: لا مجموع بعد
+    $("stTotal").textContent = T.fmt(st.n);
+    $("stPeople").textContent = "—";
+    $("stRank").textContent = "—";
+    $("goalFill").style.width = "0";
+    $("goalText").textContent = "يظهر المجموع حين يبدأ البث";
+    return;
+  }
+  if (s.sid && s.sid !== (st.sid || "")) newSession(s.sid);
+  if (s.d) room.d = s.d;
+  if (s.ti) room.ti = s.ti;
+  paintRoom();
+
+  const kicked = (s.x || []).indexOf(me) !== -1;
+  $("kicked").classList.toggle("hidden", !kicked);
+  $("stTotal").textContent = T.fmt(s.total);
+  $("stPeople").textContent = T.fmt(s.people);
+  $("stRank").textContent = kicked ? "—" : T.fmt(1 + (s.counts || []).filter(c => c > st.n).length);
+
+  const g = +s.g || 0;
+  if (g) {
+    $("goalFill").style.width = Math.min(100, s.total / g * 100) + "%";
+    $("goalText").textContent = s.total >= g
+      ? "🎉 بلغنا الهدف معاً — " + T.fmt(g)
+      : "الهدف " + T.fmt(g) + " — بقي " + T.fmt(g - s.total);
+  } else {
+    $("goalFill").style.width = "0";
+    $("goalText").textContent = "";
+  }
+}
+
+function newSession(sid) {
+  st = { name: st.name, n: 0, sid };
+  T.save("room_" + code, st);
+  paint(false);
+  dirty = true;
+  sync();
+  toast("بدأت جلسة جديدة — العدّاد من الصفر");
+}
+
+/* الشاشة لا تنطفئ وأنت تسبّح */
+let lock = null;
+async function wake() {
+  if (lock || !("wakeLock" in navigator) || document.visibilityState !== "visible") return;
+  try {
+    lock = await navigator.wakeLock.request("screen");
+    lock.addEventListener("release", () => { lock = null; });
+  } catch (e) {}
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") sync(true);
+  else if (started) { wake(); poll(); }
+});
+window.addEventListener("pagehide", () => sync(true));
+
+/* ─────────── الأزرار ─────────── */
+$("codeGo").addEventListener("click", () => {
+  const c = T.cleanCode($("codeIn").value);
+  if (!T.validCode(c)) { $("codeErr").textContent = "الكود من ٣ إلى ١٢ حرفاً إنجليزياً أو رقماً"; return; }
+  $("codeErr").textContent = "";
+  enter(c);
+});
+$("codeIn").addEventListener("keydown", e => { if (e.key === "Enter") $("codeGo").click(); });
+$("nameGo").addEventListener("click", setName);
+$("nameIn").addEventListener("keydown", e => { if (e.key === "Enter") setName(); });
+$("rename").addEventListener("click", () => { $("nameIn").value = st.name; show("sName"); });
+$("msgBack").addEventListener("click", () => { history.replaceState(null, "", location.pathname); show("sCode"); });
+$("tap").addEventListener("pointerdown", tap);
+document.addEventListener("keydown", e => {
+  if (e.repeat || $("sCount").classList.contains("hidden")) return;
+  if (e.key === " " || e.key === "Enter") tap(e);
+});
+
+const q = new URLSearchParams(location.search).get("r") || location.hash.replace("#", "");
+if (q) enter(q); else show("sCode");
+})();
+</script>
+</body>
+</html>
