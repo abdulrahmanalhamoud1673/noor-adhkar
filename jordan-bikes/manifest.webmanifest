@@ -1,0 +1,11 @@
+{
+  "name": "Jordan Bikes — احجز جولتك",
+  "short_name": "Jordan Bikes",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#07080a",
+  "theme_color": "#07080a",
+  "icons": [{ "src": "assets/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jordan Bikes — جولات الدراجات في عمّان | احجز جولتك</title>
+<meta name="description" content="جولات دراجات جماعية يومية في عمّان: دوار الخامس، عبدون، دابوق واللويبدة. صباحاً وعصراً ومغرباً وليلاً — احجز مقعدك أونلاين بأقل من دقيقة. تأجير وصيانة وتدريب على ركوب الدراجات.">
+<meta name="theme-color" content="#07080a">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Jordan Bikes — احجز جولتك على الدراجة في عمّان">
+<meta property="og:description" content="جولات يومية بأربع أوقات وأربع مناطق داخل عمّان. احجز مقعدك بأقل من دقيقة.">
+<meta property="og:locale" content="ar_JO">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<!-- أيقونات تُستعمل في كل الصفحة -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 5l-7 7 7 7"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></symbol>
+    <symbol id="i-cal-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.2a6.5 6.5 0 0 1 3.5 5.8"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+    <symbol id="i-bike" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="16" r="3.8"/><circle cx="18.5" cy="16" r="3.8"/><path d="M5.5 16l4-8h6l3 8M9.5 8L12 16l3.5-8M8 5.5h3M14.5 5h2.5l-1.5 3"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3.5h3.2l1.6 4.2-2.1 1.4a11 11 0 0 0 5.2 5.2l1.4-2.1 4.2 1.6V17a3 3 0 0 1-3 3A15.5 15.5 0 0 1 2 6.5a3 3 0 0 1 3-3z"/></symbol>
+    <symbol id="i-wa" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2a9.9 9.9 0 0 0-8.47 15.02L2.5 21.5l4.6-1.05A9.92 9.92 0 1 0 12.04 2zm0 18.13a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-2.73.62.64-2.65-.2-.32a8.22 8.22 0 1 1 6.78 3.68zm4.5-6.15c-.25-.12-1.47-.72-1.7-.8-.23-.09-.39-.13-.56.12-.16.25-.64.8-.79.97-.14.16-.29.19-.54.06a6.7 6.7 0 0 1-3.32-2.9c-.25-.43.25-.4.72-1.34.08-.16.04-.3-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.42h-.47a.9.9 0 0 0-.66.31 2.77 2.77 0 0 0-.87 2.06 4.8 4.8 0 0 0 1.01 2.56 11 11 0 0 0 4.2 3.71c1.57.68 2.18.73 2.96.62.48-.07 1.47-.6 1.68-1.18.2-.58.2-1.08.14-1.18-.06-.11-.22-.17-.47-.3z"/></symbol>
+    <symbol id="i-ig" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r=".9" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-threads" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M16.8 11.3c-.6-3.3-3-4.4-5.3-4.2-2.7.2-4.4 2.3-4.4 5 0 3.2 2.1 5.4 5.2 5.4 2.6 0 4.6-1.6 4.6-3.8 0-2.3-2.1-3.4-4.6-3.2-1.9.2-3 1.2-2.9 2.4.1 1.2 1.3 1.9 2.6 1.8 2-.1 3.3-1.6 3.4-4.7"/><path d="M20 12c0 5.5-3.3 9-8 9s-8-3.5-8-9 3.3-9 8-9c3.4 0 6 1.7 7.2 4.7"/></symbol>
+    <symbol id="i-fb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3.5h-2.2A3.8 3.8 0 0 0 9 7.3V10H6.5v3.5H9v7h3.5v-7H15l.5-3.5h-3V7.8c0-.6.4-1 1-1H15z"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4.5L3.5 6.5v13L9 17.5l6 2 5.5-2v-13L15 6.5z"/><path d="M9 4.5v13M15 6.5v13"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 8h16M4 16h10"/></symbol>
+    <symbol id="i-ticket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5V6.5a1.5 1.5 0 0 1 1.5-1.5h14a1.5 1.5 0 0 1 1.5 1.5v2a3.5 3.5 0 0 0 0 7v2a1.5 1.5 0 0 1-1.5 1.5H5a1.5 1.5 0 0 1-1.5-1.5v-2a3.5 3.5 0 0 0 0-7z"/><path d="M14 5v2.5M14 11v2M14 16.5V19"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.6v.1"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7.5 3v5.5c0 4.6-3.2 8.3-7.5 9.5-4.3-1.2-7.5-4.9-7.5-9.5V6z"/><path d="M8.8 12.2l2.2 2.2 4.3-4.4"/></symbol>
+    <symbol id="i-cash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v.01M18 14.5v.01"/></symbol>
+    <symbol id="i-wrench" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></symbol>
+    <symbol id="i-learn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4L2.5 9 12 14l9.5-5z"/><path d="M6.5 11.2v4.3c0 1.4 2.5 3 5.5 3s5.5-1.6 5.5-3v-4.3M21.5 9v5"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4.5"/><path d="M11.2 11.8L20 3M16.5 6.5l2.5 2.5M14 9l2 2"/></symbol>
+    <symbol id="i-sunrise" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 16a5.5 5.5 0 0 1 11 0M2.5 20h19M12 3v4M4.2 8.2l2 2M19.8 8.2l-2 2M2.5 16h1.5M20 16h1.5"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></symbol>
+    <symbol id="i-sunset" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 15a5.5 5.5 0 0 1 11 0M2.5 19h19M12 9V3M9 6l3 3 3-3M4.2 9.2l1.6 1.6M19.8 9.2l-1.6 1.6"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/><path d="M16.5 3.5v3M15 5h3"/></symbol>
+    <symbol id="i-note" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h10l4 4v12H5z"/><path d="M9 12h6M9 16h4"/></symbol>
+    <symbol id="i-signal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 18v-3M10 18v-6M15 18V9M20 18V5"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2.5L4.5 13.5H12L11 21.5l8.5-11H12z"/></symbol>
+  </defs>
+</svg>
+
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ═══ شريط التنقّل ═══ -->
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a href="#top" class="logo" aria-label="Jordan Bikes — الرئيسية">
+      <span class="logo-mark" data-bike="mark"></span>
+      <span>Jordan Bikes</span>
+    </a>
+    <nav class="nav-links" aria-label="أقسام الموقع">
+      <a href="#rides">الجولات</a>
+      <a href="#routes">المسارات</a>
+      <a href="#schedule">الجدول</a>
+      <a href="#services">الخدمات</a>
+      <a href="#faq">الأسئلة</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="icon-btn" data-open-mybookings aria-label="حجوزاتي">
+        <svg><use href="#i-ticket"/></svg>
+        <span class="badge" data-mb-count hidden>0</span>
+      </button>
+      <button class="btn btn-primary btn-sm" data-book>احجز الآن</button>
+      <button class="icon-btn menu-btn" id="menuBtn" aria-label="القائمة" aria-expanded="false"><svg><use href="#i-menu"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+  <button class="icon-btn mm-close" id="menuClose" aria-label="إغلاق القائمة"><svg><use href="#i-x"/></svg></button>
+  <a class="mm-link" href="#rides">الجولات <span>4 أوقات يومياً</span></a>
+  <a class="mm-link" href="#routes">المسارات <span>4 مناطق</span></a>
+  <a class="mm-link" href="#schedule">الجدول <span>كل أيام الأسبوع</span></a>
+  <a class="mm-link" href="#services">الخدمات <span>تأجير · صيانة · تدريب</span></a>
+  <a class="mm-link" href="#faq">الأسئلة <span>قبل ما تيجي</span></a>
+  <button class="btn btn-primary btn-lg btn-block" data-book>احجز جولتك <svg class="arrow"><use href="#i-arrow"/></svg></button>
+</div>
+
+<main id="top">
+
+  <!-- ═══ الواجهة ═══ -->
+  <section class="hero">
+    <div class="hero-bg" aria-hidden="true"><div class="stars" id="stars"></div></div>
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <span class="pill fade-up" style="animation-delay:.05s"><span class="dot"></span> الحجز مفتوح · جولات كل يوم في عمّان</span>
+        <h1>
+          <span class="line"><span>عمّان أحلى</span></span>
+          <span class="line"><span>على <span class="grad">عجلتين.</span></span></span>
+        </h1>
+        <p class="hero-lead fade-up" style="animation-delay:.35s">جولات دراجات جماعية كل يوم — الصبح، العصر، المغرب، وبالليل — في دوار الخامس وعبدون ودابوق واللويبدة. اختار وقتك واحجز مقعدك بأقل من دقيقة.</p>
+        <div class="hero-cta fade-up" style="animation-delay:.5s">
+          <button class="btn btn-primary btn-lg" data-book>احجز جولتك <svg class="arrow"><use href="#i-arrow"/></svg></button>
+          <a class="btn btn-ghost btn-lg" href="#schedule">الجدول الأسبوعي</a>
+        </div>
+        <div class="hero-stats fade-up" style="animation-delay:.65s">
+          <div><b data-followers>44.1K</b><span>متابع على إنستغرام</span></div>
+          <div><b>7/7</b><span>جولات كل أيام الأسبوع</span></div>
+          <div><b>4</b><span>أوقات باليوم</span></div>
+          <div><b data-price-tour>5</b><span>دنانير للجولة</span></div>
+        </div>
+      </div>
+
+      <div class="hero-visual fade-up" style="animation-delay:.3s">
+        <div class="scene" aria-hidden="true">
+          <div class="moon"></div>
+          <div class="layer layer-far" id="layerFar"></div>
+          <div class="layer layer-near" id="layerNear"></div>
+          <div class="road"></div>
+          <div class="speed"><i></i><i></i><i></i></div>
+          <div class="bike-shadow"></div>
+          <div class="bike-rig" data-bike="hero"></div>
+        </div>
+        <button class="next-ride" id="nextRide" hidden>
+          <div class="nr-top"><span class="nr-live"><span class="dot"></span> الجولة الجاية</span><span data-nr-day></span></div>
+          <div class="nr-title" data-nr-title></div>
+          <div class="nr-meta"><span data-nr-time></span><span data-nr-loc></span></div>
+          <div class="nr-foot"><span class="nr-count" data-nr-count></span><span class="nr-go">احجز مقعدك <svg><use href="#i-arrow"/></svg></span></div>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <div class="marquee" aria-hidden="true"><div class="marquee-track" id="marquee"></div></div>
+
+  <!-- ═══ الأوقات ═══ -->
+  <section class="section" id="rides">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="reveal">
+          <div class="eyebrow">أربع جولات كل يوم</div>
+          <h2 class="sec-title">اختار الوقت اللي بيشبهك</h2>
+        </div>
+        <p class="sec-sub reveal" style="--rd:.1s">كل جولة ساعة ونص بمسار مدروس، والمجموعة بتمشي على راحتها — ما في داعي تكون محترف.</p>
+      </div>
+      <div class="periods" id="periods"></div>
+    </div>
+  </section>
+
+  <!-- ═══ المسارات ═══ -->
+  <section class="section" id="routes" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="reveal">
+          <div class="eyebrow">المسارات</div>
+          <h2 class="sec-title">أربع مناطق، أربع حكايات</h2>
+        </div>
+        <p class="sec-sub reveal" style="--rd:.1s">كل يوم بمنطقة مختلفة من عمّان. شوف أي أيام بنكون فيها، واحجز جولتك الجاية هناك.</p>
+      </div>
+      <div class="routes" id="routesList"></div>
+    </div>
+  </section>
+
+  <!-- ═══ الجدول ═══ -->
+  <section class="section" id="schedule" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="reveal">
+          <div class="eyebrow">الجدول الأسبوعي</div>
+          <h2 class="sec-title">شو في جولات اليوم؟</h2>
+        </div>
+        <p class="sec-sub reveal" style="--rd:.1s">اختار اليوم، واضغط على الجولة لتحجز مباشرة.</p>
+      </div>
+      <div class="schedule-box reveal">
+        <div class="days" id="days" role="tablist" aria-label="أيام الأسبوع"></div>
+        <div class="sched-list" id="schedList"></div>
+        <div class="sched-note"><svg><use href="#i-info"/></svg> الجدول ممكن يتغيّر بالمناسبات أو حسب الطقس — وأي تعديل بنبلّغك فيه على واتساب.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ خطوات الحجز ═══ -->
+  <section class="section" id="how" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="reveal">
+          <div class="eyebrow">الحجز</div>
+          <h2 class="sec-title">ثلاث خطوات وبتكون على الطريق</h2>
+        </div>
+      </div>
+      <div class="steps-band">
+        <div class="step-card reveal"><span class="sn">01</span><div class="sic"><svg><use href="#i-cal"/></svg></div><h3>اختار موعدك</h3><p>اليوم والوقت والمنطقة اللي بتناسبك من الجدول.</p></div>
+        <div class="step-card reveal" style="--rd:.08s"><span class="sn">02</span><div class="sic"><svg><use href="#i-user"/></svg></div><h3>عبّي معلوماتك</h3><p>اسمك ورقمك وعدد الأشخاص، وإذا بدك دراجة من عنّا.</p></div>
+        <div class="step-card reveal" style="--rd:.16s"><span class="sn">03</span><div class="sic"><svg><use href="#i-bike"/></svg></div><h3>تعال واركب</h3><p>بيوصلك رقم الحجز فوراً، وبنأكّد معك على واتساب.</p></div>
+      </div>
+      <div class="book-cta reveal">
+        <div>
+          <h3>جاهز للجولة الجاية؟</h3>
+          <p data-cta-next>اختار وقتك واحجز مقعدك الآن.</p>
+        </div>
+        <button class="btn btn-primary btn-lg" data-book>ابدأ الحجز <svg class="arrow"><use href="#i-arrow"/></svg></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ الخدمات ═══ -->
+  <section class="section" id="services" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="reveal">
+          <div class="eyebrow">خدماتنا</div>
+          <h2 class="sec-title">كل شي بخص الدراجة، بمكان واحد</h2>
+        </div>
+      </div>
+      <div class="services">
+        <button class="service reveal" data-book>
+          <span class="sv-ic"><svg><use href="#i-users"/></svg></span>
+          <h3>جولات جماعية</h3>
+          <p>جولات يومية بأربع أوقات وأربع مناطق داخل عمّان، مع مجموعة بتحمّس.</p>
+          <span class="sv-cta">احجز جولة <svg><use href="#i-arrow"/></svg></span>
+        </button>
+        <button class="service reveal" style="--rd:.06s" data-book="training">
+          <span class="sv-ic"><svg><use href="#i-learn"/></svg></span>
+          <h3>تدريب على الركوب</h3>
+          <p>أول مرة؟ بنعلّمك خطوة بخطوة لحد ما تركب الدراجة بثقة.</p>
+          <span class="sv-cta">اطلب حصة تدريب <svg><use href="#i-arrow"/></svg></span>
+        </button>
+        <a class="service reveal" style="--rd:.12s" data-wa="rental" href="#" target="_blank" rel="noopener">
+          <span class="sv-ic"><svg><use href="#i-key"/></svg></span>
+          <h3>تأجير دراجات</h3>
+          <p>دراجات جاهزة للجولات أو لمشوارك الخاص بالوقت اللي بناسبك.</p>
+          <span class="sv-cta">اسأل عن التأجير <svg><use href="#i-arrow"/></svg></span>
+        </a>
+        <a class="service reveal" style="--rd:.18s" data-wa="repair" href="#" target="_blank" rel="noopener">
+          <span class="sv-ic"><svg><use href="#i-wrench"/></svg></span>
+          <h3>صيانة دراجات</h3>
+          <p>صيانة وتصليح وضبط لدراجتك، عشان ترجع تمشي متل الجديدة.</p>
+          <span class="sv-cta">احجز موعد صيانة <svg><use href="#i-arrow"/></svg></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ التواصل الاجتماعي ═══ -->
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="social-band reveal">
+        <div>
+          <div class="big" data-followers>44.1K</div>
+          <h3>عائلة Jordan Bikes على إنستغرام</h3>
+          <p>صور وفيديوهات الجولات، الجدول الأسبوعي، وكل جديد — أوّل بأوّل.</p>
+        </div>
+        <div class="social-links" id="socialLinks"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ الأسئلة ═══ -->
+  <section class="section" id="faq" style="padding-top:0">
+    <div class="wrap faq-grid">
+      <div class="faq-side reveal">
+        <div class="eyebrow">أسئلة شائعة</div>
+        <h2 class="sec-title">كل اللي بدك تعرفه قبل الجولة</h2>
+        <p class="sec-sub" style="margin-top:16px">ما لقيت جواب سؤالك؟ احكينا مباشرة وبنرد عليك.</p>
+        <a class="btn btn-ghost" data-wa="question" href="#" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg> اسألنا على واتساب</a>
+      </div>
+      <div class="faq-list" id="faqList"></div>
+    </div>
+  </section>
+
+  <!-- ═══ الختام ═══ -->
+  <section class="final">
+    <div class="wrap">
+      <h2 class="reveal">الطريق <span class="grad">بستنّاك.</span></h2>
+      <p class="reveal" style="--rd:.08s">مقعدك بالجولة الجاية على بُعد دقيقة.</p>
+      <div class="row reveal" style="--rd:.16s">
+        <button class="btn btn-primary btn-lg" data-book>احجز الآن <svg class="arrow"><use href="#i-arrow"/></svg></button>
+        <a class="btn btn-ghost btn-lg" data-tel href="#"><svg><use href="#i-phone"/></svg> <span class="ltr" data-phone-text></span></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ═══ التذييل ═══ -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <a href="#top" class="logo"><span class="logo-mark" data-bike="mark"></span><span>Jordan Bikes</span></a>
+        <p class="f-about">جولات يومية على الدراجات في عمّان، تأجير وصيانة دراجات، وتدريب على الركوب.</p>
+      </div>
+      <div>
+        <h4>الموقع</h4>
+        <ul>
+          <li><a href="#rides">الجولات</a></li>
+          <li><a href="#routes">المسارات</a></li>
+          <li><a href="#schedule">الجدول الأسبوعي</a></li>
+          <li><a href="#faq">الأسئلة الشائعة</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>تواصل</h4>
+        <ul>
+          <li><a data-tel href="#"><span class="ltr" data-phone-text></span></a></li>
+          <li><a data-wa="question" href="#" target="_blank" rel="noopener">واتساب</a></li>
+          <li><a data-link="instagram" href="#" target="_blank" rel="noopener">إنستغرام</a></li>
+          <li><a data-link="maps" href="#" target="_blank" rel="noopener">موقعنا على الخريطة</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>الحجز</h4>
+        <ul>
+          <li><a href="#" data-book>احجز جولة</a></li>
+          <li><a href="#" data-book="training">حصة تدريب</a></li>
+          <li><a href="#" data-open-mybookings>حجوزاتي</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year></span> Jordan Bikes · عمّان، الأردن</span>
+      <a href="admin.html">لوحة الإدارة</a>
+    </div>
+  </div>
+</footer>
+
+<a class="fab" data-wa="question" href="#" target="_blank" rel="noopener" aria-label="راسلنا على واتساب"><svg><use href="#i-wa"/></svg></a>
+<div class="mobile-book" id="mobileBook"><button class="btn btn-primary btn-block" data-book>احجز جولتك <svg class="arrow"><use href="#i-arrow"/></svg></button></div>
+
+<!-- ═══ نافذة الحجز ═══ -->
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" aria-hidden="true">
+  <div class="sheet-backdrop" data-close-sheet></div>
+  <div class="sheet-panel">
+    <div class="sheet-head">
+      <div>
+        <h2 id="sheetTitle">احجز جولتك</h2>
+        <div class="sh-sub">Jordan Bikes · عمّان</div>
+      </div>
+      <div class="progress" id="progress">
+        <div class="pstep" data-p="1"><i>1</i><span>الموعد</span></div>
+        <div class="pline"></div>
+        <div class="pstep" data-p="2"><i>2</i><span>معلوماتك</span></div>
+        <div class="pline"></div>
+        <div class="pstep" data-p="3"><i>3</i><span>التأكيد</span></div>
+      </div>
+      <button class="icon-btn sheet-close" data-close-sheet aria-label="إغلاق"><svg><use href="#i-x"/></svg></button>
+    </div>
+
+    <div class="sheet-body">
+      <div class="sheet-main" id="sheetMain">
+
+        <!-- ١ — الموعد -->
+        <div class="step" data-step="1">
+          <div class="seg" id="typeSeg" role="tablist">
+            <button data-type="tour" class="on" role="tab"><svg><use href="#i-users"/></svg> جولة جماعية</button>
+            <button data-type="training" role="tab"><svg><use href="#i-learn"/></svg> حصة تدريب</button>
+          </div>
+          <h3 class="step-h">اختار اليوم <small data-month-label></small></h3>
+          <div class="dates" id="dates"></div>
+          <h3 class="step-h">اختار الوقت <small data-slots-hint></small></h3>
+          <div class="slots" id="slots"></div>
+          <div class="ferr" id="err1"></div>
+        </div>
+
+        <!-- ٢ — المعلومات -->
+        <div class="step" data-step="2">
+          <div class="fields">
+            <div class="field">
+              <span class="lbl">عدد الأشخاص</span>
+              <div class="stepper">
+                <button type="button" data-riders="+1" aria-label="زيادة">+</button>
+                <output id="ridersOut">1</output>
+                <button type="button" data-riders="-1" aria-label="إنقاص">−</button>
+              </div>
+            </div>
+            <div class="field">
+              <span class="lbl">الدراجة</span>
+              <div class="choices" id="bikeChoices">
+                <button type="button" class="choice on" data-bike-opt="rent">دراجة من عنّا<small data-bike-extra>جاهزة لك</small></button>
+                <button type="button" class="choice" data-bike-opt="own">معي دراجتي<small>بجيبها معي</small></button>
+              </div>
+            </div>
+            <div class="field full">
+              <span class="lbl">مستوى الخبرة</span>
+              <div class="choices" id="levelChoices">
+                <button type="button" class="choice" data-level="beginner">مبتدئ<small>أول مرة أو قليل</small></button>
+                <button type="button" class="choice on" data-level="intermediate">متوسط<small>بركب أحياناً</small></button>
+                <button type="button" class="choice" data-level="advanced">متقدّم<small>بركب دايماً</small></button>
+              </div>
+            </div>
+            <div class="field full">
+              <label for="fName">الاسم الكامل</label>
+              <input class="input" id="fName" type="text" autocomplete="name" placeholder="مثال: أحمد محمد" maxlength="60">
+              <div class="ferr" id="errName"></div>
+            </div>
+            <div class="field full">
+              <label for="fPhone">رقم الموبايل <span class="opt">(واتساب)</span></label>
+              <div class="phone-wrap"><input class="input" id="fPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="07X XXX XXXX" maxlength="20"></div>
+              <div class="ferr" id="errPhone"></div>
+            </div>
+            <div class="field full">
+              <label for="fNotes">ملاحظات <span class="opt">(اختياري)</span></label>
+              <textarea class="input" id="fNotes" maxlength="400" placeholder="أي شي بتحب نعرفه: أعمار المشاركين، طول الشخص للدراجة، طلب خاص…"></textarea>
+            </div>
+            <input class="hp" id="fWebsite" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+          </div>
+        </div>
+
+        <!-- ٣ — المراجعة -->
+        <div class="step" data-step="3">
+          <h3 class="step-h">راجع حجزك</h3>
+          <div class="ticket" id="reviewTicket"></div>
+          <div class="note-box"><svg><use href="#i-info"/></svg><div><b data-payment></b>. <span data-meeting></span></div></div>
+          <label class="check" id="agreeWrap"><input type="checkbox" id="fAgree"> <span>بأكّد إنّ المعلومات صحيحة وبلتزم بتعليمات السلامة والمرشد خلال الجولة.</span></label>
+          <div class="ferr" id="err3"></div>
+        </div>
+
+        <!-- ٤ — تمّ -->
+        <div class="step" data-step="4">
+          <div class="success" id="successBox"></div>
+        </div>
+      </div>
+
+      <aside class="sheet-aside" id="summary"></aside>
+    </div>
+
+    <div class="sheet-foot" id="sheetFoot">
+      <div class="sf-total"><small>المجموع</small><b id="footTotal">—</b></div>
+      <button class="btn btn-ghost btn-back" id="btnBack"><svg><use href="#i-back"/></svg><span>رجوع</span></button>
+      <button class="btn btn-primary btn-next" id="btnNext">التالي <svg class="arrow"><use href="#i-arrow"/></svg></button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ حجوزاتي ═══ -->
+<div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" aria-hidden="true">
+  <div class="sheet-backdrop" data-close-drawer></div>
+  <div class="drawer-panel">
+    <div class="drawer-head">
+      <h3 id="drawerTitle">حجوزاتي</h3>
+      <button class="icon-btn" data-close-drawer aria-label="إغلاق"><svg><use href="#i-x"/></svg></button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/config.js"></script>
+<script src="assets/shared.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
