@@ -315,6 +315,8 @@ function renderNextRide() {
 }
 
 /* ══ نافذة الحجز ══ */
+/* بعض الإطارات المقيّدة ترفض تعديل السجل — النافذة تعمل بدونه */
+function hist(kind, state, url) { try { history[kind](state, "", url); } catch (e) {} }
 const sheet = $("#sheet");
 let sheetOpen = false;
 const S = {
@@ -360,7 +362,7 @@ function openSheet(pre) {
   sheet.setAttribute("aria-hidden", "false");
   document.body.classList.add("lock");
   sheetOpen = true;
-  if (location.hash !== "#book") history.pushState({ jbSheet: 1 }, "", "#book");
+  if (location.hash !== "#book") hist("pushState", { jbSheet: 1 }, "#book");
   loadAvailability();
   setTimeout(() => { const on = $(".date.on", sheet); if (on) on.scrollIntoView({ inline: "center", block: "nearest" }); }, 60);
 }
@@ -372,7 +374,7 @@ function closeSheet(fromPop) {
   sheetOpen = false;
   if (!fromPop && location.hash === "#book") {
     if (history.state && history.state.jbSheet) history.back();
-    else history.replaceState(null, "", location.pathname + location.search);
+    else hist("replaceState", null, location.pathname + location.search);
   }
   if (S.step === 4) S.notes = "";
   renderNextRide(); renderSchedule(); updateMyCount();
@@ -768,7 +770,7 @@ function init() {
   bindScroll();
   setInterval(() => { renderNextRide(); if (!sheetOpen) renderSchedule(); }, 30000);
   loadAvailability();
-  if (location.hash === "#book") { history.replaceState(null, "", location.pathname + location.search); openSheet({}); }
+  if (location.hash === "#book") { hist("replaceState", null, location.pathname + location.search); openSheet({}); }
 }
 init();
 })();
