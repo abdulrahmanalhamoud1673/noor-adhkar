@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1f6f4a">
+<title>همسة — شطرنج بالنظارة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=Noto+Sans+Symbols+2&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=1">
+<link rel="modulepreload" href="lib/chess.js">
+</head>
+<body>
+<main class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">&#9822;&#xFE0E;</span>
+      <div>
+        <h1>همسة</h1>
+        <p class="sub">الكاميرا بتشوف، المحرك بيفكّر، والنظارة بتهمسلك الحركة</p>
+      </div>
+    </div>
+    <span id="engine-chip" class="chip">المحرك عم يحمّل…</span>
+  </header>
+
+  <!-- ───────── الإعدادات ───────── -->
+  <section id="setup" class="screen">
+    <div class="card">
+      <h2>أنا بلعب بـ</h2>
+      <div class="seg" role="radiogroup" data-key="color">
+        <button type="button" data-val="w" class="on">الأبيض</button>
+        <button type="button" data-val="b">الأسود</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>كيف بيعرف حركة الخصم؟</h2>
+      <div class="options" role="radiogroup" data-key="input">
+        <button type="button" data-val="camera" class="opt on">
+          <b>كاميرا الموبايل</b>
+          <span>تلقائي. حط الموبايل على حامل بيشوف الرقعة، وهو بيلقط الحركات لحاله.</span>
+        </button>
+        <button type="button" data-val="voice" class="opt">
+          <b>بصوتك</b>
+          <span>بتحكي حركة الخصم بصوت واطي، مثلاً «e5» أو «knight f3».</span>
+        </button>
+        <button type="button" data-val="tap" class="opt">
+          <b>لمس الشاشة</b>
+          <span>بتكبس مربعين على اللوح: من وين لوين.</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="card grid2">
+      <div>
+        <h2>لغة الصوت بالأذن</h2>
+        <div class="seg" role="radiogroup" data-key="lang">
+          <button type="button" data-val="ar" class="on">عربي</button>
+          <button type="button" data-val="en">English</button>
+        </div>
+      </div>
+      <div>
+        <h2>وقت التفكير</h2>
+        <div class="seg" role="radiogroup" data-key="think">
+          <button type="button" data-val="500">سريع</button>
+          <button type="button" data-val="1500" class="on">عادي</button>
+          <button type="button" data-val="3000">أقوى</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="switch"><input type="checkbox" id="opt-echo" checked> <span>قول لي شو لعب الخصم قبل ما تقلي حركتي</span></label>
+      <label class="switch"><input type="checkbox" id="opt-tapctl" checked> <span>كبسة على النظارة = عيد آخر حركة</span></label>
+    </div>
+
+    <div class="actions">
+      <button type="button" id="btn-test" class="btn ghost">جرّب الصوت بالنظارة</button>
+      <button type="button" id="btn-start" class="btn primary">ابدأ</button>
+    </div>
+    <p id="voice-note" class="note" hidden></p>
+
+    <details class="card help">
+      <summary>قبل ما تبلّش</summary>
+      <ol>
+        <li>وصّل النظارة بالموبايل بالبلوتوث (متل سماعة عادية).</li>
+        <li>اكبس «جرّب الصوت». لازم تسمع الصوت بالنظارة مش من الموبايل.</li>
+        <li>بوضع الكاميرا: حط الموبايل أعلى ما فيك، وخلّيه يشوف الرقعة من فوق قد ما تقدر، وما تحركه بعدين.</li>
+        <li>خلّي الشاشة شغّالة. إذا الشاشة طفت الكاميرا بتوقف.</li>
+      </ol>
+    </details>
+  </section>
+
+  <!-- ───────── معايرة الكاميرا ───────── -->
+  <section id="calib" class="screen" hidden>
+    <div class="card">
+      <p id="calib-msg" class="step">رتّب القطع بوضع البداية. بعدين اكبس على <b>الزوايا الأربع للمربعات</b> (مش الإطار اللي حوالين الرقعة).</p>
+      <div class="cam" id="calib-cam">
+        <video id="video" playsinline muted autoplay></video>
+        <canvas id="calib-overlay"></canvas>
+      </div>
+      <div class="actions">
+        <button type="button" id="btn-calib-reset" class="btn ghost">من جديد</button>
+        <button type="button" id="btn-calib-rotate" class="btn ghost" disabled>الاتجاه غلط؟ دوّر</button>
+        <button type="button" id="btn-calib-ok" class="btn primary" disabled>تمام، يلا</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── اللعب ───────── -->
+  <section id="play" class="screen" hidden>
+    <div class="card hint-card" id="hint-card">
+      <div class="turn" id="turn-label">—</div>
+      <div class="hint" id="hint-text" dir="ltr">…</div>
+      <div class="meta"><span id="status-text">جاهز</span><span id="eval-text" dir="ltr"></span></div>
+    </div>
+
+    <div class="banner" id="banner" hidden></div>
+
+    <div class="cam small" id="play-cam" hidden>
+      <canvas id="play-overlay"></canvas>
+    </div>
+
+    <div class="card board-card">
+      <div id="board" class="board"></div>
+      <p class="tiny">إذا الحركة غلط أو ما انلقطت: اكبس مربع البداية بعدين مربع النهاية.</p>
+    </div>
+
+    <div class="actions wrap-row">
+      <button type="button" id="btn-repeat" class="btn primary">عيد الحركة</button>
+      <button type="button" id="btn-listen" class="btn ghost" hidden>اسمعني</button>
+      <button type="button" id="btn-undo" class="btn ghost">تراجع</button>
+      <button type="button" id="btn-resync" class="btn ghost" hidden>الكاميرا تاهت؟</button>
+      <button type="button" id="btn-new" class="btn ghost">لعبة جديدة</button>
+    </div>
+
+    <div class="card">
+      <h2>الحركات</h2>
+      <ol id="moves" class="moves" dir="ltr"></ol>
+    </div>
+  </section>
+
+</main>
+<script type="module" src="js/app.js?v=1"></script>
+</body>
+</html>
