@@ -1,7 +1,11 @@
 :root{
-  --navy:#0f1b3d; --navy-2:#1b2b5c; --amber:#ffb400; --amber-d:#e29c00; --amber-l:#fff3d1;
-  --bg:#f7f5ef; --card:#fff; --ink:#14192b; --mute:#5d6578; --line:#e6e2d6;
-  --ok:#1f9d63; --bad:#d63b3b; --r:18px; --shadow:0 6px 24px rgba(15,27,61,.08);
+  /* الهوية: ألوان العلم الأردني + رمل البتراء */
+  --navy:#0a2e20; --navy-2:#134a33;           /* أخضر غامق (الحبر) */
+  --green:#007a3d; --green-l:#e3f1e8;
+  --amber:#ce1126; --amber-d:#8f0b20; --amber-l:#fbe9ec;  /* الأحمر (للأزرار والتنبيه) */
+  --gold:#c9a24b;
+  --bg:#f6f1e7; --card:#fffdf8; --ink:#16201b; --mute:#5b665f; --line:#e4dccb;
+  --ok:#1f9d63; --bad:#ce1126; --r:18px; --shadow:0 8px 28px rgba(10,46,32,.10);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
@@ -154,3 +158,69 @@ label.f{display:block;font-weight:700;margin:14px 0 6px;color:var(--navy)}
   .print-bar{display:none}
   .sticker{box-shadow:none;border-radius:0;margin:0;width:105mm;height:148mm}
 }
+
+
+/* ================= الثيم الأردني الهاشمي ================= */
+body::before{content:"";display:block;height:9px;background:linear-gradient(180deg,#000 0 3px,#fff 3px 6px,var(--green) 6px 9px)}
+body.home{background:linear-gradient(180deg,rgba(246,241,231,0) 0,var(--bg) 640px),url(/pattern-light.svg) 0 0/96px var(--bg)}
+h1,h2,.brand,.sticker .sb,.sticker h2{font-family:"Reem Kufi","Tajawal",system-ui,sans-serif;font-weight:700}
+.brand{font-size:27px;letter-spacing:.2px}
+.btn-primary{background:var(--amber);color:#fff;box-shadow:0 4px 0 var(--amber-d)}
+.btn-primary:hover{background:#e0152d}
+.btn-dark{background:var(--navy);color:#fff}
+.btn-ghost:hover{border-color:var(--green);color:var(--green)}
+.nav a:hover{background:var(--green-l)}
+.pill{background:var(--green-l);color:var(--navy-2)}
+.hl{background:linear-gradient(transparent 64%,rgba(206,17,38,.28) 64%,rgba(206,17,38,.28) 92%,transparent 92%)}
+.card{border:1px solid var(--line)}
+.step .n{background:var(--navy);color:#fff;position:relative;clip-path:polygon(50% 0,61% 14%,78% 10%,80% 27%,95% 34%,88% 50%,95% 66%,80% 73%,78% 90%,61% 86%,50% 100%,39% 86%,22% 90%,20% 73%,5% 66%,12% 50%,5% 34%,20% 27%,22% 10%,39% 14%);width:54px;height:54px;border-radius:0;font-size:21px;background:var(--green)}
+.feat .ic{background:var(--green-l)}
+.tag.new{background:var(--amber);color:#fff}
+.tag.on{background:var(--green-l);color:#0b5a33}
+.bubble.me{background:var(--green-l)}
+.phone{background:#0b1a13}
+.phone .screen{background:var(--bg)}
+.replies .bubble{background:var(--green-l)}
+.dots i{background:var(--amber)}
+
+/* منصّة الهاتف + نجمة خلفية */
+.stage{position:relative;display:grid;place-items:center;padding:14px 0}
+.stage::before{content:"";position:absolute;width:min(420px,92vw);aspect-ratio:1;background:url(/star-big.svg) center/contain no-repeat;opacity:.2;animation:spin 90s linear infinite}
+.stage::after{content:"";position:absolute;inset:auto 0 6% 0;margin:auto;width:min(340px,80vw);height:34px;background:radial-gradient(closest-side,rgba(10,46,32,.28),transparent);filter:blur(6px);z-index:0}
+.stage .phone{position:relative;z-index:1}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.stage::before{animation:none}}
+
+/* شريط المدن */
+.cities{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.cities span{background:#fff;border:1px solid var(--line);border-radius:99px;padding:6px 16px;font-weight:700;color:var(--navy-2);font-size:15.5px}
+.cities span::before{content:"✦";color:var(--amber);margin-inline-end:7px;font-size:12px}
+
+/* شريط الدعوة الأخضر بزخرفة */
+.band{background:linear-gradient(135deg,rgba(10,46,32,.97),rgba(10,46,32,.9)),url(/pattern-dark.svg) 0 0/96px;background-color:var(--navy);position:relative;overflow:hidden}
+.band::before{content:"";position:absolute;inset-block:0;inset-inline-start:0;width:64px;background:var(--amber);clip-path:polygon(0 0,100% 50%,0 100%)}
+.band::after{content:"";position:absolute;inset-block:0;inset-inline-end:0;width:10px;background:linear-gradient(180deg,#000 0 33.3%,#fff 33.3% 66.6%,var(--green) 66.6%)}
+.band h2{color:#fff}.band p{color:#cfe3d7}
+.band .btn-primary{box-shadow:0 4px 0 var(--amber-d)}
+/* فاصل زخرفي */
+.divider{height:22px;margin:6px 0;background:url(/pattern-light.svg) center/96px 96px;-webkit-mask:linear-gradient(90deg,transparent,#000 20%,#000 80%,transparent);mask:linear-gradient(90deg,transparent,#000 20%,#000 80%,transparent);opacity:.9}
+
+/* صفحة المسح */
+.scan-head .carname{background:var(--navy);box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--gold)}
+.chip{background:var(--card)}
+.chip[aria-pressed=true]{border-color:var(--green);background:var(--green-l);box-shadow:inset 0 0 0 1px var(--green)}
+.chips.urgent .chip{border-color:#f0d2d6}
+.chips.urgent .chip[aria-pressed=true]{border-color:var(--bad);background:var(--amber-l);box-shadow:inset 0 0 0 1px var(--bad)}
+.privacy-note{background:var(--green-l);color:#0b5a33}
+footer{border-top:1px solid var(--line);margin-top:20px}
+footer::before{content:"✦ ✦ ✦";display:block;color:var(--amber);letter-spacing:8px;font-size:12px;margin-bottom:8px}
+
+/* الستيكر */
+.sticker{border:0;background:#fff;position:relative;overflow:hidden;padding:11mm 7mm 7mm}
+.sticker::before{content:"";position:absolute;inset:0 0 auto 0;height:7mm;background:linear-gradient(180deg,#000 0 2.33mm,#fff 2.33mm 4.66mm,var(--green) 4.66mm 7mm)}
+.sticker::after{content:"";position:absolute;inset:0;border:2.2mm solid var(--navy);border-radius:6mm;pointer-events:none}
+.sticker .sb{color:var(--navy)}
+.sticker .sqr{padding:2mm;border:.6mm solid var(--navy);border-radius:4mm;background:#fff}
+.sticker .steps3 span{background:var(--green-l);color:var(--navy)}
+.sticker h2{color:var(--navy)}
+@media print{.sticker{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
