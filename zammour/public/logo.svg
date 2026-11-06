@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="زمّور">
+  <rect width="64" height="64" rx="16" fill="#0f1b3d"/>
+  <path d="M14 17a7 7 0 0 1 7-7h22a7 7 0 0 1 7 7v16a7 7 0 0 1-7 7H31l-9 8v-8h-1a7 7 0 0 1-7-7z" fill="#ffb400"/>
+  <path d="M20 31.5v-4.2l3-5.3h18l3 5.3v4.2z" fill="#0f1b3d"/>
+  <rect x="24" y="24" width="16" height="3.4" rx="1" fill="#ffb400"/>
+  <circle cx="25" cy="31.5" r="2.6" fill="#ffb400"/><circle cx="39" cy="31.5" r="2.6" fill="#ffb400"/>
+  <path d="M50 12.5c2.2 1.8 3.5 4.5 3.5 7.5M54.5 9c3.2 2.7 5 6.6 5 11" fill="none" stroke="#ffb400" stroke-width="2.4" stroke-linecap="round"/>
+</svg>

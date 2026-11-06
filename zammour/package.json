@@ -1,0 +1,18 @@
+{
+  "name": "zammour",
+  "version": "0.1.0",
+  "description": "زمّور — رسالة لصاحب السيارة بدون ما تعرف رقمه",
+  "private": true,
+  "type": "commonjs",
+  "main": "server/index.js",
+  "engines": { "node": ">=22.13" },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server/index.js",
+    "dev": "NODE_ENV=development node --disable-warning=ExperimentalWarning server/index.js",
+    "test": "node --disable-warning=ExperimentalWarning --test test/"
+  },
+  "dependencies": {
+    "express": "4.21.2",
+    "qrcode": "1.5.4"
+  }
+}
