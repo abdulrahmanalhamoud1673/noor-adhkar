@@ -9,7 +9,8 @@ fs.mkdirSync(dataDir, { recursive: true });
 
 // مفاتيح التشفير: في الإنتاج لازم تيجي من البيئة. في التطوير نولّدها ونحفظها محلياً.
 function secret(name) {
-  if (process.env[name]) return Buffer.from(process.env[name], 'hex');
+  const v = process.env[name];
+  if (v) return /^[0-9a-f]{64}$/i.test(v) ? Buffer.from(v, 'hex') : crypto.createHash('sha256').update(v).digest(); // أي نص عشوائي طويل بيصلح
   if (isProd) throw new Error(`${name} مطلوب في الإنتاج (32 بايت hex). ولّده: openssl rand -hex 32`);
   const f = path.join(dataDir, `.dev-${name}`);
   if (!fs.existsSync(f)) fs.writeFileSync(f, crypto.randomBytes(32).toString('hex'), { mode: 0o600 });
@@ -19,7 +20,7 @@ function secret(name) {
 module.exports = {
   isProd,
   port: Number(process.env.PORT || 3000),
-  baseUrl: (process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`).replace(/\/$/, ''),
+  baseUrl: (process.env.BASE_URL || process.env.RENDER_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`).replace(/\/$/, ''),
   dbFile: path.join(dataDir, 'zammour.db'),
   encKey: secret('ENC_KEY'),       // تشفير الرسائل والأرقام
   macKey: secret('MAC_KEY'),       // توقيع الجلسات + تجزئة الـIP والأرقام
@@ -27,5 +28,7 @@ module.exports = {
   turnstileSecret: process.env.TURNSTILE_SECRET || '',
   turnstileSiteKey: process.env.TURNSTILE_SITE_KEY || '',
   trustProxy: process.env.TRUST_PROXY ? Number(process.env.TRUST_PROXY) : 0,
+  // وضع التجربة: الرمز بيظهر على الشاشة (بدون SMS). للتجارب فقط، مش للإنتاج الحقيقي.
+  demoMode: process.env.DEMO_MODE === '1',
   brand: 'زمّور',
 };

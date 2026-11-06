@@ -1,0 +1,18 @@
+# نشر بضغطة على Render: New → Blueprint → اختر هالمستودع
+services:
+  - type: web
+    name: zammour
+    runtime: node
+    rootDir: zammour
+    plan: free
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - { key: NODE_VERSION, value: "22" }
+      - { key: NODE_ENV, value: production }
+      - { key: TRUST_PROXY, value: "1" }
+      - { key: DEMO_MODE, value: "1" }     # وضع تجربة: رمز الدخول بيظهر على الشاشة. شيله لما تربط SMS/واتساب
+      - { key: NOTIFIER, value: console }
+      - { key: ENC_KEY, generateValue: true }
+      - { key: MAC_KEY, generateValue: true }

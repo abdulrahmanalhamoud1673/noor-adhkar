@@ -101,7 +101,7 @@ app.post('/api/auth/request', wrap(async (req, res) => {
               ON CONFLICT(phone_hash) DO UPDATE SET code_hash=excluded.code_hash, expires_at=excluded.expires_at, attempts=0, sent_at=excluded.sent_at`)
     .run(ph, C.mac('otp:' + ph + code), now() + 5 * sec.min, now());
   await notify.send(phone, `رمز التحقق لزمّور: ${code}\nما تشاركه مع حدا.`, 'otp', { label: 'رمز التحقق', text: code, url: cfg.baseUrl });
-  res.json({ ok: true, ...(!cfg.isProd && cfg.notifier === 'console' ? { devCode: code } : {}) });
+  res.json({ ok: true, ...((!cfg.isProd || cfg.demoMode) && cfg.notifier === 'console' ? { devCode: code } : {}) });
 }));
 
 app.post('/api/auth/verify', wrap(async (req, res) => {
@@ -317,6 +317,8 @@ app.post('/api/m/:token/block', (req, res) => {
   blockSender(m);
   res.json({ ok: true });
 });
+
+app.get('/healthz', (req, res) => res.type('text').send('ok'));
 
 // ————— الصفحات —————
 const pub = path.join(__dirname, '..', 'public');

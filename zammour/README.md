@@ -17,6 +17,12 @@ npm test         # فلتر الرسائل + اختبارات API كاملة
 - حدود إرسال، honeypot، Turnstile اختياري، 3 مخالفات = إيقاف مؤقت.
 - ستيكر A6 جاهز للطباعة.
 
+## نشر تجريبي بضغطة (Render)
+1. ادخل render.com ← **New ← Blueprint** ← اربط GitHub واختر هالمستودع (الملف `render.yaml` جاهز).
+2. بعد دقيقتين بيعطيك رابط `https://zammour-xxxx.onrender.com`. الـQR بياخد الرابط تلقائياً.
+3. وضع التجربة (`DEMO_MODE=1`) بيعرض رمز الدخول على الشاشة بدل ما يبعثه SMS، والرسائل بتظهر لصاحب السيارة بلوحة التحكم.
+ملاحظة: النسخة المجانية بتنام بعد خمول وبتفقد البيانات مع كل نشر. للاستخدام الفعلي استخدم خطة بقرص دائم (`DATA_DIR`) وأزل `DEMO_MODE`.
+
 ## الإنتاج
 متغيرات البيئة: `NODE_ENV=production`, `BASE_URL`, `ENC_KEY` و`MAC_KEY` (`openssl rand -hex 32` لكل واحد)،
 `TRUST_PROXY=1` خلف nginx/Cloudflare، `TURNSTILE_SITE_KEY/SECRET` اختياري.
