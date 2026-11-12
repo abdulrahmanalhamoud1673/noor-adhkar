@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════
-   نور — منبّه الفجر بالمهمّات
+   نور — منبّه المهمّات
    ----------------------------------------------------------
    لا يسكت المنبّه بضغطة. يطلب منك تصوير أشياء في بيتك يختارها
    عشوائياً — حنفية الحمّام، الميكروويف، الثلاجة — فلا سبيل إلى
@@ -199,7 +199,7 @@ const Alarm = {
   async openCam() {
     const v = $("almVideo");
     try {
-      const mod = await import("./pose-model.js?v=42");
+      const mod = await import("./pose-model.js?v=43");
       // الخلفية: أنت تصوّر الثلاجة لا وجهك
       this.stream = await mod.openCamera(v, t => this.say(t), "environment");
       this.fit(v);
@@ -577,7 +577,7 @@ const Alarm = {
     this.renderRun();
   },
 
-  /** لوحة الجهوزية: تقول قبل الفجر ما الذي ينقص */
+  /** لوحة الجهوزية: تقول قبل موعد المنبّه ما الذي ينقص */
   renderReady() {
     const box = $("almReady");
     if (!box) return;
@@ -601,7 +601,7 @@ const Alarm = {
     if (row) row.classList.toggle("hidden", !!key);
   },
 
-  /** فحص المفتاح والنموذج قبل الفجر لا عنده */
+  /** فحص المفتاح والنموذج قبل الموعد لا عنده */
   async testKey() {
     const out = $("almTestOut");
     const key = Store.get("aiKey", "");
