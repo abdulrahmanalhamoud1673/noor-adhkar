@@ -959,7 +959,7 @@ $("startCoach").addEventListener("click", async () => {
   if (diag) diag.textContent = "جارٍ فتح الكاميرا…";
 
   try {
-    if (!window.Coach) await import("./salah-coach.js?v=46");
+    if (!window.Coach) await import("./salah-coach.js?v=47");
     await window.Coach.start(coachRakaat, coachVerify);
     camFullscreen("coachStage", true);
   } catch (err) {
@@ -1032,7 +1032,7 @@ $("startChallenge").addEventListener("click", async () => {
   if (diag) diag.textContent = "جارٍ فتح الكاميرا…";
 
   try {
-    if (!window.Challenge) await import("./pushup-challenge.js?v=46");
+    if (!window.Challenge) await import("./pushup-challenge.js?v=47");
     await window.Challenge.start(chReps, chPhrase);
     camFullscreen("chStage", true);
   } catch (err) {
