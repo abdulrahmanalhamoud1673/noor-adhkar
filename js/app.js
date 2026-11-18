@@ -84,7 +84,6 @@ const Wake = {
     if (open("mushaf")) return true;
     if (typeof Mushaf !== "undefined" && playing(Mushaf.audio)) return true;
     if (typeof Quran !== "undefined" && playing(Quran.audio)) return true;
-    if (window.Coach && window.Coach.running) return true;
     if (window.Challenge && window.Challenge.running) return true;
     return false;
   },
@@ -149,8 +148,6 @@ function goto(pageId) {
     b.classList.toggle("active", b.dataset.goto === pageId)
   );
   window.scrollTo({ top: 0, behavior: "smooth" });
-  if (pageId !== "page-coach" && window.Coach) window.Coach.stop();
-  if (pageId !== "page-coach") camFullscreen("coachStage", false);
   if (pageId !== "page-challenge") camFullscreen("chStage", false);
 
   // عرض الشريط لا يُقاس إلا بعد ظهور الصفحة، وإلا حُسبت الأسهم على عرض صفر
@@ -911,85 +908,6 @@ const Voice = {
 };
 
 /* ══════════════════════════════════════
-   مدرّب الصلاة بالكاميرا (يُحمَّل عند الحاجة فقط)
-   ══════════════════════════════════════ */
-let coachRakaat = 2;
-
-document.querySelectorAll("#prayerPick button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    coachRakaat = +btn.dataset.rakaat;
-    document.querySelectorAll("#prayerPick button").forEach(b => b.classList.remove("on"));
-    btn.classList.add("on");
-    vibrate(15);
-  });
-});
-
-/** وضع فكّ القفل: يأتي من شاشة القفل بعدد ركعات مفروض لا يمكن تغييره */
-let coachVerify = false;
-
-function applyLockRequest() {
-  const m = /pray=(\d)/.exec(location.hash);
-  if (!m) return;
-
-  coachRakaat = +m[1];
-  coachVerify = true;
-
-  // نثبّت الصلاة المطلوبة ونمنع اختيار صلاة أقصر للتحايل
-  document.querySelectorAll("#prayerPick button").forEach(b => {
-    const same = +b.dataset.rakaat === coachRakaat;
-    b.classList.toggle("on", same);
-    b.disabled = !same;
-    b.style.opacity = same ? "1" : ".3";
-  });
-
-  goto("page-coach");
-  $("startCoach").textContent = "ابدأ الصلاة لفكّ القفل";
-}
-
-$("startCoach").addEventListener("click", async () => {
-  const btn = $("startCoach");
-  btn.disabled = true;
-  btn.textContent = "جارٍ التجهيز…";
-
-  // نُظهر شاشة الكاميرا قبل البدء لا بعده، وإلا بقيت رسائل التقدّم
-  // مخفيّة خلفها وظهر الزرّ معلّقاً بلا سبب مفهوم
-  $("coachIntro").classList.add("hidden");
-  $("coachStage").classList.remove("hidden");
-  const diag = $("coachDiag");
-  if (diag) diag.textContent = "جارٍ فتح الكاميرا…";
-
-  try {
-    if (!window.Coach) await import("./salah-coach.js?v=47");
-    await window.Coach.start(coachRakaat, coachVerify);
-    camFullscreen("coachStage", true);
-  } catch (err) {
-    console.error(err);
-    camFullscreen("coachStage", false);
-    $("coachStage").classList.add("hidden");
-    $("coachIntro").classList.remove("hidden");
-    alert(
-      "تعذّر بدء المدرّب.\n\n" + (err.message || err) +
-      "\n\nإن تكرّر: تأكّد من السماح للكاميرا ومن وجود إنترنت " +
-      "(النموذج يُحمَّل مرّة واحدة فقط ثم يُحفظ في جهازك)."
-    );
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "ابدأ الصلاة";
-  }
-});
-
-function closeCoach() {
-  if (window.Coach) window.Coach.stop();
-  camFullscreen("coachStage", false);
-  $("coachStage").classList.add("hidden");
-  $("coachIntro").classList.remove("hidden");
-}
-$("stopCoach").addEventListener("click", closeCoach);
-$("coachExit").addEventListener("click", closeCoach);
-$("prevStep").addEventListener("click", () => window.Coach && window.Coach.go(-1));
-$("nextStep").addEventListener("click", () => window.Coach && window.Coach.go(1));
-
-/* ══════════════════════════════════════
    تحدّي الاستغفار
    ══════════════════════════════════════ */
 let chPhrase = Store.get("chPhrase", "أَسْتَغْفِرُ اللهَ");
@@ -1032,7 +950,7 @@ $("startChallenge").addEventListener("click", async () => {
   if (diag) diag.textContent = "جارٍ فتح الكاميرا…";
 
   try {
-    if (!window.Challenge) await import("./pushup-challenge.js?v=47");
+    if (!window.Challenge) await import("./pushup-challenge.js?v=49");
     await window.Challenge.start(chReps, chPhrase);
     camFullscreen("chStage", true);
   } catch (err) {

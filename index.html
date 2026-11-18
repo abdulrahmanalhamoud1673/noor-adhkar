@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=47">
+<link rel="stylesheet" href="css/style.css?v=49">
 </head>
 <body>
 
@@ -326,75 +326,6 @@
   </div>
 
   <div class="steps-list" id="stepsList"></div>
-
-  <button class="btn btn-gold full" data-goto="page-coach">🕋 صلِّ الآن مع الشيخ بالكاميرا</button>
-</section>
-
-<!-- ══════════ صفحة: صلِّ مع الشيخ ══════════ -->
-<section class="page" id="page-coach">
-  <div class="page-head">
-    <h2>🕋 صلِّ مع الشيخ</h2>
-    <p>الكاميرا تتابع وضعية جسمك ويديك، والشيخ يتلو معك خطوة بخطوة</p>
-  </div>
-
-  <div class="coach-intro card-glass" id="coachIntro">
-    <label class="pick-label">أي صلاة تريد أن تصلّي الآن؟</label>
-    <div class="prayer-pick" id="prayerPick">
-      <button data-rakaat="2" data-name="الفجر">الفجر<span>٢ ركعات</span></button>
-      <button data-rakaat="4" data-name="الظهر">الظهر<span>٤ ركعات</span></button>
-      <button data-rakaat="4" data-name="العصر">العصر<span>٤ ركعات</span></button>
-      <button data-rakaat="3" data-name="المغرب">المغرب<span>٣ ركعات</span></button>
-      <button data-rakaat="4" data-name="العشاء">العشاء<span>٤ ركعات</span></button>
-    </div>
-
-    <div class="coach-steps">
-      <div><b>1</b> ضع الهاتف على الأرض أو كرسي <b>من جانبك</b> — لا أمامك.</div>
-      <div><b>2</b> ابتعد مترين تقريباً حتى يظهر جسمك من الرأس إلى القدم.</div>
-      <div><b>3</b> إضاءة جيدة وخلفية غير مزدحمة.</div>
-      <div><b>4</b> كبّر — والتطبيق يتابعك حتى التسليم.</div>
-    </div>
-
-    <p class="privacy-note">🔒 كل التحليل داخل جهازك. لا تُرسل صورة ولا فيديو إلى أي مكان.</p>
-    <button id="startCoach" class="btn btn-gold btn-lg full">ابدأ الصلاة</button>
-  </div>
-
-  <div class="verify-banner hidden" id="verifyBanner">
-    🔒 <b>وضع فكّ القفل</b> — أدِّ الصلاة كاملة أمام الكاميرا. لا تخطّي ولا اختصار، وعند التسليم يُفتح القفل.
-  </div>
-
-  <div class="coach-stage hidden" id="coachStage">
-    <button class="cam-exit" id="coachExit" aria-label="خروج">✕</button>
-    <div class="video-wrap full-bleed">
-      <video id="camVideo" playsinline autoplay muted></video>
-      <canvas id="camCanvas"></canvas>
-      <div class="pose-badge" id="poseBadge">جارٍ التحضير…</div>
-      <div class="conf-bar"><div id="confFill"></div></div>
-      <div class="ch-diag" id="coachDiag">جارٍ فتح الكاميرا…</div>
-    </div>
-
-    <div class="coach-row">
-      <div class="sheikh-box card-glass">
-        <div class="sheikh-label">الشيخ</div>
-        <div class="sheikh-stage" id="sheikhStage"></div>
-        <div class="sheikh-pose" id="sheikhPoseName">قيام</div>
-      </div>
-
-      <div class="coach-panel card-glass">
-        <div class="coach-rakah" id="coachRakah">—</div>
-        <h3 id="coachStepName">—</h3>
-        <p class="coach-hands" id="coachHands">—</p>
-        <div class="coach-reps" id="coachReps"></div>
-      </div>
-    </div>
-
-    <div class="coach-say" id="coachSay">—</div>
-
-    <div class="coach-controls" id="coachManual">
-      <button id="prevStep" class="btn btn-outline">◀ السابق</button>
-      <button id="stopCoach" class="btn btn-danger">إيقاف</button>
-      <button id="nextStep" class="btn btn-outline">التالي ▶</button>
-    </div>
-  </div>
 </section>
 
 </main>
@@ -405,7 +336,6 @@
   <button class="nav-btn" data-goto="page-adhkar"><span>📿</span>الأذكار</button>
   <button class="nav-btn" data-goto="page-quran"><span>📖</span>القرآن</button>
   <button class="nav-btn" data-goto="page-learn"><span>🕌</span>الصلاة</button>
-  <button class="nav-btn" data-goto="page-coach"><span>🕋</span>صلِّ معي</button>
 </nav>
 
 <!-- ══════════ لوحة ورد اليوم ══════════ -->
@@ -455,12 +385,12 @@
 
 <div id="toast" class="toast"></div>
 
-<script src="js/data.js?v=47"></script>
-<script src="js/prayertimes.js?v=47"></script>
-<script src="js/app.js?v=47"></script>
-<script src="js/mushaf.js?v=47"></script>
-<script src="js/reading-plan.js?v=47"></script>
-<script src="js/quran-extras.js?v=47"></script>
-<script src="js/ambient.js?v=47"></script>
+<script src="js/data.js?v=49"></script>
+<script src="js/prayertimes.js?v=49"></script>
+<script src="js/app.js?v=49"></script>
+<script src="js/mushaf.js?v=49"></script>
+<script src="js/reading-plan.js?v=49"></script>
+<script src="js/quran-extras.js?v=49"></script>
+<script src="js/ambient.js?v=49"></script>
 </body>
 </html>
