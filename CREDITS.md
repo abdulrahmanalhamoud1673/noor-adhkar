@@ -55,18 +55,20 @@
 
 ## أصوات الطبيعة (`audio/ambient/`)
 
-كلّها تسجيلات حقيقية برخص حرّة، قُصّت وسُوّيت مستوياتها وبُنيت حلقاتٍ
-متّصلة (يُمزَج آخر المقطع ببدايته فلا يُسمع قطع عند التكرار).
+تسجيلات ميدانية حقيقية من **radio aporee** على archive.org، بُنيت منها حلقات
+متّصلة (قصّ ٤٥ ثانية ثمّ مزج الطرفين بـ acrossfade، ثمّ loudnorm).
+
+**النسبة واجبة قانوناً لرخص CC BY وBY-SA وBY-NC-SA — لا تحذف هذا الجدول.**
 
 | الصوت | المصدر | الرخصة |
 |---|---|---|
-| 🌧️ مطر — `rain.ogg` | [Rain on leaves (Gravity Sound)](https://commons.wikimedia.org/wiki/File:Rain_on_leaves_(Gravity_Sound).wav) | CC BY 4.0 — Gravity Sound |
-| 🔥 نار — `fire.ogg` | [Spadelsberg, Neuffen — fireplace](https://archive.org/details/aporee_51595_58873) (radio aporee، تسجيل ميداني للمصوّر Hoerma) | Public Domain Mark 1.0 |
-| 🍃 رياح — `wind.ogg` | [Wind in forest (Gravity Sound)](https://commons.wikimedia.org/wiki/File:Wind_in_forest_(Gravity_Sound).wav) | CC BY 4.0 — Gravity Sound |
-| 🐦 عصافير — `birds.ogg` | [Forest ambience (Gravity Sound)](https://commons.wikimedia.org/wiki/File:Forest_ambience_(Gravity_Sound).wav) | CC BY 4.0 — Gravity Sound |
+| 🌧️ مطر — `rain.ogg` | [Mont-Saint-Guibert, Belgique - Rain in forest](https://archive.org/details/aporee_32271_37080) — radio aporee | CC BY 3.0 — Vincent Duseigne |
+| 🔥 نار — `fire.ogg` | [neoscenes: campfire](https://archive.org/details/aporee_2680_3685) — radio aporee | CC BY-SA 3.0 — John Hopkins |
+| 🍃 رياح — `wind.ogg` | [Villar-d'Arêne, Provence-Alpes-Côte d'Azur, France - Flags in the wind](https://archive.org/details/aporee_74145_86749) — radio aporee | Public Domain Mark 1.0 — juL McOisans |
+| 🐦 عصافير — `birds.ogg` | [1358 35th Ave, San Francisco, CA 94122, USA - Bird and Bell Sunset Due](https://archive.org/details/aporee_50390_57473) — radio aporee | CC BY-NC-SA 3.0 — brendah555 |
 
-رخصة **CC BY 4.0 تُلزم بنسبة العمل إلى صاحبه**، فهذا الجدول جزء من
-شروط الاستخدام ولا يجوز حذفه.
+> النسخة السابقة من هذه الأصوات كانت ضجيجاً مُصنّعاً لا تسجيلات؛ ظهر ذلك في الطيف:
+> المطر ضجيج أبيض مسطّح، والعصافير نغمة ثابتة عند ٣ كيلوهرتز.
 
 ## ورد اليوم (`js/reading-plan.js`)
 

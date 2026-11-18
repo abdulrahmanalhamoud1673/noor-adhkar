@@ -5,9 +5,9 @@
    كل المعالجة داخل جهازك — لا تُرفع صورة ولا فيديو.
    ══════════════════════════════════════════════════════════ */
 
-import { createSheikh, POSE_AR } from "./sheikh-figure.js?v=44";
-import { fitFrame } from "./pushup-challenge.js?v=44";
-import { loadLandmarker, openCamera } from "./pose-model.js?v=44";
+import { createSheikh, POSE_AR } from "./sheikh-figure.js?v=45";
+import { fitFrame } from "./pushup-challenge.js?v=45";
+import { loadLandmarker, openCamera } from "./pose-model.js?v=45";
 
 /* نقاط الهيكل */
 const L = {
