@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#0d1326">
+<meta name="theme-color" content="#10131f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>نور — أذكاري وصلاتي</title>
@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=45">
+<link rel="stylesheet" href="css/style.css?v=46">
 </head>
 <body>
 
@@ -78,20 +78,11 @@
     <span class="quran-cta-arrow">‹</span>
   </button>
 
-  <button class="quran-cta alarm-cta" data-goto="page-alarm">
-    <span class="quran-cta-icon">⏰</span>
-    <div>
-      <div class="quran-cta-title">منبّه المهمّات</div>
-      <div class="quran-cta-sub">لا يسكت إلا أن تقوم وتصوّر ما يطلبه</div>
-    </div>
-    <span class="quran-cta-arrow">‹</span>
-  </button>
-
-  <a class="quran-cta tasbeeh-cta" href="tasbeeh/host.html">
+  <a class="quran-cta tasbeeh-cta" href="tasbeeh/">
     <span class="quran-cta-icon">📿</span>
     <div>
-      <div class="quran-cta-title">المسبحة الجماعية</div>
-      <div class="quran-cta-sub">غرفة ذكر لبثّك — يظهر المسبّحون وأعدادهم على الشاشة</div>
+      <div class="quran-cta-title">حلقة ذكر</div>
+      <div class="quran-cta-sub">سبّحوا معاً — أنت وأهلك، كلٌّ على هاتفه</div>
     </div>
     <span class="quran-cta-arrow">‹</span>
   </a>
@@ -316,98 +307,6 @@
   </div>
 </div>
 
-<!-- ══════════ صفحة: منبّه المهمّات ══════════ -->
-<section class="page" id="page-alarm">
-  <div class="page-head">
-    <h2>⏰ منبّه المهمّات</h2>
-    <p>لا يسكت بضغطة — يطلب منك تصوير أشياء في بيتك، فتقوم فعلاً</p>
-  </div>
-
-  <!-- الإعداد -->
-  <div id="almSetup">
-    <div class="card-glass">
-      <label class="pick-label">كم مهمّة قبل أن يسكت؟</label>
-      <div class="reps-pick" id="almCountPick">
-        <button data-count="1">١</button>
-        <button data-count="2">٢</button>
-        <button data-count="3" class="on">٣</button>
-        <button data-count="4">٤</button>
-        <button data-count="5">٥</button>
-      </div>
-
-      <label class="pick-label">الأهداف — أشياء بعيدة عن سريرك</label>
-      <div class="alm-targets" id="almTargets"></div>
-      <p class="alm-warn hidden" id="almWarn"></p>
-
-      <div class="alm-add">
-        <input type="text" id="almInput" placeholder="اكتب هدفاً… مثل: إبريق الشاي" autocomplete="off">
-        <button id="almAdd">إضافة</button>
-      </div>
-
-      <label class="pick-label">اقتراحات</label>
-      <div class="alm-suggest" id="almSuggest"></div>
-
-      <label class="pick-label">الجهوزية</label>
-      <div class="alm-ready" id="almReady"></div>
-
-      <button class="btn btn-outline full" id="almTest">🔎 افحص المفتاح والنموذج</button>
-      <div class="alm-test" id="almTestOut"></div>
-
-      <div class="alm-keyrow hidden" id="almKeyRow">
-        <input type="password" id="almKeyInput" placeholder="الصق مفتاح Gemini هنا…" autocomplete="off">
-        <button id="almKeySave">حفظ</button>
-      </div>
-
-      <p class="privacy-note">
-        📷 الصورة تُرسل إلى Gemini للتحقّق فقط ولا تُحفظ في أي مكان.
-        والمفتاح يبقى في هاتفك وحده.
-      </p>
-      <button class="btn btn-gold btn-lg full" id="almTry">🔔 جرّب المهمّات الآن</button>
-    </div>
-  </div>
-
-  <!-- الجولة -->
-  <div class="hidden" id="almRun">
-    <div class="alm-task-box card-glass" id="almTaskBox">
-      <div class="alm-label" id="almLabel">وجّه الكاميرا نحو</div>
-      <div class="alm-task" id="almTask">—</div>
-      <div class="alm-dots" id="almDots"></div>
-      <div class="alm-progress" id="almProgress">0 / 3</div>
-    </div>
-
-    <div class="video-wrap full-bleed alm-cam">
-      <video id="almVideo" playsinline autoplay muted></video>
-      <div class="alm-saw hidden" id="almSaw"></div>
-      <div class="ch-diag" id="almHint"></div>
-
-      <!-- يظهر حين ينقص المفتاح — والكاميرا تبقى تعمل خلفه -->
-      <div class="alm-overlay hidden" id="almNeedKey">
-        <div class="alm-overlay-card">
-          <div class="alm-overlay-title">🔑 ينقص مفتاح التحقّق</div>
-          <p>الصق مفتاح Gemini المجاني وأكمِل بالتصوير.</p>
-          <input type="password" id="almRunKey" placeholder="الصق المفتاح…" autocomplete="off">
-          <button class="btn btn-gold full" id="almRunKeySave">حفظ ومتابعة</button>
-          <button class="alm-link" id="almUseLocal">لا أملكه — صوّر أماكن مختلفة بدلاً منه</button>
-        </div>
-      </div>
-    </div>
-
-    <button class="btn btn-outline full" id="almShoot">📸 تحقّق الآن</button>
-    <button class="btn btn-outline full hidden" id="almGiveUp">الكاميرا لا تعمل — أوقِف المنبّه</button>
-    <button class="btn btn-outline full" id="almCancel">إلغاء</button>
-  </div>
-
-  <!-- الختام -->
-  <div class="hidden" id="almDone">
-    <div class="card-glass alm-done">
-      <div class="alm-done-icon">🌅</div>
-      <h3>قمتَ — والحمد لله</h3>
-      <p>سكت المنبّه. الصلاة خير من النوم.</p>
-      <button class="btn btn-outline full" id="almBack">رجوع</button>
-    </div>
-  </div>
-</section>
-
 <!-- ══════════ صفحة: تعلّم الصلاة ══════════ -->
 <section class="page" id="page-learn">
   <div class="page-head">
@@ -556,13 +455,12 @@
 
 <div id="toast" class="toast"></div>
 
-<script src="js/data.js?v=45"></script>
-<script src="js/prayertimes.js?v=45"></script>
-<script src="js/app.js?v=45"></script>
-<script src="js/mushaf.js?v=45"></script>
-<script src="js/reading-plan.js?v=45"></script>
-<script src="js/quran-extras.js?v=45"></script>
-<script src="js/alarm-mission.js?v=45"></script>
-<script src="js/ambient.js?v=45"></script>
+<script src="js/data.js?v=46"></script>
+<script src="js/prayertimes.js?v=46"></script>
+<script src="js/app.js?v=46"></script>
+<script src="js/mushaf.js?v=46"></script>
+<script src="js/reading-plan.js?v=46"></script>
+<script src="js/quran-extras.js?v=46"></script>
+<script src="js/ambient.js?v=46"></script>
 </body>
 </html>

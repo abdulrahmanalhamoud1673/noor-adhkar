@@ -959,7 +959,7 @@ $("startCoach").addEventListener("click", async () => {
   if (diag) diag.textContent = "جارٍ فتح الكاميرا…";
 
   try {
-    if (!window.Coach) await import("./salah-coach.js?v=45");
+    if (!window.Coach) await import("./salah-coach.js?v=46");
     await window.Coach.start(coachRakaat, coachVerify);
     camFullscreen("coachStage", true);
   } catch (err) {
@@ -1032,7 +1032,7 @@ $("startChallenge").addEventListener("click", async () => {
   if (diag) diag.textContent = "جارٍ فتح الكاميرا…";
 
   try {
-    if (!window.Challenge) await import("./pushup-challenge.js?v=45");
+    if (!window.Challenge) await import("./pushup-challenge.js?v=46");
     await window.Challenge.start(chReps, chPhrase);
     camFullscreen("chStage", true);
   } catch (err) {
@@ -1090,7 +1090,6 @@ function boot() {
   step("المصحف", () => Mushaf.init());
   step("آخر ما قرأت", renderLastRead);
   step("المفضّلة وورد اليوم", () => QuranExtras.init());
-  step("منبّه المهمّات", () => Alarm.init());
 
   const hour = new Date().getHours();
   step("الأذكار", () => showAdhkar(hour >= 12 ? "masaa" : "sabah"));
@@ -1113,7 +1112,6 @@ function boot() {
   step("تنظيف الذاكرة المخزّنة", cleanupOldCaches);
   step("طلب فكّ القفل", applyLockRequest);
   step("طلب التحدّي", applyChallengeRequest);
-  step("طلب المنبّه", () => Alarm.applyRequest());
 }
 
 /**
@@ -1124,7 +1122,6 @@ function boot() {
 window.addEventListener("hashchange", () => {
   step("طلب فكّ القفل", applyLockRequest);
   step("طلب التحدّي", applyChallengeRequest);
-  step("طلب المنبّه", () => Alarm.applyRequest());
 });
 
 /**

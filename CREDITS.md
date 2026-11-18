@@ -65,7 +65,7 @@
 | 🌧️ مطر — `rain.ogg` | [Mont-Saint-Guibert, Belgique - Rain in forest](https://archive.org/details/aporee_32271_37080) — radio aporee | CC BY 3.0 — Vincent Duseigne |
 | 🔥 نار — `fire.ogg` | [neoscenes: campfire](https://archive.org/details/aporee_2680_3685) — radio aporee | CC BY-SA 3.0 — John Hopkins |
 | 🍃 رياح — `wind.ogg` | [Villar-d'Arêne, Provence-Alpes-Côte d'Azur, France - Flags in the wind](https://archive.org/details/aporee_74145_86749) — radio aporee | Public Domain Mark 1.0 — juL McOisans |
-| 🐦 عصافير — `birds.ogg` | [1358 35th Ave, San Francisco, CA 94122, USA - Bird and Bell Sunset Due](https://archive.org/details/aporee_50390_57473) — radio aporee | CC BY-NC-SA 3.0 — brendah555 |
+| 🐦 عصافير — `birds.ogg` | [Saint Amand de Coly, little bird](https://archive.org/details/aporee_11667_13721) — radio aporee | CC BY-SA 3.0 — Flavien Gillié |
 
 > النسخة السابقة من هذه الأصوات كانت ضجيجاً مُصنّعاً لا تسجيلات؛ ظهر ذلك في الطيف:
 > المطر ضجيج أبيض مسطّح، والعصافير نغمة ثابتة عند ٣ كيلوهرتز.
