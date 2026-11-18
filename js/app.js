@@ -959,7 +959,7 @@ $("startCoach").addEventListener("click", async () => {
   if (diag) diag.textContent = "جارٍ فتح الكاميرا…";
 
   try {
-    if (!window.Coach) await import("./salah-coach.js?v=43");
+    if (!window.Coach) await import("./salah-coach.js?v=44");
     await window.Coach.start(coachRakaat, coachVerify);
     camFullscreen("coachStage", true);
   } catch (err) {
@@ -1032,7 +1032,7 @@ $("startChallenge").addEventListener("click", async () => {
   if (diag) diag.textContent = "جارٍ فتح الكاميرا…";
 
   try {
-    if (!window.Challenge) await import("./pushup-challenge.js?v=43");
+    if (!window.Challenge) await import("./pushup-challenge.js?v=44");
     await window.Challenge.start(chReps, chPhrase);
     camFullscreen("chStage", true);
   } catch (err) {
@@ -1108,7 +1108,6 @@ function boot() {
 
   // تنظيف عامل الخدمة القديم الذي كان يخزّن نسخاً قديمة من الملفات
   step("تحدّي الاستغفار", initChallengePickers);
-  step("فضفض", () => Chat.init());
   step("أصوات الطبيعة", () => Ambient.init());
   step("إبقاء الشاشة مضاءة", () => Wake.init());
   step("تنظيف الذاكرة المخزّنة", cleanupOldCaches);
