@@ -94,7 +94,9 @@ const Ambient = {
     const btn = $("ambBtn");
     if (btn) {
       const s = SOUNDS.find(x => x.id === this.current);
-      btn.textContent = s ? s.icon : "🌿";
+      // رسمٌ ثابت لا إيموجي: اللون وحده يقول إن كان يعمل
+      btn.innerHTML = '<svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 5.2C10.8 4 5.5 8 5 14.3c-.2 2.4.8 4 .8 4s2-3.9 5.6-5.8"/><path d="M6 18.3C14.6 19 20 14.4 19.5 5.2"/></svg>';
+      btn.classList.toggle("on", !!s);
       btn.classList.toggle("on", !!s);
     }
     document.querySelectorAll("#ambList .amb-card").forEach(c => {

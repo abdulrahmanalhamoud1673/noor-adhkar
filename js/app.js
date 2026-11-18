@@ -950,7 +950,7 @@ $("startChallenge").addEventListener("click", async () => {
   if (diag) diag.textContent = "جارٍ فتح الكاميرا…";
 
   try {
-    if (!window.Challenge) await import("./pushup-challenge.js?v=49");
+    if (!window.Challenge) await import("./pushup-challenge.js?v=51");
     await window.Challenge.start(chReps, chPhrase);
     camFullscreen("chStage", true);
   } catch (err) {
@@ -1067,3 +1067,30 @@ function cleanupOldCaches() {
 }
 
 document.addEventListener("DOMContentLoaded", boot);
+
+
+/* ══════════════════════════════════════
+   الإضاءة: نهار أو ليل
+   ══════════════════════════════════════ */
+(function () {
+  const KEY = "theme";
+  const btn = $("themeBtn");
+  if (!btn) return;
+
+  function apply(mode) {
+    document.body.classList.toggle("dark", mode === "dark");
+    btn.innerHTML = mode === "dark"
+      ? '<svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M4.2 12H2M22 12h-2.2M5.9 5.9 4.4 4.4M19.6 19.6l-1.5-1.5M18.1 5.9l1.5-1.5M4.4 19.6l1.5-1.5"/></svg>'
+      : '<svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.2A8.4 8.4 0 1 1 9.8 4a6.6 6.6 0 0 0 10.2 10.2z"/></svg>';
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = mode === "dark" ? "#10131f" : "#f7f3ec";
+  }
+
+  apply(Store.get(KEY, "light"));
+  btn.addEventListener("click", () => {
+    const next = document.body.classList.contains("dark") ? "light" : "dark";
+    Store.set(KEY, next);
+    apply(next);
+    vibrate(12);
+  });
+})();

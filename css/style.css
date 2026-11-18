@@ -547,13 +547,6 @@ body.no-scroll { overflow: hidden; }
 }
 /* ────────── خطوات الصلاة ────────── */
 .rakaat-info { padding: 16px; }
-.rakaat-title { font-size: 14px; color: var(--gold); font-weight: 700; margin-bottom: 12px; text-align: center; }
-.rakaat-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
-.rakaat-grid div {
-  background: rgba(255,255,255,0.29); border-radius: 12px; padding: 10px 4px; text-align: center;
-}
-.rakaat-grid span { display: block; font-size: 11.5px; color: var(--text-dim); }
-.rakaat-grid strong { font-size: 19px; color: var(--emerald); }
 .steps-list { display: flex; flex-direction: column; gap: 11px; margin-bottom: 18px; }
 .step {
   background: var(--glass); border: 1px solid var(--line); border-radius: 17px;
@@ -1189,3 +1182,44 @@ body.cam-open .page { animation: none !important; transform: none !important; }
 .surah-fav:active { transform: scale(1.25); }
 /* بطاقة المسبحة الجماعية — رابط لا زرّ، فنوحّد مظهره */
 a.quran-cta { text-decoration: none; color: inherit; }
+
+
+/* ────────── رسوم شريط التنقّل ──────────
+   خطٌّ واحد يرث لون النصّ، فيتبدّل مع الثيم ولا يختلف بين الهواتف */
+.nav-ic { width: 23px; height: 23px; display: block; margin: 0 auto 3px; }
+.nav-btn.active .nav-ic { stroke-width: 2; }
+.topbar-actions { display: flex; gap: 8px; }
+
+/* ────────── ثيم الليل ──────────
+   نفس التصميم بدرجاتٍ معكوسة: من ورقٍ عاجيّ إلى حبرٍ أزرق عميق */
+body.dark {
+  --bg-0: #080a12;
+  --bg-1: #10131f;
+  --bg-2: #1a1f2e;
+  --emerald: #8aa6dd;
+  --emerald-dim: #6a84b6;
+  --gold: #d9b98e;
+  --gold-soft: #eed8bb;
+  --text: #eceef6;
+  --text-dim: #99a0b4;
+  --line: rgba(217, 185, 142, 0.16);
+  --glass: rgba(255, 255, 255, 0.055);
+  --danger: #e08a84;
+}
+body.dark .topbar,
+body.dark .bottom-nav { background: rgba(16, 19, 31, .95); }
+body.dark .card-glass,
+body.dark .time-cell,
+body.dark .quick-card { background: var(--glass); }
+body.dark .countdown-ring { background: rgba(0, 0, 0, .28); }
+body.dark .countdown { color: #a9c0ea; }
+body.dark .amb-sheet .amb-panel,
+body.dark .sheet-panel { background: var(--bg-2); }
+
+/* رسوم مرسومة بدل الإيموجي — ترث لون النصّ فتتبدّل مع الثيم */
+.quick-ic { width: 30px; height: 30px; display: block; margin: 0 auto 8px; color: var(--gold); }
+.btn-ic { width: 20px; height: 20px; display: block; }
+.icon-btn { display: flex; align-items: center; justify-content: center; }
+a.nav-btn, a.nav-btn:hover { text-decoration: none; }
+.amb-btn svg { color: var(--text-dim); }
+.amb-btn.on svg { color: var(--gold); }
