@@ -684,6 +684,15 @@ input[type=range]::-webkit-slider-thumb {
   font-size: 44px; font-weight: 800; color: var(--gold-soft);
   font-variant-numeric: tabular-nums; direction: ltr; letter-spacing: 2px;
 }
+.bottom-nav {
+  /* أعلى من المصحف والمشغّل حتى يبقى التنقّل متاحاً دائماً */
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 400;
+  display: flex;
+  background: rgba(255,255,255,0.96); backdrop-filter: blur(20px);
+  border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom);
+  max-width: 640px; margin: 0 auto;
+}
 .nav-btn {
   flex: 1 1 0; min-width: 0;
   position: relative;

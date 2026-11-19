@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=62">
+<link rel="stylesheet" href="css/style.css?v=63">
 </head>
 <body>
 
@@ -161,6 +161,11 @@
   </p>
 </section>
 
+</main>
+
+<!-- المشغّل والمصحف خارج <main>: كان داخله، و<main> يفتح سياق
+     تكديسٍ بـ z-index: 1، فيعلوه الشريط العلويّ مهما رُفع ما بداخله.
+     فكان زرّ إغلاق المصحف مغطّى، ولا سبيل للخروج منه. -->
 <!-- ══════════ مشغّل التلاوة ══════════ -->
 <div id="player" class="player hidden">
   <div class="player-grip"></div>
@@ -195,12 +200,12 @@
 <!-- ══════════ وضع المصحف: قراءة مع تلوين الآية ══════════ -->
 <div id="mushaf" class="mushaf hidden">
   <div class="mushaf-top">
-    <button class="icon-btn" id="mushafClose" aria-label="إغلاق">✕</button>
+    <button class="icon-btn mushaf-back" id="mushafClose" aria-label="رجوع"><svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
     <div class="mushaf-title">
       <div id="mushafSurah">—</div>
       <div id="mushafReciter">—</div>
     </div>
-    <button class="icon-btn" id="mushafMenu" aria-label="خيارات">⚙</button>
+    <button class="icon-btn" id="mushafMenu" aria-label="خيارات"><svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.1"/><path d="M19.1 14.4a1.5 1.5 0 0 0 .3 1.7l.1.1a1.8 1.8 0 1 1-2.6 2.6l-.1-.1a1.5 1.5 0 0 0-2.6 1.1v.3a1.8 1.8 0 1 1-3.6 0v-.1a1.5 1.5 0 0 0-2.6-1.1l-.1.1a1.8 1.8 0 1 1-2.6-2.6l.1-.1a1.5 1.5 0 0 0-1.1-2.6h-.3a1.8 1.8 0 1 1 0-3.6h.1a1.5 1.5 0 0 0 1.1-2.6l-.1-.1A1.8 1.8 0 1 1 7.6 4.8l.1.1a1.5 1.5 0 0 0 2.6-1.1v-.3a1.8 1.8 0 1 1 3.6 0v.1a1.5 1.5 0 0 0 2.6 1.1l.1-.1a1.8 1.8 0 1 1 2.6 2.6l-.1.1a1.5 1.5 0 0 0 1.1 2.6h.3a1.8 1.8 0 1 1 0 3.6h-.1a1.5 1.5 0 0 0-1.4.9z"/></svg></button>
   </div>
 
   <div class="mushaf-panel hidden" id="mushafPanel">
@@ -236,8 +241,6 @@
     </div>
   </div>
 </div>
-
-</main>
 
 <!-- ══════════ شريط التنقّل السفلي ══════════ -->
 <nav class="bottom-nav">
@@ -295,12 +298,12 @@
 
 <div id="toast" class="toast"></div>
 
-<script src="js/data.js?v=62"></script>
-<script src="js/prayertimes.js?v=62"></script>
-<script src="js/app.js?v=62"></script>
-<script src="js/mushaf.js?v=62"></script>
-<script src="js/reading-plan.js?v=62"></script>
-<script src="js/quran-extras.js?v=62"></script>
-<script src="js/ambient.js?v=62"></script>
+<script src="js/data.js?v=63"></script>
+<script src="js/prayertimes.js?v=63"></script>
+<script src="js/app.js?v=63"></script>
+<script src="js/mushaf.js?v=63"></script>
+<script src="js/reading-plan.js?v=63"></script>
+<script src="js/quran-extras.js?v=63"></script>
+<script src="js/ambient.js?v=63"></script>
 </body>
 </html>

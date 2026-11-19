@@ -89,6 +89,11 @@ const Mushaf = {
 
     $("mushaf").classList.remove("hidden");
     document.body.classList.add("no-scroll");
+    // خطوةٌ في سجلّ التصفّح: فزرّ الرجوع في الهاتف يُغلق المصحف
+    // ولا يخرج من التطبيق كلّه
+    try {
+      if (!history.state || !history.state.mushaf) history.pushState({ mushaf: 1 }, "");
+    } catch (e) {}
     if (window.Wake) Wake.sync();      // ثبّت الإضاءة فوراً لا بعد أربع ثوانٍ
     $("mushafSurah").textContent = Quran.surahName(num);
     $("mushafReciter").textContent = Quran.reciter.name;
@@ -243,10 +248,14 @@ const Mushaf = {
   },
 
   close() {
+    if ($("mushaf").classList.contains("hidden")) return;
     this.stop();
     $("mushaf").classList.add("hidden");
     document.body.classList.remove("no-scroll");
     if (window.Wake) Wake.sync();      // أطلق القفل فوراً حفاظاً على البطارية
+    try {
+      if (history.state && history.state.mushaf) history.back();
+    } catch (e) {}
   },
 
   /* ─────────── التلوين والتمرير ─────────── */
@@ -311,3 +320,11 @@ function renderLastRead() {
   };
   if (window.QuranExtras) QuranExtras.renderResumeBar();
 }
+
+
+/* زرّ الرجوع في الهاتف: يُغلق المصحف قبل أن يخرج من الصفحة */
+window.addEventListener("popstate", function () {
+  var el = document.getElementById("mushaf");
+  // Mushaf مُعرَّفٌ بـ const فلا يصل إليه window
+  if (el && !el.classList.contains("hidden") && typeof Mushaf !== "undefined") Mushaf.close();
+});
