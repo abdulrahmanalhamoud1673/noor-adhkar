@@ -241,8 +241,8 @@ body.dark {
 }
 body.dark .toast { background: rgba(35,39,48,.97); }
 body.dark .field { background: rgba(236,231,223,0.055); }
-body.dark .chip { background: rgba(236,231,223,0.055); }
-body.dark .fam-row { background: rgba(236,231,223,0.055); }
+body.dark .chip:not(.on) { background: rgba(236,231,223,0.055); }
+body.dark .fam-row:not(.me) { background: rgba(236,231,223,0.055); }
 body.dark .p-goal { background: rgba(236,231,223,0.090); }
 body.dark .p-btn {
   background: radial-gradient(circle at 34% 28%, #343a46, #262b35 58%, #1b1f27);
@@ -251,3 +251,6 @@ body.dark .p-btn {
 }
 body.dark .bead { fill: rgba(236,231,223,0.090); stroke: rgba(201,154,99,0.230); }
 body.dark .sheet-grip { background: rgba(236,231,223,0.150); }
+
+body.dark .btn-gold,
+body.dark .chip.on { color: #14171f; }

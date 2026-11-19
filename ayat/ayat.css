@@ -325,3 +325,9 @@ body.dark .result-stars svg { color: rgba(236,231,223,.2); }
   background: var(--card); border: 1px solid var(--line); box-shadow: var(--shadow);
   padding: 12px 18px; border-radius: 99px; font-size: 14px; font-weight: 700;
 }
+
+/* الذهب في الليل فاتح، فالنصّ عليه حِبرٌ لا بياض */
+body.dark .btn-gold,
+body.dark .chip.on,
+body.dark .level-no,
+body.dark .mode-solo .mode-ic { color: #14171f; }

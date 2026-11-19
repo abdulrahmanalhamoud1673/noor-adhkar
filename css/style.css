@@ -175,6 +175,9 @@ body::before {
 }
 .seg span { font-size: 18px; }
 .seg.active { color: #ffffff; }
+.seg-ic { width: 19px; height: 19px; flex: 0 0 19px; }
+/* الذهب في الليل فاتح، فالنصّ عليه حِبر لا بياض */
+body.dark .seg.active { color: #10131f; }
 .seg-pill {
   position: absolute; z-index: 1; top: 5px; bottom: 5px;
   width: calc(50% - 5px); right: 5px; border-radius: 13px;
@@ -229,7 +232,8 @@ body::before {
 }
 .face-photo.ok { opacity: 1; }
 .reciter-name { font-size: 12.5px; font-weight: 700; line-height: 1.5; }
-.reciter.on .reciter-name { color: #fff; }
+.reciter.on .reciter-name { color: var(--gold); }
+body.dark .reciter.on .reciter-name { color: #fff; }
 .reciter-style { font-size: 10.5px; color: var(--text-dim); margin-top: 4px; }
 /* ────────── بحث السور ────────── */
 .quran-search { margin-bottom: 14px; }
@@ -673,54 +677,12 @@ input[type=range]::-webkit-slider-thumb {
 .credit span { font-size: 11px; color: var(--text-dim); }
 .credit a { font-size: 11px; color: var(--gold); text-decoration: none; }
 .version { text-align: center; font-size: 12px; color: var(--text-dim); padding: 22px 0; }
-/* ────────── شاشة القفل ────────── */
-.lock-screen {
-  position: fixed; inset: 0; z-index: 9999;
-  background: linear-gradient(180deg, #efe9dd, #000);
-  display: flex; align-items: center; justify-content: center;
-  padding: 26px; overflow-y: auto;
-  animation: lockIn .5s ease;
-}
+
 @keyframes lockIn { from { opacity: 0; } to { opacity: 1; } }
-.lock-glow {
-  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-  width: 480px; height: 480px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(74,114,168,0.121), transparent 68%);
-  animation: pulse 3.5s ease-in-out infinite;
-}
 @keyframes pulse { 0%,100% { transform: translate(-50%,-50%) scale(1); opacity: .55; } 50% { transform: translate(-50%,-50%) scale(1.2); opacity: .9; } }
-.lock-content { position: relative; text-align: center; max-width: 420px; width: 100%; }
-.lock-icon { font-size: 62px; margin-bottom: 14px; }
-.lock-label { font-size: 14px; color: var(--gold); letter-spacing: 2px; }
-.lock-content h1 { font-size: 46px; font-weight: 800; margin: 5px 0 16px; }
-.lock-verse { font-family: 'Amiri', serif; font-size: 19px; color: var(--text-dim); line-height: 2; margin-bottom: 26px; }
-.lock-timer {
-  border: 1px solid var(--line); border-radius: 17px; padding: 17px;
-  background: rgba(43,42,49,0.042); margin-bottom: 20px;
-}
 #lockCountdown {
   font-size: 44px; font-weight: 800; color: var(--gold-soft);
   font-variant-numeric: tabular-nums; direction: ltr; letter-spacing: 2px;
-}
-.lock-timer span { font-size: 12.5px; color: var(--text-dim); }
-.lock-blocked {
-  background: rgba(239,68,68,.09); border: 1px solid rgba(239,68,68,.25);
-  border-radius: 15px; padding: 15px; margin-bottom: 22px;
-}
-.lock-blocked-title { font-size: 13px; color: #c0564e; margin-bottom: 11px; font-weight: 700; }
-.lock-blocked-list { display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; }
-.lock-blocked-list span {
-  background: rgba(255,255,255,0.39); border-radius: 9px; padding: 6px 11px; font-size: 12.5px;
-}
-/* ────────── التنقّل السفلي ────────── */
-.bottom-nav {
-  /* أعلى من المصحف والمشغّل حتى يبقى التنقّل متاحاً دائماً */
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 400;
-  display: flex;
-  background: rgba(255,255,255,0.96); backdrop-filter: blur(20px);
-  border-top: 1px solid var(--line);
-  padding-bottom: env(safe-area-inset-bottom);
-  max-width: 640px; margin: 0 auto;
 }
 .nav-btn {
   flex: 1 1 0; min-width: 0;
@@ -820,24 +782,24 @@ input[type=range]::-webkit-slider-thumb {
 @media (min-width: 641px) {
   .video-wrap.full-bleed { width: 100%; margin-inline: 0; border-radius: var(--radius); }
 }
-/* قراءة حيّة تشرح لماذا يَعُدّ أو لا يَعُدّ */
-.ch-diag {
-  position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
-  background: linear-gradient(0deg, rgba(255,255,255,0.86), transparent);
-  padding: 16px 12px 9px; text-align: center;
-  font-size: 12.5px; font-weight: 700; color: var(--gold-soft);
-  direction: rtl; letter-spacing: .2px; min-height: 14px;
-}
-/* مؤشّر الميكروفون أثناء انتظار الذكر */
-.ch-mic {
-  display: flex; align-items: center; gap: 10px; justify-content: center;
-  margin: 10px auto 4px; max-width: 260px;
-  font-size: 12.5px; color: var(--text-dim);
-}
+
+
 @keyframes adhanIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+/* شريط الأذان — ضاعت قاعدته الأساسية في تنظيفٍ سابق، فكان النصّ
+   أبيضَ بلا خلفيّةٍ تحمله: يظهر الشريط ولا يُرى منه شيء */
+.adhan-bar {
+  position: fixed; left: 12px; right: 12px; z-index: 420;
+  bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 12px);
+  max-width: 616px; margin: 0 auto;
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px; border-radius: 18px;
+  background: linear-gradient(135deg, var(--emerald-dim), var(--emerald));
+  box-shadow: 0 10px 30px rgba(43, 42, 49, .18);
+  animation: adhanIn .35s cubic-bezier(.3,1.1,.5,1);
+}
 .adhan-bar span { flex: 1; font-size: 14.5px; font-weight: 700; color: #fff; }
 .adhan-bar button {
-  background: rgba(255,255,255,0.39); border: 1px solid rgba(43,42,49,0.090);
+  background: rgba(255,255,255,0.22); border: 1px solid rgba(255,255,255,0.34);
   color: #fff; font-family: inherit; font-size: 13px; font-weight: 700;
   padding: 9px 15px; border-radius: 12px; cursor: pointer; white-space: nowrap;
 }
@@ -845,21 +807,7 @@ input[type=range]::-webkit-slider-thumb {
    مقصور على الوضع العادي: في ملء الشاشة يعلو الشاشة بقاعدة أخرى،
    وتثبيت bottom هنا كان يمطّطه على طول الشاشة. */
 .coach-stage:not(.cam-fs) #coachDiag { bottom: 5px; }
-/* ══════════════════════════════════════
-   وضع ملء الشاشة للكاميرا
-   ──────────────────────────────────────
-   الصورة تملأ شاشة الهاتف كلها وتُعرض كاملة بلا قصّ (contain لا
-   cover) فلا زوم أبداً. وكل الأدوات تتوزّع على أطراف الشاشة —
-   لوحة واحدة أسفل خلف ستارة متدرّجة، وأزرار صغيرة في الزوايا —
-   حتى لا يقف شيء في وسط الصورة ولا تتناثر البطاقات فوقها.
-   ══════════════════════════════════════ */
-.coach-stage.cam-fs,
-.ch-stage.cam-fs {
-  position: fixed; inset: 0; z-index: 500;
-  margin: 0; padding: 0; background: #000;
-  display: flex; flex-direction: column; justify-content: flex-end;
-  overflow: hidden;
-}
+
 /* الفيديو يفترش الشاشة خلف كل شيء */
 .cam-fs .video-wrap {
   position: absolute; inset: 0;
@@ -969,8 +917,9 @@ input[type=range]::-webkit-slider-thumb {
   background: rgba(255,255,255,0.49); border-radius: 99px;
   font-size: 10px; padding: 1px 6px; color: var(--gold);
 }
+body.dark .plan-slot.now { color: #fff; }
 .plan-slot.now {
-  border-color: var(--emerald); color: #fff;
+  border-color: var(--emerald); color: var(--emerald-dim);
   background: linear-gradient(160deg, rgba(74,114,168,0.143), rgba(74,114,168,0.033));
   box-shadow: 0 0 18px rgba(74,114,168,0.121);
 }
@@ -1121,3 +1070,48 @@ body.dark .countdown-ring { background: rgba(0, 0, 0, .28); border-color: var(--
 .hero-loc .ic { color: var(--gold); margin-inline-end: .3em; }
 .last-read-icon .ic, .resume-icon .ic, .quran-cta-icon .ic { width: 1em; height: 1em; margin: 0; }
 .player-art .ic { width: 42%; height: 42%; margin: 0; stroke-width: 1.4; opacity: .75; }
+
+
+/* ══════════════════════════════════════════════════════════
+   ثيم الليل — المصحف والمشغّل
+   ----------------------------------------------------------
+   كانت هذه الأسطح مكتوبةً بلونٍ فاتحٍ ثابت لا بمتغيّرات الثيم،
+   فإذا أُطفئ النور بقيت ورقاً أبيض ونزل عليها نصُّ الليل الفاتح
+   فاختفى: صفحةٌ فارغة إلا من أرقام الآيات.
+   ══════════════════════════════════════════════════════════ */
+body.dark .mushaf {
+  background:
+    radial-gradient(900px 500px at 50% 0%, rgba(217,185,142,0.075), transparent 60%),
+    linear-gradient(180deg, #10131f, #080a12);
+}
+body.dark .mushaf-top,
+body.dark .mushaf-bar { background: rgba(16,19,31,0.94); }
+body.dark .mushaf-panel { background: rgba(255,255,255,0.040); }
+body.dark .mushaf-frame {
+  background: linear-gradient(140deg, rgba(217,185,142,0.105), rgba(217,185,142,0.030));
+}
+body.dark .ayah-medal { background: rgba(255,255,255,0.075); }
+body.dark .ayah:active { background: rgba(255,255,255,0.085); }
+body.dark .ayah.active {
+  background: linear-gradient(180deg, rgba(217,185,142,0.230), rgba(217,185,142,0.120));
+  color: #fff8e1;
+}
+body.dark .ayah.active .ayah-medal { background: var(--gold); color: #10131f; }
+body.dark .mushaf-buttons button,
+body.dark .mp-stepper button { background: rgba(255,255,255,0.085); }
+body.dark .mushaf-buttons .play-main {
+  background: linear-gradient(140deg, var(--gold), #a08a6a); color: #10131f;
+  box-shadow: 0 6px 22px rgba(0,0,0,0.42);
+}
+body.dark .mushaf-buttons .mb-small.on { background: rgba(217,185,142,0.160); }
+
+/* المشغّل والأسطح البيضاء الباقية */
+body.dark .player { background: linear-gradient(180deg, #1a1f2e, #10131f); }
+body.dark .rec-arrow {
+  background: rgba(26,31,46,0.96);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.38);
+}
+body.dark .plan-slot-count { background: rgba(255,255,255,0.105); }
+body.dark .plan-why { background: rgba(255,255,255,0.060); }
+body.dark .toast { background: rgba(26,31,46,0.96); }
+body.dark .surah-listen { background: rgba(138,166,221,0.105); }

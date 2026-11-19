@@ -302,8 +302,8 @@ const Adhan = {
     if (!bar) return;
     $("adhanText").textContent = needsTap
       ? `حان وقت صلاة ${name} — اضغط لسماع الأذان`
-      : `🕌 حان الآن وقت صلاة ${name}`;
-    $("adhanStop").textContent = needsTap ? "▶ شغّل" : "■ إيقاف";
+      : `حان الآن وقت صلاة ${name}`;
+    $("adhanStop").textContent = needsTap ? "شغّل الأذان" : "إيقاف";
     $("adhanStop").onclick = () => {
       if (needsTap) { this.el().play().catch(() => {}); this.showStop(name); }
       else { this.el().pause(); this.hideStop(); }
