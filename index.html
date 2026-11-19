@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=55">
+<link rel="stylesheet" href="css/style.css?v=58">
 </head>
 <body>
 
@@ -45,7 +45,7 @@
       <div class="countdown" id="countdown">--:--:--</div>
       <div class="countdown-sub">حتى الأذان</div>
     </div>
-    <div class="hero-loc" id="locationLabel">📍 عمّان، الأردن</div>
+    <div class="hero-loc"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21.2s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"/><circle cx="12" cy="10.2" r="2.6"/></svg><span id="locationLabel">عمّان</span></div>
   </div>
 
   <div class="times-grid" id="timesGrid"></div>
@@ -64,7 +64,7 @@
   </div>
 
   <button class="last-read hidden" id="lastReadCard">
-    <span class="last-read-icon">🔖</span>
+    <span class="last-read-icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 3.8h11a1 1 0 0 1 1 1v15.4l-6.5-4-6.5 4V4.8a1 1 0 0 1 1-1z"/></svg></span>
     <div>
       <div class="last-read-label">أكمل ما قرأت</div>
       <div class="last-read-name" id="lastReadName">—</div>
@@ -74,7 +74,7 @@
   </button>
 
   <button class="quran-cta" data-goto="page-quran">
-    <span class="quran-cta-icon">📖</span>
+    <span class="quran-cta-icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7.4C10.3 5.9 8.2 5.2 5.1 5.2v12.2c3.1 0 5.2.7 6.9 2.2 1.7-1.5 3.8-2.2 6.9-2.2V5.2c-3.1 0-5.2.7-6.9 2.2z"/><path d="M12 7.4v12.2"/></svg></span>
     <div>
       <div class="quran-cta-title">القرآن الكريم</div>
       <div class="quran-cta-sub">استمع بصوت خمسة من أجمل القرّاء</div>
@@ -84,7 +84,7 @@
 
   <div class="card-glass streak-card">
     <div class="streak-head">
-      <span>🔥 سلسلة الأيام</span>
+      <span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21.3c3.3 0 5.6-2.2 5.6-5.3 0-3.9-3.5-5.4-3.1-9.3-2 .7-3.1 2.2-3.1 3.9 0 1.1.5 1.9.5 2.6 0 .8-.6 1.4-1.3 1.4-1 0-1.6-1-1.5-2.4-1.5 1.2-2.7 2.6-2.7 4.5 0 2.7 2.3 4.6 5.6 4.6z"/></svg>سلسلة الأيام</span>
       <strong id="streakDays">0 يوم</strong>
     </div>
     <div class="streak-bar"><div id="streakFill"></div></div>
@@ -117,7 +117,7 @@
 <!-- ══════════ صفحة: القرآن الكريم ══════════ -->
 <section class="page" id="page-quran">
   <div class="page-head">
-    <h2>📖 القرآن الكريم</h2>
+    <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7.4C10.3 5.9 8.2 5.2 5.1 5.2v12.2c3.1 0 5.2.7 6.9 2.2 1.7-1.5 3.8-2.2 6.9-2.2V5.2c-3.1 0-5.2.7-6.9 2.2z"/><path d="M12 7.4v12.2"/></svg>القرآن الكريم</h2>
     <p>اضغط <b>اسم السورة</b> لتفتح المصحف وتقرأ مع الشيخ</p>
   </div>
 
@@ -129,7 +129,7 @@
 
   <!-- تابِع من حيث وقفت -->
   <button class="resume-bar hidden" id="resumeBar">
-    <span class="resume-icon">🔖</span>
+    <span class="resume-icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 3.8h11a1 1 0 0 1 1 1v15.4l-6.5-4-6.5 4V4.8a1 1 0 0 1 1-1z"/></svg></span>
     <span id="resumeText">—</span>
     <span class="resume-arrow">‹</span>
   </button>
@@ -137,7 +137,7 @@
   <!-- ورد اليوم: ماذا أقرأ الآن؟ -->
   <div class="plan-box">
     <div class="plan-head">
-      <h3>📅 ورد اليوم</h3>
+      <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.8" y="5.4" width="16.4" height="14.6" rx="2.6"/><path d="M3.8 10h16.4M8.4 3.6v3.4M15.6 3.6v3.4"/></svg>ورد اليوم</h3>
       <span id="planNow">—</span>
     </div>
     <div class="plan-slots" id="planSlots"></div>
@@ -165,7 +165,7 @@
 <div id="player" class="player hidden">
   <div class="player-grip"></div>
   <div class="player-head">
-    <div class="player-art" id="playerArt">📖</div>
+    <div class="player-art" id="playerArt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7.4C10.3 5.9 8.2 5.2 5.1 5.2v12.2c3.1 0 5.2.7 6.9 2.2 1.7-1.5 3.8-2.2 6.9-2.2V5.2c-3.1 0-5.2.7-6.9 2.2z"/><path d="M12 7.4v12.2"/></svg></div>
     <div class="player-meta">
       <div class="player-surah" id="playerSurah">—</div>
       <div class="player-reciter" id="playerReciter">—</div>
@@ -187,7 +187,7 @@
     <button id="playerNext" aria-label="السورة التالية">⏭</button>
   </div>
 
-  <button class="btn btn-outline full" id="readSurah">📖 اقرأ نص السورة</button>
+  <button class="btn btn-outline full" id="readSurah">اقرأ نص السورة</button>
   <div class="surah-text hidden" id="surahText"></div>
 </div>
 <div id="playerBackdrop" class="player-backdrop hidden"></div>
@@ -241,10 +241,11 @@
 
 <!-- ══════════ شريط التنقّل السفلي ══════════ -->
 <nav class="bottom-nav">
-  <button class="nav-btn active" data-goto="page-home"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/><path d="M9.8 20v-5.4h4.4V20"/></svg>الرئيسية</button>
-  <button class="nav-btn" data-goto="page-adhkar"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="7"/><circle cx="12" cy="6" r="1.9" fill="currentColor" stroke="none"/><circle cx="5.5" cy="16" r="1.5" fill="currentColor" stroke="none"/><circle cx="18.5" cy="16" r="1.5" fill="currentColor" stroke="none"/></svg>الأذكار</button>
-  <button class="nav-btn" data-goto="page-quran"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7.2C10.4 5.8 8.3 5.1 5.2 5.1v12.1c3.1 0 5.2.7 6.8 2.1 1.6-1.4 3.7-2.1 6.8-2.1V5.1c-3.1 0-5.2.7-6.8 2.1z"/><path d="M12 7.2v12.1"/></svg>القرآن</button>
-  <a class="nav-btn" href="tasbeeh/"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="2.6"/><circle cx="12" cy="4.7" r="1.8"/><circle cx="5.7" cy="16" r="1.8"/><circle cx="18.3" cy="16" r="1.8"/></svg>حلقة ذكر</a>
+  <button class="nav-btn active" data-goto="page-home"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.4 10.6 12 3.6l8.6 7"/><path d="M5.7 9.4V20h12.6V9.4"/><path d="M9.9 20v-5.2h4.2V20"/></svg><i>الرئيسية</i></button>
+  <button class="nav-btn" data-goto="page-adhkar"><svg class="nav-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="16.7" cy="5.5" r="1.45"/><circle cx="19.6" cy="9.5" r="1.45"/><circle cx="19.6" cy="14.5" r="1.45"/><circle cx="16.7" cy="18.5" r="1.45"/><circle cx="12.0" cy="20.0" r="1.45"/><circle cx="7.3" cy="18.5" r="1.45"/><circle cx="4.4" cy="14.5" r="1.45"/><circle cx="4.4" cy="9.5" r="1.45"/><circle cx="7.3" cy="5.5" r="1.45"/><circle cx="12.0" cy="4.0" r="2.05"/></svg><i>الأذكار</i></button>
+  <button class="nav-btn" data-goto="page-quran"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7.4C10.3 5.9 8.2 5.2 5.1 5.2v12.2c3.1 0 5.2.7 6.9 2.2 1.7-1.5 3.8-2.2 6.9-2.2V5.2c-3.1 0-5.2.7-6.9 2.2z"/><path d="M12 7.4v12.2"/><path d="M15.2 9.6h1.4M15.2 12.4h1.4M7.4 9.6h1.4M7.4 12.4h1.4"/></svg><i>القرآن</i></button>
+  <a class="nav-btn" href="ayat/"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.4" y="4.2" width="17.2" height="15.6" rx="3.4"/><path d="M7 9.3h10"/><path d="M7 13h3.1"/><path d="M14 13h3"/><circle cx="12.1" cy="13" r=".9" fill="currentColor" stroke="none"/><path d="M7 16.5h5.4"/></svg><i>أكمل الآية</i></a>
+  <a class="nav-btn" href="tasbeeh/"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="2.5"/><path d="M8.1 14.4c.9-1.2 2.3-1.8 3.9-1.8s3 .6 3.9 1.8"/><circle cx="5.3" cy="16.4" r="2"/><circle cx="18.7" cy="16.4" r="2"/><path d="M2.6 20.6c.5-.9 1.5-1.4 2.7-1.4s2.2.5 2.7 1.4"/><path d="M16 20.6c.5-.9 1.5-1.4 2.7-1.4s2.2.5 2.7 1.4"/></svg><i>حلقة ذكر</i></a>
 </nav>
 
 <!-- ══════════ لوحة ورد اليوم ══════════ -->
@@ -294,12 +295,12 @@
 
 <div id="toast" class="toast"></div>
 
-<script src="js/data.js?v=55"></script>
-<script src="js/prayertimes.js?v=55"></script>
-<script src="js/app.js?v=55"></script>
-<script src="js/mushaf.js?v=55"></script>
-<script src="js/reading-plan.js?v=55"></script>
-<script src="js/quran-extras.js?v=55"></script>
-<script src="js/ambient.js?v=55"></script>
+<script src="js/data.js?v=58"></script>
+<script src="js/prayertimes.js?v=58"></script>
+<script src="js/app.js?v=58"></script>
+<script src="js/mushaf.js?v=58"></script>
+<script src="js/reading-plan.js?v=58"></script>
+<script src="js/quran-extras.js?v=58"></script>
+<script src="js/ambient.js?v=58"></script>
 </body>
 </html>

@@ -30,7 +30,10 @@ const dhikr = id => DHIKR.find(d => d.id === id) || DHIKR[0];
 /* لا يُقال ذكرٌ في أقل من ربع ثانية: هذا سقف المعقول في الثانية */
 const MAX_RATE = 4;
 
-const path = (code, sub) => "rooms/" + code + "_t" + (sub ? "/" + sub : "");
+/* لاحقةُ الغرفة تفصل غرف الحلقة عن غرف اللعبة في القاعدة نفسها */
+let NS = "_t";
+const setNs = s => { NS = s; };
+const path = (code, sub) => "rooms/" + code + NS + (sub ? "/" + sub : "");
 const url = (code, sub) => DB + "/" + path(code, sub) + ".json";
 
 async function req(method, code, sub, body, keepalive) {
@@ -162,7 +165,7 @@ function makeBoard() {
 }
 
 window.T = {
-  DB, DHIKR, dhikr, MAX_RATE, NOW, path,
+  DB, DHIKR, dhikr, MAX_RATE, NOW, path, setNs,
   get: (c, s) => req("GET", c, s),
   put: (c, s, b) => req("PUT", c, s, b),
   patch: (c, s, b) => req("PATCH", c, s, b),

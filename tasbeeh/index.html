@@ -11,24 +11,36 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="tasbeeh.css?v=3">
+<link rel="stylesheet" href="tasbeeh.css?v=5">
 </head>
 <body>
+<header class="subbar">
+  <button class="back" id="back" aria-label="رجوع">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+  </button>
+  <div>
+    <div class="subbar-title">حلقة ذكر</div>
+    <div class="subbar-sub" id="barSub">سبّحوا معاً، كلٌّ على هاتفه</div>
+  </div>
+</header>
+
 <main class="p-app">
 
   <!-- ابدأ أو ادخل -->
   <section class="p-screen hidden" id="sStart">
     <div class="p-center">
-      <div class="p-logo">📿</div>
+      <div class="p-logo"><svg viewBox="0 0 48 48" fill="currentColor" aria-hidden="true"><circle cx="32.0" cy="10.1" r="2.70"/><circle cx="37.9" cy="16.0" r="2.70"/><circle cx="40.0" cy="24.0" r="2.70"/><circle cx="37.9" cy="32.0" r="2.70"/><circle cx="32.0" cy="37.9" r="2.70"/><circle cx="24.0" cy="40.0" r="2.70"/><circle cx="16.0" cy="37.9" r="2.70"/><circle cx="10.1" cy="32.0" r="2.70"/><circle cx="8.0" cy="24.0" r="2.70"/><circle cx="10.1" cy="16.0" r="2.70"/><circle cx="16.0" cy="10.1" r="2.70"/><circle cx="24.0" cy="8.0" r="3.90"/></svg></div>
       <h1 class="p-h1">حلقة ذكر</h1>
       <p class="p-sub">سبّحوا معاً — كل واحد على هاتفه،<br>والعدّ يتجمّع لكم جميعاً</p>
 
-      <button class="btn btn-gold" id="goNew">✨ ابدأ حلقة جديدة</button>
+      <button class="btn btn-gold" id="goNew">ابدأ حلقة جديدة</button>
 
-      <div class="p-or">أو ادخل حلقة عندك كودها</div>
-      <input class="field code-field" id="codeIn" maxlength="12" autocomplete="off"
-             autocapitalize="characters" spellcheck="false" placeholder="ABOD">
-      <button class="btn btn-ghost" id="codeGo">دخول</button>
+      <div class="join">
+        <div class="p-or">أو ادخل حلقة عندك كودها</div>
+        <input class="field code-field" id="codeIn" maxlength="12" autocomplete="off"
+               autocapitalize="characters" spellcheck="false" placeholder="ABOD">
+        <button class="btn btn-ghost" id="codeGo">دخول</button>
+      </div>
       <p class="p-err" id="startErr"></p>
     </div>
   </section>
@@ -101,7 +113,7 @@
   <!-- رسالة -->
   <section class="p-screen hidden" id="sMsg">
     <div class="p-center">
-      <div class="p-logo">📿</div>
+      <div class="p-logo"><svg viewBox="0 0 48 48" fill="currentColor" aria-hidden="true"><circle cx="32.0" cy="10.1" r="2.70"/><circle cx="37.9" cy="16.0" r="2.70"/><circle cx="40.0" cy="24.0" r="2.70"/><circle cx="37.9" cy="32.0" r="2.70"/><circle cx="32.0" cy="37.9" r="2.70"/><circle cx="24.0" cy="40.0" r="2.70"/><circle cx="16.0" cy="37.9" r="2.70"/><circle cx="10.1" cy="32.0" r="2.70"/><circle cx="8.0" cy="24.0" r="2.70"/><circle cx="10.1" cy="16.0" r="2.70"/><circle cx="16.0" cy="10.1" r="2.70"/><circle cx="24.0" cy="8.0" r="3.90"/></svg></div>
       <p class="p-sub" id="msgText"></p>
       <button class="btn btn-ghost" id="msgBack">رجوع</button>
     </div>
@@ -126,7 +138,17 @@
 
 <div class="toast hidden" id="toast"></div>
 
-<script src="shared.js?v=3"></script>
+<script>
+/* الإضاءة نفسها التي اختارها في صفحة التطبيق */
+try {
+  if (JSON.parse(localStorage.getItem("noor_theme")) === "dark") {
+    document.body.classList.add("dark");
+    var m = document.querySelector('meta[name="theme-color"]');
+    if (m) m.content = "#1a1d24";
+  }
+} catch (e) {}
+</script>
+<script src="../js/room.js?v=4"></script>
 <script>
 /* ══════════════════════════════════════════════════════════
    حلقة ذكر للعائلة — صفحة واحدة للجميع
@@ -433,8 +455,8 @@ function share(firstTime) {
     navigator.share({ title: "حلقة ذكر", text, url }).catch(() => {});
   } else {
     navigator.clipboard?.writeText(url)
-      .then(() => toast("✅ نُسخ الرابط — أرسله لأهلك"))
-      .catch(() => window.prompt("انسخ الرابط وأرسله:", url));
+      .then(() => toast("نُسخ الرابط — أرسله لأهلك"))
+      .catch(() => toast(url));   /* نافذة prompt محجوبةٌ داخل تطبيق أندرويد */
   }
   if (firstTime) toast("أرسل الرابط لأهلك ليدخلوا");
 }
@@ -506,6 +528,26 @@ $("setReset").addEventListener("click", async () => {
     toast("🔄 جولة جديدة");
   } catch (e) { toast("تعذّر — تحقّق من الإنترنت"); }
 });
+
+
+/* ─────────── سهم الرجوع ───────────
+   يرجع خطوةً داخل الصفحة إن كان فيها خطوة، وإلا خرج إلى التطبيق.
+   وكان الخروج متعذّراً: من دخل الحلقة لم يجد بابًا يخرج منه. */
+function visible() { return SCREENS.filter(s => !$(s).classList.contains("hidden"))[0] || "sStart"; }
+$("back").addEventListener("click", () => {
+  const cur = visible();
+  if (cur === "sNew" || cur === "sMsg") {
+    history.replaceState(null, "", location.pathname);
+    show("sStart");
+  } else if (cur === "sName" && st) {
+    show("sMain");
+  } else {
+    location.href = "../";
+  }
+});
+
+/* عنوان الشريط يتبع الحلقة التي أنت فيها */
+function barSub(t) { const e = $("barSub"); if (e) e.textContent = t; }
 
 const q = new URLSearchParams(location.search).get("r") || location.hash.replace("#", "");
 if (q) enter(q); else show("sStart");

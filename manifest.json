@@ -1,7 +1,7 @@
 {
   "name": "نور — أذكار وقرآن",
   "short_name": "نور",
-  "description": "أذكار الصباح والمساء، القرآن الكريم، وأوقات الصلاة",
+  "description": "أذكار الصباح والمساء، القرآن الكريم، أوقات الصلاة، ولعبة «أكمل الآية»",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",

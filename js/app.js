@@ -209,7 +209,7 @@ function renderTimes() {
 
   $("nextPrayerName").textContent = PRAYER_NAMES[next.key];
   $("nextPrayerTime").textContent = PT.fmt(next.at % 1440);
-  $("locationLabel").textContent = "📍 " + getLocation().name;
+  $("locationLabel").textContent = getLocation().name;
 
   const grid = $("timesGrid");
   grid.innerHTML = "";
@@ -656,7 +656,7 @@ const Quran = {
         <div class="surah-num">${num}</div>
         <div class="surah-info">
           <div class="surah-name">سورة ${name}</div>
-          <div class="surah-sub">${ayahs} آية · ${place} · اضغط للقراءة 📖</div>
+          <div class="surah-sub">${ayahs} آية · ${place} · اضغط للقراءة</div>
         </div>
         <button class="surah-fav${fav ? " on" : ""}" data-fav="${num}" aria-label="مفضّلة">${fav ? "★" : "☆"}</button>
         <button class="surah-listen" data-listen="${num}">${this.surah === num && !this.audio.paused ? "❚❚ إيقاف" : "استماع"}</button>`;
@@ -697,7 +697,7 @@ const Quran = {
     this.surah = num;
     $("surahText").classList.add("hidden");
     $("surahText").innerHTML = "";
-    $("readSurah").textContent = "📖 اقرأ نص السورة";
+    $("readSurah").textContent = "اقرأ نص السورة";
 
     $("playerSurah").textContent = this.surahName(num);
     $("playerReciter").textContent = this.reciter.name;
@@ -755,7 +755,7 @@ const Quran = {
     const box = $("surahText");
     if (!box.classList.contains("hidden")) {
       box.classList.add("hidden");
-      $("readSurah").textContent = "📖 اقرأ نص السورة";
+      $("readSurah").textContent = "اقرأ نص السورة";
       return;
     }
 
@@ -783,7 +783,7 @@ const Quran = {
       box.classList.remove("hidden");
       $("readSurah").textContent = "✕ أخفِ النص";
     } catch {
-      $("readSurah").textContent = "📖 اقرأ نص السورة";
+      $("readSurah").textContent = "اقرأ نص السورة";
       toast("تعذّر تحميل النص — يحتاج إنترنت");
     }
   }

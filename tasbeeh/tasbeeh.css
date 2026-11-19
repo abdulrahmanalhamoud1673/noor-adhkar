@@ -17,7 +17,7 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; }
+html, body { min-height: 100%; }
 body {
   font-family: 'Tajawal', system-ui, -apple-system, 'Segoe UI', sans-serif;
   color: var(--text);
@@ -61,7 +61,7 @@ button { cursor: pointer; }
   background: rgba(255,255,255,0.27); color: var(--text); font-size: 14px;
 }
 .chip.on { background: var(--pearl); color: #ffffff; border-color: var(--pearl); font-weight: 800; }
-.p-err { color: #f0a8a8; font-size: 13.5px; min-height: 1.2em; text-align: center; }
+.p-err { color: var(--danger); font-size: 13.5px; min-height: 1.2em; text-align: center; }
 .p-link { background: none; border: none; color: var(--pearl); font-size: 13.5px; text-decoration: underline; padding: 8px; }
 .p-or { font-size: 13px; color: var(--dim); margin-top: 6px; }
 .card-soft { background: var(--glass); border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
@@ -75,13 +75,14 @@ button { cursor: pointer; }
 
 /* ─── الهيكل ─── */
 .p-app {
-  max-width: 480px; margin: 0 auto; min-height: 100%;
+  max-width: 480px; margin: 0 auto; min-height: calc(100vh - 62px);
   display: flex; flex-direction: column;
-  padding: max(14px, env(safe-area-inset-top)) 16px max(14px, env(safe-area-inset-bottom));
+  padding: 10px 16px max(14px, env(safe-area-inset-bottom));
 }
 .p-screen { flex: 1; display: flex; flex-direction: column; }
 .p-center { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 12px; text-align: center; }
-.p-logo { font-size: 54px; }
+.p-logo { width: 62px; height: 62px; margin: 0 auto; color: var(--pearl); }
+.p-logo svg { width: 100%; height: 100%; }
 .p-h1 { font-size: 24px; font-weight: 800; }
 .p-sub { color: var(--dim); font-size: 14.5px; line-height: 1.8; }
 
@@ -119,16 +120,16 @@ button { cursor: pointer; }
 .p-bead-wrap svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .bead { fill: rgba(43,42,49,0.090); stroke: rgba(142,92,44,0.168); stroke-width: .6; transition: fill .18s; }
 .bead.on { fill: var(--pearl); stroke: none; }
-.bead.now { fill: #fff; filter: drop-shadow(0 0 3px rgba(240,235,224,.9)); }
+.bead.now { fill: var(--pearl-soft); filter: drop-shadow(0 0 4px rgba(142,92,44,.45)); }
 .bead.imam { fill: var(--moon); stroke: rgba(142,92,44,0.420); stroke-width: 1; }
 #beads.full .bead { fill: var(--pearl-soft); }
 
 .p-btn {
   position: absolute; inset: 13%; border-radius: 50%; border: none; color: var(--text);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: radial-gradient(circle at 35% 30%, #232a3e, #171b29 60%, #f7f3ec);
-  box-shadow: 0 0 0 2px rgba(142,92,44,0.210), 0 18px 46px rgba(255,255,255,0.55),
-              inset 0 2px 14px rgba(43,42,49,0.058);
+  background: radial-gradient(circle at 34% 28%, #ffffff, var(--bg-1) 58%, #e8dfd0);
+  box-shadow: 0 0 0 2px rgba(142,92,44,0.200), 0 14px 34px rgba(110,86,54,0.130),
+              inset 0 -6px 18px rgba(142,92,44,0.070), inset 0 3px 10px rgba(255,255,255,0.9);
   pointer-events: none;
 }
 .p-count { font-size: clamp(44px, 15vw, 70px); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
@@ -136,13 +137,13 @@ button { cursor: pointer; }
 .p-cycles { font-size: 12px; color: var(--pearl); margin-top: 3px; min-height: 1.1em; }
 .p-btn.p-pulse { animation: tapPulse .3s ease-out; }
 @keyframes tapPulse {
-  0%   { transform: scale(.97); box-shadow: 0 0 0 2px rgba(142,92,44,0.350), 0 0 0 0 rgba(142,92,44,0.280), 0 18px 46px rgba(255,255,255,0.55); }
-  100% { transform: scale(1);   box-shadow: 0 0 0 2px rgba(142,92,44,0.210), 0 0 0 26px rgba(142,92,44,0.000), 0 18px 46px rgba(255,255,255,0.55); }
+  0%   { transform: scale(.97); box-shadow: 0 0 0 2px rgba(142,92,44,0.420), 0 0 0 0 rgba(142,92,44,0.300), 0 14px 34px rgba(110,86,54,0.130); }
+  100% { transform: scale(1);   box-shadow: 0 0 0 2px rgba(142,92,44,0.200), 0 0 0 26px rgba(142,92,44,0.000), 0 14px 34px rgba(110,86,54,0.130); }
 }
 .plus {
   position: fixed; transform: translate(-50%, -50%); z-index: 40; pointer-events: none;
   font-weight: 800; font-size: 22px; color: var(--pearl-soft);
-  text-shadow: 0 2px 10px rgba(255,255,255,0.55); animation: rise .7s ease-out forwards;
+  text-shadow: 0 2px 10px rgba(142,92,44,0.220); animation: rise .7s ease-out forwards;
 }
 @keyframes rise { to { transform: translate(-50%, -150%); opacity: 0; } }
 
@@ -178,3 +179,75 @@ button { cursor: pointer; }
 @keyframes sheetUp { from { transform: translateY(16px); opacity: 0; } }
 .sheet-grip { width: 42px; height: 4px; border-radius: 9px; background: rgba(43,42,49,0.090); margin: 2px auto 8px; }
 .sheet-panel h3 { font-size: 17px; font-weight: 800; }
+
+
+/* ══════════════════════════════════════
+   الشريط العلويّ — بابُ الخروج
+   كان من دخل الحلقة لا يجد سبيلاً للرجوع
+   ══════════════════════════════════════ */
+.subbar {
+  position: sticky; top: 0; z-index: 55;
+  display: flex; align-items: center; gap: 10px;
+  padding: calc(10px + env(safe-area-inset-top)) 14px 10px;
+  background: color-mix(in srgb, var(--bg-1) 88%, transparent);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--line);
+}
+.back {
+  width: 40px; height: 40px; flex: 0 0 40px;
+  display: grid; place-items: center;
+  border: 1px solid var(--line); border-radius: 13px;
+  background: var(--glass); color: var(--text);
+  transition: transform .12s;
+}
+.back:active { transform: scale(.93); }
+.back svg { width: 20px; height: 20px; }
+.subbar-title { font-size: 16px; font-weight: 800; letter-spacing: -.2px; }
+.subbar-sub { font-size: 11.5px; color: var(--dim); margin-top: 1px; }
+
+/* ── واجهة البداية: أهدأ وأوضح ── */
+.p-center { gap: 14px; }
+.p-h1 { letter-spacing: -.4px; }
+.join {
+  background: var(--bg-2); border: 1px solid var(--line); border-radius: 20px;
+  padding: 16px; display: flex; flex-direction: column; gap: 10px;
+  box-shadow: 0 2px 10px rgba(80,62,40,.055), 0 12px 30px rgba(80,62,40,.055);
+}
+.p-or { margin: 0; font-weight: 600; }
+.join .btn-ghost {
+  box-shadow: none; background: transparent;
+  border: 1.5px solid var(--pearl); color: var(--pearl);
+}
+
+/* ══════════════════════════════════════
+   الليل — تتبع ما اختاره في التطبيق
+   ══════════════════════════════════════ */
+body.dark {
+  --bg-0: #14171f;
+  --bg-1: #1a1d24;
+  --bg-2: #232730;
+  --moon: #7fa6d8;
+  --pearl: #c99a63;
+  --pearl-soft: #b8864c;
+  --text: #ece7df;
+  --dim: #a09a90;
+  --line: rgba(236,231,223,0.13);
+  --glass: rgba(236,231,223,0.045);
+  --danger: #e08a81;
+  background:
+    radial-gradient(1000px 600px at 80% -10%, rgba(127,166,216,0.070), transparent 60%),
+    linear-gradient(180deg, var(--bg-1), var(--bg-0));
+  background-attachment: fixed;
+}
+body.dark .toast { background: rgba(35,39,48,.97); }
+body.dark .field { background: rgba(236,231,223,0.055); }
+body.dark .chip { background: rgba(236,231,223,0.055); }
+body.dark .fam-row { background: rgba(236,231,223,0.055); }
+body.dark .p-goal { background: rgba(236,231,223,0.090); }
+body.dark .p-btn {
+  background: radial-gradient(circle at 34% 28%, #343a46, #262b35 58%, #1b1f27);
+  box-shadow: 0 0 0 2px rgba(201,154,99,0.260), 0 14px 34px rgba(0,0,0,0.38),
+              inset 0 -6px 18px rgba(0,0,0,0.35), inset 0 3px 10px rgba(255,255,255,0.055);
+}
+body.dark .bead { fill: rgba(236,231,223,0.090); stroke: rgba(201,154,99,0.230); }
+body.dark .sheet-grip { background: rgba(236,231,223,0.150); }
