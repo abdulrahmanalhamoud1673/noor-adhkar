@@ -950,7 +950,7 @@ $("startChallenge").addEventListener("click", async () => {
   if (diag) diag.textContent = "جارٍ فتح الكاميرا…";
 
   try {
-    if (!window.Challenge) await import("./pushup-challenge.js?v=51");
+    if (!window.Challenge) await import("./pushup-challenge.js?v=52");
     await window.Challenge.start(chReps, chPhrase);
     camFullscreen("chStage", true);
   } catch (err) {
