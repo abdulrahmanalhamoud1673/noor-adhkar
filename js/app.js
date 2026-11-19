@@ -52,7 +52,19 @@ window.S = S;
 
 /* ---------- أدوات عامة ---------- */
 const $ = id => document.getElementById(id);
-const todayKey = () => new Date().toISOString().slice(0, 10);
+/**
+ * تاريخ اليوم بتوقيت الجهاز لا بتوقيت غرينتش.
+ *
+ * كان toISOString يعطي تاريخ غرينتش، وعمّان تسبقه بثلاث ساعات:
+ * فمن ذكر بين منتصف الليل والثالثة فجراً سُجّل له في يوم أمس،
+ * ثم تُصفَّر عدّاداته فجأةً عند الثالثة.
+ */
+function dayKey(d) {
+  d = d || new Date();
+  const p = n => String(n).padStart(2, "0");
+  return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+}
+const todayKey = () => dayKey();
 
 function toast(msg) {
   const t = $("toast");
@@ -334,7 +346,32 @@ function renderHijri() {
 /* ══════════════════════════════════════
    الأذكار
    ══════════════════════════════════════ */
-function counterKey(type) { return `counts_${type}_${todayKey()}`; }
+/**
+ * العدّادات محفوظةٌ بترتيب الذكر في القائمة. وقد حُذف من المساء
+ * ذكرٌ مكرّر، فانزاح ما بعده مرتبةً واحدة: لو بقي المفتاح نفسه
+ * لعُرض عدُّ ذكرٍ على ذكرٍ آخر بقيّة اليوم. فرقم القائمة في المفتاح.
+ */
+const LIST_V = { sabah: 1, masaa: 2 };
+function counterKey(type) {
+  return `counts_${LIST_V[type] || 1}_${type}_${todayKey()}`;
+}
+
+/**
+ * يمسح عدّادات الأيام الماضية.
+ *
+ * كانت تتراكم مفتاحين كل يوم ولا يمسحها شيء، فتمتلئ ذاكرة
+ * المتصفّح بأيامٍ لا يعود إليها أحد. نُبقي اليوم وأمس فقط —
+ * وأمسِ لأن السلسلة تسأل عنه.
+ */
+function pruneOldCounters() {
+  const keep = [todayKey(), dayKey(new Date(Date.now() - 86400000))];
+  try {
+    for (const k of Object.keys(localStorage)) {
+      const m = k.match(/^noor_counts_(?:\d+_)?(?:sabah|masaa)_(\d{4}-\d{2}-\d{2})$/);
+      if (m && keep.indexOf(m[1]) === -1) localStorage.removeItem(k);
+    }
+  } catch (e) {}
+}
 
 /** النوع المعروض حالياً: sabah أو masaa */
 let adhkarType = "sabah";
@@ -349,6 +386,20 @@ const ADHKAR_META = {
     when: "وقتها: من بعد العصر إلى غروب الشمس (ويمتد إلى نصف الليل)"
   }
 };
+
+/**
+ * أيُّ الأذكار الآن؟ بأوقات الصلاة لا بساعةٍ ثابتة.
+ *
+ * كان الاختيار «الساعة ١٢ فما فوق = مساء»، فيفتح أذكار المساء
+ * ظهراً والعصر لم يدخل بعد. ووقت المساء من العصر.
+ */
+function adhkarNow() {
+  try {
+    const t = currentTimes || computeTimes();
+    if (t && !isNaN(t.asr)) return nowMinutes() >= t.asr ? "masaa" : "sabah";
+  } catch (e) {}
+  return new Date().getHours() >= 15 ? "masaa" : "sabah";
+}
 
 function showAdhkar(type) {
   adhkarType = type;
@@ -459,7 +510,7 @@ function updateStreak() {
   let streak = Store.get("streak", { days: 0, last: "" });
 
   if (bothDone && streak.last !== todayKey()) {
-    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    const yesterday = dayKey(new Date(Date.now() - 86400000));
     streak = { days: streak.last === yesterday ? streak.days + 1 : 1, last: todayKey() };
     Store.set("streak", streak);
     toast("🔥 ما شاء الله! أكملت أذكار اليوم");
@@ -894,7 +945,7 @@ function boot() {
   step("المفضّلة وورد اليوم", () => QuranExtras.init());
 
   const hour = new Date().getHours();
-  step("الأذكار", () => showAdhkar(hour >= 12 ? "masaa" : "sabah"));
+  step("الأذكار", () => showAdhkar(adhkarNow()));
 
   step("العدّاد التنازلي", () => {
     setInterval(tickCountdown, 500);
@@ -911,6 +962,7 @@ function boot() {
   step("أصوات الطبيعة", () => Ambient.init());
   step("إبقاء الشاشة مضاءة", () => Wake.init());
   step("تنظيف الذاكرة المخزّنة", cleanupOldCaches);
+  step("مسح عدّادات الأيام الماضية", pruneOldCounters);
 }
 
 /**
