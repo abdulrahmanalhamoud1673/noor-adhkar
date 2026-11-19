@@ -1,16 +1,26 @@
 {
-  "name": "نور — أذكاري وصلاتي",
+  "name": "نور — أذكار وقرآن",
   "short_name": "نور",
-  "description": "أذكار الصباح والمساء، أوقات الصلاة، تعليم الصلاة بالكاميرا، وقفل وقت الصلاة",
+  "description": "أذكار الصباح والمساء، القرآن الكريم، وأوقات الصلاة",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#04150f",
-  "theme_color": "#06231c",
+  "background_color": "#f7f3ec",
+  "theme_color": "#f7f3ec",
   "lang": "ar",
   "dir": "rtl",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }

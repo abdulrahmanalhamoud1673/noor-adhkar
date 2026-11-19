@@ -84,7 +84,6 @@ const Wake = {
     if (open("mushaf")) return true;
     if (typeof Mushaf !== "undefined" && playing(Mushaf.audio)) return true;
     if (typeof Quran !== "undefined" && playing(Quran.audio)) return true;
-    if (window.Challenge && window.Challenge.running) return true;
     return false;
   },
 
@@ -148,7 +147,6 @@ function goto(pageId) {
     b.classList.toggle("active", b.dataset.goto === pageId)
   );
   window.scrollTo({ top: 0, behavior: "smooth" });
-  if (pageId !== "page-challenge") camFullscreen("chStage", false);
 
   // عرض الشريط لا يُقاس إلا بعد ظهور الصفحة، وإلا حُسبت الأسهم على عرض صفر
   if (pageId === "page-quran" && typeof Quran !== "undefined") {
@@ -792,40 +790,6 @@ const Quran = {
 };
 
 /* ══════════════════════════════════════
-   خطوات الصلاة
-   ══════════════════════════════════════ */
-function renderSteps() {
-  const c = $("stepsList");
-  c.innerHTML = "";
-  PRAYER_STEPS.forEach((st, i) => {
-    const el = document.createElement("div");
-    el.className = "step";
-    el.innerHTML = `
-      <div class="step-head">
-        <div class="step-num">${i + 1}</div>
-        <div class="step-name">${st.name}</div>
-        <div class="step-arrow">▼</div>
-      </div>
-      <div class="step-body">
-        <div class="step-how">${st.how}</div>
-        <div class="step-say">${st.sayFull}</div>
-        ${st.repeat > 1 ? `<div class="step-rep">تُقال ${st.repeat} مرات</div>` : ""}
-        <button class="step-speak">🔊 استمع</button>
-      </div>`;
-    el.querySelector(".step-head").addEventListener("click", () => el.classList.toggle("open"));
-    const speakBtn = el.querySelector(".step-speak");
-    if (st.quran) speakBtn.textContent = "🔊 استمع بصوت " + "الشيخ";
-    speakBtn.addEventListener("click", e => {
-      e.stopPropagation();
-      // ما كان قرآناً يُتلى بصوت الشيخ الحقيقي
-      if (st.quran) Voice.recite(st.quran.surah, st.quran.from, st.quran.to);
-      else Voice.speak(st.sayFull, st.audio);
-    });
-    c.appendChild(el);
-  });
-}
-
-/* ══════════════════════════════════════
    الصوت — ملف صوتي إن وُجد، وإلا نطق آلي
    ══════════════════════════════════════ */
 const Voice = {
@@ -908,85 +872,6 @@ const Voice = {
 };
 
 /* ══════════════════════════════════════
-   تحدّي الاستغفار
-   ══════════════════════════════════════ */
-let chPhrase = Store.get("chPhrase", "أَسْتَغْفِرُ اللهَ");
-let chReps = Store.get("chReps", 10);
-
-function initChallengePickers() {
-  const mark = (sel, isOn) =>
-    document.querySelectorAll(sel).forEach(b => b.classList.toggle("on", isOn(b)));
-
-  mark("#dhikrPick button", b => b.dataset.phrase === chPhrase);
-  mark("#repsPick button", b => +b.dataset.reps === chReps);
-
-  document.querySelectorAll("#dhikrPick button").forEach(b => {
-    b.addEventListener("click", () => {
-      chPhrase = b.dataset.phrase;
-      Store.set("chPhrase", chPhrase);
-      mark("#dhikrPick button", x => x.dataset.phrase === chPhrase);
-      vibrate(15);
-    });
-  });
-
-  document.querySelectorAll("#repsPick button").forEach(b => {
-    b.addEventListener("click", () => {
-      chReps = +b.dataset.reps;
-      Store.set("chReps", chReps);
-      mark("#repsPick button", x => +x.dataset.reps === chReps);
-      vibrate(15);
-    });
-  });
-}
-
-$("startChallenge").addEventListener("click", async () => {
-  const btn = $("startChallenge");
-  btn.disabled = true;
-  btn.textContent = "جارٍ التجهيز…";
-
-  $("chIntro").classList.add("hidden");
-  $("chStage").classList.remove("hidden");
-  const diag = $("chDiag");
-  if (diag) diag.textContent = "جارٍ فتح الكاميرا…";
-
-  try {
-    if (!window.Challenge) await import("./pushup-challenge.js?v=52");
-    await window.Challenge.start(chReps, chPhrase);
-    camFullscreen("chStage", true);
-  } catch (err) {
-    console.error(err);
-    camFullscreen("chStage", false);
-    $("chStage").classList.add("hidden");
-    $("chIntro").classList.remove("hidden");
-    alert("تعذّر بدء التحدّي.\n\n" + (err.message || err));
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "ابدأ التحدّي";
-  }
-});
-
-function closeChallenge() {
-  if (window.Challenge) window.Challenge.stop();
-  camFullscreen("chStage", false);
-  $("chStage").classList.add("hidden");
-  $("chIntro").classList.remove("hidden");
-}
-$("stopChallenge").addEventListener("click", closeChallenge);
-$("chExit").addEventListener("click", closeChallenge);
-
-/** يفتحه تطبيق أندرويد عبر #challenge=العدد */
-function applyChallengeRequest() {
-  const m = /challenge=(\d+)/.exec(location.hash);
-  if (!m) return;
-  chReps = +m[1];
-  const p = /phrase=([^&]+)/.exec(location.hash);
-  if (p) chPhrase = decodeURIComponent(p[1]);
-  initChallengePickers();
-  goto("page-challenge");
-  $("startChallenge").textContent = "ابدأ لفكّ الحظر";
-}
-
-/* ══════════════════════════════════════
    الإقلاع
    ══════════════════════════════════════ */
 /**
@@ -1002,7 +887,6 @@ function step(name, fn) {
 function boot() {
   step("التاريخ الهجري", renderHijri);
   step("أوقات الصلاة", renderTimes);
-  step("خطوات الصلاة", renderSteps);
   step("الصوت", () => Voice.init());
   step("القرآن", () => Quran.init());
   step("المصحف", () => Mushaf.init());
@@ -1024,23 +908,10 @@ function boot() {
   });
 
   // تنظيف عامل الخدمة القديم الذي كان يخزّن نسخاً قديمة من الملفات
-  step("تحدّي الاستغفار", initChallengePickers);
   step("أصوات الطبيعة", () => Ambient.init());
   step("إبقاء الشاشة مضاءة", () => Wake.init());
   step("تنظيف الذاكرة المخزّنة", cleanupOldCaches);
-  step("طلب فكّ القفل", applyLockRequest);
-  step("طلب التحدّي", applyChallengeRequest);
 }
-
-/**
- * تطبيق أندرويد يفتح الصفحة نفسها مع #pray=…‏ أو #challenge=…‏ .
- * حين تكون الصفحة محمّلة أصلاً لا يُعيد المتصفّح تحميلها، فلا تعمل boot()
- * ولا تُقرأ العلامة. لذلك نُنصت لتغيّر العلامة ونعيد قراءتها.
- */
-window.addEventListener("hashchange", () => {
-  step("طلب فكّ القفل", applyLockRequest);
-  step("طلب التحدّي", applyChallengeRequest);
-});
 
 /**
  * التخزين المؤقت كان يخلط ملفات قديمة بجديدة فيتعطّل التطبيق.

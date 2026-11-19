@@ -3,15 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#10131f">
+<meta name="theme-color" content="#f7f3ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1a1d24" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>نور — أذكاري وصلاتي</title>
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>نور — أذكار وقرآن</title>
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=53">
+<link rel="stylesheet" href="css/style.css?v=55">
 </head>
 <body>
 
@@ -160,71 +161,6 @@
   </p>
 </section>
 
-<!-- ══════════ صفحة: تحدّي الاستغفار ══════════ -->
-<section class="page" id="page-challenge">
-  <div class="page-head">
-    <h2>💪 تحدّي الاستغفار</h2>
-    <p>ضغطات أمام الكاميرا، ومع كل ضغطة ذكر — ثم يُفكّ الحظر</p>
-  </div>
-
-  <div class="card-glass" id="chIntro">
-    <label class="pick-label">الذكر الذي ستقوله مع كل ضغطة</label>
-    <div class="dhikr-pick" id="dhikrPick">
-      <button data-phrase="أَسْتَغْفِرُ اللهَ" class="on">أستغفر الله</button>
-      <button data-phrase="الْحَمْدُ لِلّٰهِ">الحمد لله</button>
-      <button data-phrase="اللهُ أَكْبَرُ">الله أكبر</button>
-      <button data-phrase="سُبْحَانَ اللهِ">سبحان الله</button>
-      <button data-phrase="لَا إِلٰهَ إِلَّا اللهُ">لا إله إلا الله</button>
-    </div>
-
-    <label class="pick-label">عدد الضغطات</label>
-    <div class="reps-pick" id="repsPick">
-      <button data-reps="5">٥</button>
-      <button data-reps="10" class="on">١٠</button>
-      <button data-reps="15">١٥</button>
-      <button data-reps="20">٢٠</button>
-      <button data-reps="30">٣٠</button>
-    </div>
-
-    <div class="coach-steps">
-      <div><b>1</b> ضع الهاتف <b>بالعرض (أفقياً)</b> على الأرض من جانبك — لا أمامك.</div>
-      <div><b>2</b> ابعده عنك متراً تقريباً حتى يظهر جسمك <b>من رأسك إلى قدميك</b>.</div>
-      <div><b>3</b> خذ وضع الضغط: الجسم أفقي ومفرود، والكاميرا تراك من الجنب.</div>
-      <div><b>4</b> انزل حتى ينثني مرفقك، ثم اصعد — وقل الذكر بصوت مسموع مع كل ضغطة.</div>
-    </div>
-    <p class="privacy-note">
-      💡 أعلى الكاميرا سطر يعرض الأرقام مباشرة (أفقي / مفرود / زاوية المرفق)،
-      فإن لم يَعُدّ تعرف السبب فوراً.<br>
-      🔒 الكاميرا والميكروفون داخل جهازك فقط — لا يُرفع شيء.
-    </p>
-    <button id="startChallenge" class="btn btn-gold btn-lg full">ابدأ التحدّي</button>
-  </div>
-
-  <div class="ch-stage hidden" id="chStage">
-    <button class="cam-exit" id="chExit" aria-label="خروج">✕</button>
-    <div class="video-wrap full-bleed">
-      <video id="chVideo" playsinline autoplay muted></video>
-      <canvas id="chCanvas"></canvas>
-      <div class="ch-counter" id="chCount">0 / 10</div>
-      <div class="ch-diag" id="chDiag"></div>
-    </div>
-
-    <div class="ch-phrase-box card-glass">
-      <div class="ch-label">قل مع كل ضغطة</div>
-      <div class="ch-phrase" id="chPhrase">أَسْتَغْفِرُ اللهَ</div>
-      <div class="ch-mic hidden" id="chMic">
-        <span>🎤 أسمعك</span>
-        <div class="ch-mic-bar"><div id="chMicBar"></div></div>
-      </div>
-      <div class="ch-dots" id="chDots"></div>
-      <div class="progress-bar ch-progress"><div id="chBar"></div></div>
-    </div>
-
-    <div class="ch-hint" id="chHint">…</div>
-    <button id="stopChallenge" class="btn btn-danger full">إيقاف</button>
-  </div>
-</section>
-
 <!-- ══════════ مشغّل التلاوة ══════════ -->
 <div id="player" class="player hidden">
   <div class="player-grip"></div>
@@ -358,12 +294,12 @@
 
 <div id="toast" class="toast"></div>
 
-<script src="js/data.js?v=53"></script>
-<script src="js/prayertimes.js?v=53"></script>
-<script src="js/app.js?v=53"></script>
-<script src="js/mushaf.js?v=53"></script>
-<script src="js/reading-plan.js?v=53"></script>
-<script src="js/quran-extras.js?v=53"></script>
-<script src="js/ambient.js?v=53"></script>
+<script src="js/data.js?v=55"></script>
+<script src="js/prayertimes.js?v=55"></script>
+<script src="js/app.js?v=55"></script>
+<script src="js/mushaf.js?v=55"></script>
+<script src="js/reading-plan.js?v=55"></script>
+<script src="js/quran-extras.js?v=55"></script>
+<script src="js/ambient.js?v=55"></script>
 </body>
 </html>
